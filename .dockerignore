@@ -1,0 +1,12 @@
+node_modules
+.next
+.git
+.gitignore
+*.md
+.env.local
+.vscode
+landing
+regist
+npm-debug.log
+yarn-error.log
+.DS_Store

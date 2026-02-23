@@ -1,26 +1,324 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0A3625;
+  --foreground: #000000;
+  --card: #ffffff;
+  --card-foreground: #1a1a1a;
+  --popover: #ffffff;
+  --popover-foreground: #1a1a1a;
+  --primary: #0A3625;
+  --primary-foreground: #ffffff;
+  --secondary: #e8f5ee;
+  --secondary-foreground: #0A3625;
+  --muted: #f0f0eb;
+  --muted-foreground: #6b6b6b;
+  --accent: #BE8C13;
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
+  --destructive-foreground: #fecaca;
+  --border: #d4d4c8;
+  --input: #d4d4c8;
+  --ring: #0A3625;
+  --chart-1: #0A3625;
+  --chart-2: #BE8C13;
+  --chart-3: #2d9b5a;
+  --chart-4: #1a1a1a;
+  --chart-5: #f0f0eb;
+  --radius: 0.625rem;
+  --gold: #BE8C13;
+  --gold-gradient-start: #B48E3E;
+  --gold-gradient-mid: #E6E39A;
+  --gold-gradient-end: #B48E3E;
+  --green: #0A3625;
+  --green-light: #e8f5ee;
+}
+
+/* Override foreground color for autocomplete elements */
+.tt-menu,
+.tt-menu *,
+.tt-dataset,
+.tt-dataset *,
+.tt-suggestion,
+.tt-suggestion *,
+.tt-highlight,
+.twitter-typeahead span,
+.twitter-typeahead pre {
+  color: #000000 !important;
 }
 
 @theme inline {
+  --font-sans: var(--font-sarabun), 'Geist', sans-serif;
+  --font-mono: 'Geist Mono', 'Geist Mono Fallback';
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-gold: var(--gold);
+  --color-green: var(--green);
+  --color-green-light: var(--green-light);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+html {
+  scroll-behavior: smooth;
+}
+
+.cinematic-gold-title {
+  background: linear-gradient(
+    90deg,
+    #8B6914 0%,
+    #B8860B 20%,
+    #DAA520 35%,
+    #FFD700 45%,
+    #FFFACD 50%,
+    #FFD700 55%,
+    #DAA520 65%,
+    #B8860B 80%,
+    #8B6914 100%
+  );
+  
+  background-image: 
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      transparent 30%,
+      rgba(255, 255, 255, 0.3) 45%,
+      rgba(255, 255, 255, 0.6) 50%,
+      rgba(255, 255, 255, 0.3) 55%,
+      transparent 70%,
+      transparent 100%
+    ),
+    linear-gradient(
+      90deg,
+      #8B6914 0%,
+      #B8860B 20%,
+      #DAA520 35%,
+      #FFD700 45%,
+      #FFFACD 50%,
+      #FFD700 55%,
+      #DAA520 65%,
+      #B8860B 80%,
+      #8B6914 100%
+    );
+  
+  background-size: 200% 100%, 100% 100%;
+  background-position: -200% center, center center;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  
+  text-shadow:
+    0 1px 0 rgba(255, 250, 205, 0.8),
+    0 2px 0 rgba(255, 250, 205, 0.4),
+    0 3px 2px rgba(107, 79, 15, 0.6),
+    0 5px 4px rgba(107, 79, 15, 0.4),
+    0 8px 8px rgba(107, 79, 15, 0.3),
+    0 0 20px rgba(218, 165, 32, 0.5),
+    0 0 40px rgba(218, 165, 32, 0.3),
+    0 0 60px rgba(218, 165, 32, 0.2);
+  
+  animation: cinematic-shimmer 4s linear infinite;
+  will-change: background-position;
+}
+
+@keyframes cinematic-shimmer {
+  0% {
+    background-position: -200% center, center center;
+  }
+  100% {
+    background-position: 200% center, center center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cinematic-gold-title {
+    animation: none;
+    background-position: center center, center center;
+  }
+}
+
+
+/* Placeholder styles for form inputs */
+input::placeholder,
+textarea::placeholder {
+  color: #9CA3AF !important;
+  opacity: 1 !important;
+}
+
+input::-webkit-input-placeholder,
+textarea::-webkit-input-placeholder {
+  color: #9CA3AF !important;
+  opacity: 1 !important;
+}
+
+input::-moz-placeholder,
+textarea::-moz-placeholder {
+  color: #9CA3AF !important;
+  opacity: 1 !important;
+}
+
+input:-ms-input-placeholder,
+textarea:-ms-input-placeholder {
+  color: #9CA3AF !important;
+  opacity: 1 !important;
+}
+
+/* Input text color - black */
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="number"],
+input[type="file"],
+textarea,
+select {
+  color: #111827 !important; /* text-gray-900 - black */
+}
+
+/* All inputs should have black text when filled */
+input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]),
+textarea,
+select {
+  color: #111827 !important;
+}
+
+/* Select placeholder (first option) */
+select option[value=""],
+select option:first-child {
+  color: #9CA3AF !important;
+}
+
+select:invalid,
+select[value=""] {
+  color: #9CA3AF !important;
+}
+
+select:valid {
+  color: #111827 !important;
+}
+
+/* Thai address autocomplete dropdown styling - jquery.Thailand.js */
+/* Ultra strong selectors to override jQuery UI default styles */
+.ui-autocomplete,
+.ui-autocomplete *,
+.ui-autocomplete li,
+.ui-autocomplete li *,
+.ui-autocomplete div,
+.ui-autocomplete div *,
+.ui-autocomplete span,
+.ui-autocomplete a {
+  color: #000000 !important;
+  background-color: white !important;
+  font-family: inherit !important;
+  font-weight: 600 !important;
+  opacity: 1 !important;
+}
+
+.ui-menu-item,
+.ui-menu-item *,
+.ui-menu-item-wrapper,
+.ui-menu-item-wrapper *,
+.ui-menu-item div,
+.ui-menu-item div *,
+.ui-menu-item span,
+.ui-menu-item a {
+  color: #000000 !important;
+  background-color: white !important;
+  font-weight: 600 !important;
+  opacity: 1 !important;
+}
+
+/* Hover and active states - keep text black */
+.ui-menu-item:hover,
+.ui-menu-item:hover *,
+.ui-menu-item-wrapper:hover,
+.ui-menu-item-wrapper:hover *,
+.ui-state-active,
+.ui-state-active *,
+.ui-state-focus,
+.ui-state-focus *,
+.ui-state-hover,
+.ui-state-hover * {
+  background-color: #e5e7eb !important;
+  color: #000000 !important;
+  font-weight: 600 !important;
+  opacity: 1 !important;
+}
+
+/* jQuery UI autocomplete container */
+.ui-autocomplete {
+  max-height: 300px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 9999 !important;
+  border: 1px solid #d4d4d4 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+  background-color: white !important;
+}
+
+.ui-menu .ui-menu-item {
+  color: #000000 !important;
+  padding: 10px 12px !important;
+  cursor: pointer !important;
+  list-style: none !important;
+  font-weight: 600 !important;
+  opacity: 1 !important;
+}
+
+/* Force all text inside autocomplete to be pure black with maximum specificity */
+.ui-autocomplete .ui-menu-item a,
+.ui-autocomplete .ui-menu-item span,
+.ui-autocomplete .ui-menu-item div,
+.ui-autocomplete .ui-menu-item strong,
+.ui-autocomplete .ui-menu-item-wrapper a,
+.ui-autocomplete .ui-menu-item-wrapper span,
+.ui-autocomplete .ui-menu-item-wrapper div,
+.ui-autocomplete .ui-menu-item-wrapper strong {
+  color: #000000 !important;
+  text-decoration: none !important;
+  font-weight: 600 !important;
+  opacity: 1 !important;
+}
+
+/* Override any jQuery UI theme colors */
+.ui-widget-content,
+.ui-widget-content * {
+  color: #000000 !important;
+  font-weight: 600 !important;
+  opacity: 1 !important;
 }

@@ -1,36 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Thai Music Platform
 
-## Getting Started
+โครงการคัดเลือกกิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์
 
-First, run the development server:
+## โครงสร้างโปรเจค
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```
+app/
+├── (front)/              # Frontend pages
+│   ├── page.tsx         # Home (from landing)
+│   ├── about/           # เกี่ยวกับโครงการ
+│   ├── certificate/     # ใบรับรอง
+│   ├── download/        # ดาวน์โหลดเอกสาร
+│   ├── contract/        # สัญญา
+│   └── regist-100/      # ลงทะเบียน (from regist)
+├── (admin)/             # Admin pages
+│   ├── login/           # เข้าสู่ระบบ
+│   ├── forgetpassword/  # ลืมรหัสผ่าน
+│   └── dashboard/       # แดชบอร์ด
+│       ├── members/     # จัดการสมาชิก
+│       ├── allschools/  # โรงเรียนทั้งหมด
+│       └── schools/[id]/ # รายละเอียดโรงเรียน
+├── api/                 # API routes
+├── components/          # Shared components (from landing)
+├── components-regist/   # Registration components (from regist)
+├── hooks/               # Custom hooks
+├── lib/                 # Utilities
+└── globals.css          # Global styles
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## การติดตั้ง
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# Install dependencies
+npm install
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Copy environment variables
+cp .env.local.example .env.local
 
-## Learn More
+# Run development server
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Scripts
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `npm run dev` - เริ่ม development server
+- `npm run build` - Build สำหรับ production
+- `npm start` - เริ่ม production server
+- `npm run lint` - ตรวจสอบ code
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## เทคโนโลยีที่ใช้
 
-## Deploy on Vercel
+- Next.js 16 (App Router)
+- React 19
+- TypeScript
+- Tailwind CSS 4
+- MongoDB
+- Radix UI
+- React Hook Form
+- Zod
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## หมายเหตุ
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+โปรเจคนี้รวม 2 โปรเจคเดิม:
+- `/landing` → `app/(front)/` (home page และ components)
+- `/regist` → `app/(front)/regist-100/` และ `app/api/register-100/`

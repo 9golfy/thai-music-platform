@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test jquery.Thailand.js</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="https://earthchie.github.io/jquery.Thailand.js/jquery.Thailand.js/dist/jquery.Thailand.min.css">
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test jquery.Thailand.js Auto-Complete</h1>
+    
+    <div id="status"></div>
+    
+    <div class="form-group">
+        <label>ตำบล/แขวง</label>
+        <input type="text" id="district" placeholder="พิมพ์ตำบล/แขวง">
+    </div>
+    
+    <div class="form-group">
+        <label>อำเภอ/เขต</label>
+        <input type="text" id="amphoe" placeholder="พิมพ์อำเภอ/เขต">
+    </div>
+    
+    <div class="form-group">
+        <label>จังหวัด</label>
+        <input type="text" id="province" placeholder="พิมพ์จังหวัด">
+    </div>
+    
+    <div class="form-group">
+        <label>รหัสไปรษณีย์</label>
+        <input type="text" id="zipcode" placeholder="พิมพ์รหัสไปรษณีย์">
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://earthchie.github.io/jquery.Thailand.js/jquery.Thailand.js/dependencies/JQL.min.js"></script>
+    <script src="https://earthchie.github.io/jquery.Thailand.js/jquery.Thailand.js/dependencies/typeahead.bundle.js"></script>
+    <script src="https://earthchie.github.io/jquery.Thailand.js/jquery.Thailand.js/dist/jquery.Thailand.min.js"></script>
+    
+    <script>
+        function showStatus(message, isError = false) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.className = 'status ' + (isError ? 'error' : 'success');
+            statusDiv.textContent = message;
+            console.log(message);
+        }
+
+        // Wait for all scripts to load
+        window.addEventListener('load', function() {
+            console.log('=== Testing jquery.Thailand.js ===');
+            
+            // Check jQuery
+            if (typeof jQuery === 'undefined') {
+                showStatus('❌ jQuery not loaded', true);
+                return;
+            }
+            console.log('✅ jQuery loaded:', jQuery.fn.jquery);
+            
+            // Check $.Thailand
+            if (typeof jQuery.Thailand !== 'function') {
+                showStatus('❌ $.Thailand not loaded', true);
+                return;
+            }
+            console.log('✅ $.Thailand loaded');
+            
+            // Check elements
+            console.log('Elements found:');
+            console.log('  #district:', $('#district').length);
+            console.log('  #amphoe:', $('#amphoe').length);
+            console.log('  #province:', $('#province').length);
+            console.log('  #zipcode:', $('#zipcode').length);
+            
+            // Initialize
+            try {
+                $.Thailand({
+                    database: 'https://earthchie.github.io/jquery.Thailand.js/jquery.Thailand.js/database/db.json',
+                    $district: $('#district'),
+                    $amphoe: $('#amphoe'),
+                    $province: $('#province'),
+                    $zipcode: $('#zipcode'),
+                    onDataFill: function(data) {
+                        console.log('📍 Auto-filled:', data);
+                        showStatus('✅ Auto-complete working! Data: ' + JSON.stringify(data));
+                    },
+                    onLoad: function() {
+                        console.log('✅ Database loaded');
+                        showStatus('✅ jquery.Thailand.js initialized successfully! Try typing in any field.');
+                    }
+                });
+            } catch (error) {
+                console.error('❌ Initialization error:', error);
+                showStatus('❌ Error: ' + error.message, true);
+            }
+        });
+    </script>
+</body>
+</html>
