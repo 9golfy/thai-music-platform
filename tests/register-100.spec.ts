@@ -7,7 +7,7 @@ test.describe('Register 100 Form E2E - Complete Test', () => {
     test.setTimeout(180000);
     
     // Navigate to form
-    await page.goto('http://localhost:3000/regist-100');
+    await page.goto('http://localhost:3000/regist100');
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(2000);
 

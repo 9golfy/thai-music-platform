@@ -16,7 +16,7 @@ test.describe('Full Registration Form Test', () => {
     console.log('🚀 Starting full form test...');
     
     // Navigate to form
-    await page.goto('http://localhost:3000/regist-100');
+    await page.goto('http://localhost:3000/regist100');
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(2000);
 

@@ -1,0 +1,580 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e3]:
+    - navigation [ref=e4]:
+      - generic [ref=e6]:
+        - link "โลโก้โครงการ โครงการคัดเลือกสถานศึกษา ตามกิจกรรมโรงเรียนดนตรีไทย ๑๐๐ เปอร์เซ็นต์" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - img "โลโก้โครงการ" [ref=e8]
+          - generic [ref=e9]:
+            - generic [ref=e10]: โครงการคัดเลือกสถานศึกษา
+            - generic [ref=e11]: ตามกิจกรรมโรงเรียนดนตรีไทย ๑๐๐ เปอร์เซ็นต์
+        - generic [ref=e12]:
+          - link "หน้าแรก" [ref=e13] [cursor=pointer]:
+            - /url: /
+          - link "ข้อมูลโครงการ" [ref=e14] [cursor=pointer]:
+            - /url: /about
+          - link "ประกาศนียบัตร" [ref=e15] [cursor=pointer]:
+            - /url: /certificate
+          - link "ดาวน์โหลด" [ref=e16] [cursor=pointer]:
+            - /url: /download
+          - link "ติดต่อ" [ref=e17] [cursor=pointer]:
+            - /url: /contract
+        - link "เข้าระบบ" [ref=e18] [cursor=pointer]:
+          - /url: /login
+          - img [ref=e19]
+          - text: เข้าระบบ
+    - main [ref=e22]:
+      - generic [ref=e24]:
+        - generic [ref=e27]:
+          - generic [ref=e28]:
+            - generic [ref=e30]: app_registration
+            - generic [ref=e31]:
+              - heading "แบบฟอร์มลงทะเบียน" [level=2] [ref=e32]
+              - paragraph [ref=e33]: ประเภทโรงเรียนสนับสนุนและส่งเสริมดนตรีไทย
+          - generic [ref=e34]:
+            - paragraph [ref=e35]: ความคืบหน้า (PROGRESS)
+            - paragraph [ref=e36]: 4 / 8
+        - generic [ref=e39]:
+          - button "1 ข้อมูลพื้นฐาน" [ref=e41]:
+            - generic [ref=e42]: "1"
+            - generic [ref=e43]: ข้อมูลพื้นฐาน
+          - button "2 ผู้บริหาร" [ref=e46]:
+            - generic [ref=e47]: "2"
+            - generic [ref=e48]: ผู้บริหาร
+          - button "3 แผนการสอน" [ref=e51]:
+            - generic [ref=e52]: "3"
+            - generic [ref=e53]: แผนการสอน
+          - button "4 ผู้สอนดนตรีไทย" [ref=e56]:
+            - generic [ref=e57]: "4"
+            - generic [ref=e58]: ผู้สอนดนตรีไทย
+          - button "5 เครื่องดนตรี" [ref=e61]:
+            - generic [ref=e62]: "5"
+            - generic [ref=e63]: เครื่องดนตรี
+          - button "6 การสนับสนุน" [ref=e66]:
+            - generic [ref=e67]: "6"
+            - generic [ref=e68]: การสนับสนุน
+          - button "7 การเผยแพร่" [ref=e71]:
+            - generic [ref=e72]: "7"
+            - generic [ref=e73]: การเผยแพร่
+          - button "8 ประชาสัมพันธ์" [ref=e76]:
+            - generic [ref=e77]: "8"
+            - generic [ref=e78]: ประชาสัมพันธ์
+        - generic [ref=e80]:
+          - generic [ref=e81]:
+            - generic [ref=e82]:
+              - heading "ผู้สอนดนตรีไทย / ผู้รับผิดชอบ" [level=3] [ref=e84]
+              - generic [ref=e85]:
+                - generic [ref=e86]:
+                  - generic [ref=e87]:
+                    - heading "ครูคนที่ 1" [level=4] [ref=e88]
+                    - button "ลบ" [ref=e89]
+                  - generic [ref=e90]:
+                    - generic [ref=e91]: คุณลักษณะครูผู้สอน
+                    - combobox [ref=e92]:
+                      - option "เลือกคุณลักษณะ"
+                      - option "ครูผู้สอนดนตรีในโรงเรียนที่สำเร็จการศึกษาสาขาวิชาดนตรีไทย" [selected]
+                      - option "ครูภูมิปัญญาในท้องถิ่น"
+                      - option "ผู้ทรงคุณวุฒิ ด้านการสอนดนตรีไทย"
+                      - option "วิทยากร/บุคคลภายนอก ที่มาร่วมสอนดนตรีไทยในปัจจุบัน"
+                  - generic [ref=e93]:
+                    - generic [ref=e94]: ชื่อ-นามสกุล
+                    - textbox [ref=e95]: นายครู ทดสอบ 1
+                  - generic [ref=e96]:
+                    - generic [ref=e97]: ตำแหน่ง
+                    - textbox [ref=e98]: ครูดนตรีไทย
+                  - generic [ref=e99]:
+                    - generic [ref=e100]: วุฒิการศึกษา
+                    - textbox [ref=e101]
+                  - generic [ref=e102]:
+                    - generic [ref=e103]: โทรศัพท์
+                    - textbox [ref=e104]: "0800000000"
+                  - generic [ref=e105]:
+                    - generic [ref=e106]: อีเมล
+                    - textbox [ref=e107]
+                  - generic [ref=e108]:
+                    - generic [ref=e109]: รูปภาพครู (สูงสุด 1MB, รองรับ jpg/jpeg/png)
+                    - generic [ref=e110]:
+                      - generic [ref=e111] [cursor=pointer]: Choose File
+                      - generic [ref=e112]: teacher1.jpg
+                    - generic [ref=e113]:
+                      - generic [ref=e114]: teacher1.jpg (518.57 KB)
+                      - button "ลบ" [ref=e115]
+                - generic [ref=e116]:
+                  - generic [ref=e117]:
+                    - heading "ครูคนที่ 2" [level=4] [ref=e118]
+                    - button "ลบ" [ref=e119]
+                  - generic [ref=e120]:
+                    - generic [ref=e121]: คุณลักษณะครูผู้สอน
+                    - combobox [ref=e122]:
+                      - option "เลือกคุณลักษณะ"
+                      - option "ครูผู้สอนดนตรีในโรงเรียนที่สำเร็จการศึกษาสาขาวิชาดนตรีไทย" [selected]
+                      - option "ครูภูมิปัญญาในท้องถิ่น"
+                      - option "ผู้ทรงคุณวุฒิ ด้านการสอนดนตรีไทย"
+                      - option "วิทยากร/บุคคลภายนอก ที่มาร่วมสอนดนตรีไทยในปัจจุบัน"
+                  - generic [ref=e123]:
+                    - generic [ref=e124]: ชื่อ-นามสกุล
+                    - textbox [ref=e125]: นายครู ทดสอบ 2
+                  - generic [ref=e126]:
+                    - generic [ref=e127]: ตำแหน่ง
+                    - textbox [ref=e128]: ครูดนตรีไทย
+                  - generic [ref=e129]:
+                    - generic [ref=e130]: วุฒิการศึกษา
+                    - textbox [ref=e131]
+                  - generic [ref=e132]:
+                    - generic [ref=e133]: โทรศัพท์
+                    - textbox [ref=e134]: "0800000001"
+                  - generic [ref=e135]:
+                    - generic [ref=e136]: อีเมล
+                    - textbox [ref=e137]
+                  - generic [ref=e138]:
+                    - generic [ref=e139]: รูปภาพครู (สูงสุด 1MB, รองรับ jpg/jpeg/png)
+                    - generic [ref=e140]:
+                      - generic [ref=e141] [cursor=pointer]: Choose File
+                      - generic [ref=e142]: teacher2.jpg
+                    - generic [ref=e143]:
+                      - generic [ref=e144]: teacher2.jpg (518.57 KB)
+                      - button "ลบ" [ref=e145]
+                - generic [ref=e146]:
+                  - generic [ref=e147]:
+                    - heading "ครูคนที่ 3" [level=4] [ref=e148]
+                    - button "ลบ" [ref=e149]
+                  - generic [ref=e150]:
+                    - generic [ref=e151]: คุณลักษณะครูผู้สอน
+                    - combobox [ref=e152]:
+                      - option "เลือกคุณลักษณะ"
+                      - option "ครูผู้สอนดนตรีในโรงเรียนที่สำเร็จการศึกษาสาขาวิชาดนตรีไทย" [selected]
+                      - option "ครูภูมิปัญญาในท้องถิ่น"
+                      - option "ผู้ทรงคุณวุฒิ ด้านการสอนดนตรีไทย"
+                      - option "วิทยากร/บุคคลภายนอก ที่มาร่วมสอนดนตรีไทยในปัจจุบัน"
+                  - generic [ref=e153]:
+                    - generic [ref=e154]: ชื่อ-นามสกุล
+                    - textbox [ref=e155]: นายครู ทดสอบ 3
+                  - generic [ref=e156]:
+                    - generic [ref=e157]: ตำแหน่ง
+                    - textbox [ref=e158]: ครูดนตรีไทย
+                  - generic [ref=e159]:
+                    - generic [ref=e160]: วุฒิการศึกษา
+                    - textbox [ref=e161]
+                  - generic [ref=e162]:
+                    - generic [ref=e163]: โทรศัพท์
+                    - textbox [ref=e164]: "0800000002"
+                  - generic [ref=e165]:
+                    - generic [ref=e166]: อีเมล
+                    - textbox [ref=e167]
+                  - generic [ref=e168]:
+                    - generic [ref=e169]: รูปภาพครู (สูงสุด 1MB, รองรับ jpg/jpeg/png)
+                    - generic [ref=e170]:
+                      - generic [ref=e171] [cursor=pointer]: Choose File
+                      - generic [ref=e172]: teacher3.jpg
+                    - generic [ref=e173]:
+                      - generic [ref=e174]: teacher3.jpg (518.57 KB)
+                      - button "ลบ" [ref=e175]
+                - generic [ref=e176]:
+                  - generic [ref=e177]:
+                    - heading "ครูคนที่ 4" [level=4] [ref=e178]
+                    - button "ลบ" [ref=e179]
+                  - generic [ref=e180]:
+                    - generic [ref=e181]: คุณลักษณะครูผู้สอน
+                    - combobox [ref=e182]:
+                      - option "เลือกคุณลักษณะ"
+                      - option "ครูผู้สอนดนตรีในโรงเรียนที่สำเร็จการศึกษาสาขาวิชาดนตรีไทย" [selected]
+                      - option "ครูภูมิปัญญาในท้องถิ่น"
+                      - option "ผู้ทรงคุณวุฒิ ด้านการสอนดนตรีไทย"
+                      - option "วิทยากร/บุคคลภายนอก ที่มาร่วมสอนดนตรีไทยในปัจจุบัน"
+                  - generic [ref=e183]:
+                    - generic [ref=e184]: ชื่อ-นามสกุล
+                    - textbox [ref=e185]: นายครู ทดสอบ 4
+                  - generic [ref=e186]:
+                    - generic [ref=e187]: ตำแหน่ง
+                    - textbox [ref=e188]: ครูดนตรีไทย
+                  - generic [ref=e189]:
+                    - generic [ref=e190]: วุฒิการศึกษา
+                    - textbox [ref=e191]
+                  - generic [ref=e192]:
+                    - generic [ref=e193]: โทรศัพท์
+                    - textbox [ref=e194]: "0800000003"
+                  - generic [ref=e195]:
+                    - generic [ref=e196]: อีเมล
+                    - textbox [ref=e197]
+                  - generic [ref=e198]:
+                    - generic [ref=e199]: รูปภาพครู (สูงสุด 1MB, รองรับ jpg/jpeg/png)
+                    - generic [ref=e200]:
+                      - generic [ref=e201] [cursor=pointer]: Choose File
+                      - generic [ref=e202]: teacher4.jpg
+                    - generic [ref=e203]:
+                      - generic [ref=e204]: teacher4.jpg (518.57 KB)
+                      - button "ลบ" [ref=e205]
+                - generic [ref=e206]:
+                  - generic [ref=e207]:
+                    - heading "ครูคนที่ 5" [level=4] [ref=e208]
+                    - button "ลบ" [ref=e209]
+                  - generic [ref=e210]:
+                    - generic [ref=e211]: คุณลักษณะครูผู้สอน
+                    - combobox [ref=e212]:
+                      - option "เลือกคุณลักษณะ"
+                      - option "ครูผู้สอนดนตรีในโรงเรียนที่สำเร็จการศึกษาสาขาวิชาดนตรีไทย" [selected]
+                      - option "ครูภูมิปัญญาในท้องถิ่น"
+                      - option "ผู้ทรงคุณวุฒิ ด้านการสอนดนตรีไทย"
+                      - option "วิทยากร/บุคคลภายนอก ที่มาร่วมสอนดนตรีไทยในปัจจุบัน"
+                  - generic [ref=e213]:
+                    - generic [ref=e214]: ชื่อ-นามสกุล
+                    - textbox [ref=e215]: นายครู ทดสอบ 5
+                  - generic [ref=e216]:
+                    - generic [ref=e217]: ตำแหน่ง
+                    - textbox [ref=e218]: ครูดนตรีไทย
+                  - generic [ref=e219]:
+                    - generic [ref=e220]: วุฒิการศึกษา
+                    - textbox [ref=e221]
+                  - generic [ref=e222]:
+                    - generic [ref=e223]: โทรศัพท์
+                    - textbox [ref=e224]: "0800000004"
+                  - generic [ref=e225]:
+                    - generic [ref=e226]: อีเมล
+                    - textbox [ref=e227]
+                  - generic [ref=e228]:
+                    - generic [ref=e229]: รูปภาพครู (สูงสุด 1MB, รองรับ jpg/jpeg/png)
+                    - generic [ref=e230]:
+                      - generic [ref=e231] [cursor=pointer]: Choose File
+                      - generic [ref=e232]: teacher5.jpg
+                    - generic [ref=e233]:
+                      - generic [ref=e234]: teacher5.jpg (518.57 KB)
+                      - button "ลบ" [ref=e235]
+                - generic [ref=e236]:
+                  - generic [ref=e237]:
+                    - heading "ครูคนที่ 6" [level=4] [ref=e238]
+                    - button "ลบ" [ref=e239]
+                  - generic [ref=e240]:
+                    - generic [ref=e241]: คุณลักษณะครูผู้สอน
+                    - combobox [ref=e242]:
+                      - option "เลือกคุณลักษณะ"
+                      - option "ครูผู้สอนดนตรีในโรงเรียนที่สำเร็จการศึกษาสาขาวิชาดนตรีไทย" [selected]
+                      - option "ครูภูมิปัญญาในท้องถิ่น"
+                      - option "ผู้ทรงคุณวุฒิ ด้านการสอนดนตรีไทย"
+                      - option "วิทยากร/บุคคลภายนอก ที่มาร่วมสอนดนตรีไทยในปัจจุบัน"
+                  - generic [ref=e243]:
+                    - generic [ref=e244]: ชื่อ-นามสกุล
+                    - textbox [ref=e245]: นายครู ทดสอบ 6
+                  - generic [ref=e246]:
+                    - generic [ref=e247]: ตำแหน่ง
+                    - textbox [ref=e248]: ครูดนตรีไทย
+                  - generic [ref=e249]:
+                    - generic [ref=e250]: วุฒิการศึกษา
+                    - textbox [ref=e251]
+                  - generic [ref=e252]:
+                    - generic [ref=e253]: โทรศัพท์
+                    - textbox [ref=e254]: "0800000005"
+                  - generic [ref=e255]:
+                    - generic [ref=e256]: อีเมล
+                    - textbox [ref=e257]
+                  - generic [ref=e258]:
+                    - generic [ref=e259]: รูปภาพครู (สูงสุด 1MB, รองรับ jpg/jpeg/png)
+                    - generic [ref=e260]:
+                      - generic [ref=e261] [cursor=pointer]: Choose File
+                      - generic [ref=e262]: teacher6.jpg
+                    - generic [ref=e263]:
+                      - generic [ref=e264]: teacher6.jpg (518.57 KB)
+                      - button "ลบ" [ref=e265]
+                - generic [ref=e266]:
+                  - generic [ref=e267]:
+                    - heading "ครูคนที่ 7" [level=4] [ref=e268]
+                    - button "ลบ" [ref=e269]
+                  - generic [ref=e270]:
+                    - generic [ref=e271]: คุณลักษณะครูผู้สอน
+                    - combobox [ref=e272]:
+                      - option "เลือกคุณลักษณะ"
+                      - option "ครูผู้สอนดนตรีในโรงเรียนที่สำเร็จการศึกษาสาขาวิชาดนตรีไทย" [selected]
+                      - option "ครูภูมิปัญญาในท้องถิ่น"
+                      - option "ผู้ทรงคุณวุฒิ ด้านการสอนดนตรีไทย"
+                      - option "วิทยากร/บุคคลภายนอก ที่มาร่วมสอนดนตรีไทยในปัจจุบัน"
+                  - generic [ref=e273]:
+                    - generic [ref=e274]: ชื่อ-นามสกุล
+                    - textbox [ref=e275]: นายครู ทดสอบ 7
+                  - generic [ref=e276]:
+                    - generic [ref=e277]: ตำแหน่ง
+                    - textbox [ref=e278]: ครูดนตรีไทย
+                  - generic [ref=e279]:
+                    - generic [ref=e280]: วุฒิการศึกษา
+                    - textbox [ref=e281]
+                  - generic [ref=e282]:
+                    - generic [ref=e283]: โทรศัพท์
+                    - textbox [ref=e284]: "0800000006"
+                  - generic [ref=e285]:
+                    - generic [ref=e286]: อีเมล
+                    - textbox [ref=e287]
+                  - generic [ref=e288]:
+                    - generic [ref=e289]: รูปภาพครู (สูงสุด 1MB, รองรับ jpg/jpeg/png)
+                    - generic [ref=e290]:
+                      - generic [ref=e291] [cursor=pointer]: Choose File
+                      - generic [ref=e292]: teacher7.jpg
+                    - generic [ref=e293]:
+                      - generic [ref=e294]: teacher7.jpg (518.57 KB)
+                      - button "ลบ" [ref=e295]
+                - generic [ref=e296]:
+                  - generic [ref=e297]:
+                    - heading "ครูคนที่ 8" [level=4] [ref=e298]
+                    - button "ลบ" [ref=e299]
+                  - generic [ref=e300]:
+                    - generic [ref=e301]: คุณลักษณะครูผู้สอน
+                    - combobox [ref=e302]:
+                      - option "เลือกคุณลักษณะ"
+                      - option "ครูผู้สอนดนตรีในโรงเรียนที่สำเร็จการศึกษาสาขาวิชาดนตรีไทย" [selected]
+                      - option "ครูภูมิปัญญาในท้องถิ่น"
+                      - option "ผู้ทรงคุณวุฒิ ด้านการสอนดนตรีไทย"
+                      - option "วิทยากร/บุคคลภายนอก ที่มาร่วมสอนดนตรีไทยในปัจจุบัน"
+                  - generic [ref=e303]:
+                    - generic [ref=e304]: ชื่อ-นามสกุล
+                    - textbox [ref=e305]: นายครู ทดสอบ 8
+                  - generic [ref=e306]:
+                    - generic [ref=e307]: ตำแหน่ง
+                    - textbox [ref=e308]: ครูดนตรีไทย
+                  - generic [ref=e309]:
+                    - generic [ref=e310]: วุฒิการศึกษา
+                    - textbox [ref=e311]
+                  - generic [ref=e312]:
+                    - generic [ref=e313]: โทรศัพท์
+                    - textbox [ref=e314]: "0800000007"
+                  - generic [ref=e315]:
+                    - generic [ref=e316]: อีเมล
+                    - textbox [ref=e317]
+                  - generic [ref=e318]:
+                    - generic [ref=e319]: รูปภาพครู (สูงสุด 1MB, รองรับ jpg/jpeg/png)
+                    - generic [ref=e320]:
+                      - generic [ref=e321] [cursor=pointer]: Choose File
+                      - generic [ref=e322]: teacher8.jpg
+                    - generic [ref=e323]:
+                      - generic [ref=e324]: teacher8.jpg (518.57 KB)
+                      - button "ลบ" [ref=e325]
+                - generic [ref=e326]:
+                  - generic [ref=e327]:
+                    - heading "ครูคนที่ 9" [level=4] [ref=e328]
+                    - button "ลบ" [ref=e329]
+                  - generic [ref=e330]:
+                    - generic [ref=e331]: คุณลักษณะครูผู้สอน
+                    - combobox [ref=e332]:
+                      - option "เลือกคุณลักษณะ"
+                      - option "ครูผู้สอนดนตรีในโรงเรียนที่สำเร็จการศึกษาสาขาวิชาดนตรีไทย" [selected]
+                      - option "ครูภูมิปัญญาในท้องถิ่น"
+                      - option "ผู้ทรงคุณวุฒิ ด้านการสอนดนตรีไทย"
+                      - option "วิทยากร/บุคคลภายนอก ที่มาร่วมสอนดนตรีไทยในปัจจุบัน"
+                  - generic [ref=e333]:
+                    - generic [ref=e334]: ชื่อ-นามสกุล
+                    - textbox [ref=e335]: นายครู ทดสอบ 9
+                  - generic [ref=e336]:
+                    - generic [ref=e337]: ตำแหน่ง
+                    - textbox [ref=e338]: ครูดนตรีไทย
+                  - generic [ref=e339]:
+                    - generic [ref=e340]: วุฒิการศึกษา
+                    - textbox [ref=e341]
+                  - generic [ref=e342]:
+                    - generic [ref=e343]: โทรศัพท์
+                    - textbox [ref=e344]: "0800000008"
+                  - generic [ref=e345]:
+                    - generic [ref=e346]: อีเมล
+                    - textbox [ref=e347]
+                  - generic [ref=e348]:
+                    - generic [ref=e349]: รูปภาพครู (สูงสุด 1MB, รองรับ jpg/jpeg/png)
+                    - generic [ref=e350]:
+                      - generic [ref=e351] [cursor=pointer]: Choose File
+                      - generic [ref=e352]: teacher9.jpg
+                    - generic [ref=e353]:
+                      - generic [ref=e354]: teacher9.jpg (518.57 KB)
+                      - button "ลบ" [ref=e355]
+                - generic [ref=e356]:
+                  - generic [ref=e357]:
+                    - heading "ครูคนที่ 10" [level=4] [ref=e358]
+                    - button "ลบ" [ref=e359]
+                  - generic [ref=e360]:
+                    - generic [ref=e361]: คุณลักษณะครูผู้สอน
+                    - combobox [ref=e362]:
+                      - option "เลือกคุณลักษณะ"
+                      - option "ครูผู้สอนดนตรีในโรงเรียนที่สำเร็จการศึกษาสาขาวิชาดนตรีไทย" [selected]
+                      - option "ครูภูมิปัญญาในท้องถิ่น"
+                      - option "ผู้ทรงคุณวุฒิ ด้านการสอนดนตรีไทย"
+                      - option "วิทยากร/บุคคลภายนอก ที่มาร่วมสอนดนตรีไทยในปัจจุบัน"
+                  - generic [ref=e363]:
+                    - generic [ref=e364]: ชื่อ-นามสกุล
+                    - textbox [ref=e365]: นายครู ทดสอบ 10
+                  - generic [ref=e366]:
+                    - generic [ref=e367]: ตำแหน่ง
+                    - textbox [ref=e368]: ครูดนตรีไทย
+                  - generic [ref=e369]:
+                    - generic [ref=e370]: วุฒิการศึกษา
+                    - textbox [ref=e371]
+                  - generic [ref=e372]:
+                    - generic [ref=e373]: โทรศัพท์
+                    - textbox [active] [ref=e374]: "0800000009"
+                  - generic [ref=e375]:
+                    - generic [ref=e376]: อีเมล
+                    - textbox [ref=e377]
+                  - generic [ref=e378]:
+                    - generic [ref=e379]: รูปภาพครู (สูงสุด 1MB, รองรับ jpg/jpeg/png)
+                    - generic [ref=e380]:
+                      - generic [ref=e381] [cursor=pointer]: Choose File
+                      - generic [ref=e382]: teacher10.jpg
+                    - generic [ref=e383]:
+                      - generic [ref=e384]: teacher10.jpg (518.57 KB)
+                      - button "ลบ" [ref=e385]
+                - button "+ เพิ่มข้อมูล" [ref=e386] [cursor=pointer]
+            - generic [ref=e387]:
+              - generic [ref=e388]:
+                - heading "การเรียนการสอนดนตรีไทย" [level=3] [ref=e389]
+                - paragraph [ref=e390]: แต่ละข้อที่เลือกจะได้ 1 คะแนน
+              - generic [ref=e391]:
+                - generic [ref=e392] [cursor=pointer]:
+                  - checkbox "เป็นวิชาบังคับในชั้นเรียน (ระบุรายละเอียดในหัวข้อถัดไป)" [ref=e393]
+                  - generic [ref=e394]: เป็นวิชาบังคับในชั้นเรียน (ระบุรายละเอียดในหัวข้อถัดไป)
+                - generic [ref=e395] [cursor=pointer]:
+                  - checkbox "มีการเรียนการสอนนอกเวลาราชการ (ระบุรายละเอียดในหัวข้อถัดไป)" [ref=e396]
+                  - generic [ref=e397]: มีการเรียนการสอนนอกเวลาราชการ (ระบุรายละเอียดในหัวข้อถัดไป)
+                - generic [ref=e398] [cursor=pointer]:
+                  - checkbox "มีวิชาเลือก/วิชาเรียนเพิ่มเติม/ชุมนุม (ระบุรายละเอียดในหัวข้อถัดไป)" [ref=e399]
+                  - generic [ref=e400]: มีวิชาเลือก/วิชาเรียนเพิ่มเติม/ชุมนุม (ระบุรายละเอียดในหัวข้อถัดไป)
+                - generic [ref=e401] [cursor=pointer]:
+                  - checkbox "มีหลักสูตรวิชาของท้องถิ่น (ระบุรายละเอียดในหัวข้อถัดไป)" [ref=e402]
+                  - generic [ref=e403]: มีหลักสูตรวิชาของท้องถิ่น (ระบุรายละเอียดในหัวข้อถัดไป)
+            - generic [ref=e404]:
+              - heading "ระยะเวลาทำการเรียนการสอนในเวลาราชการ" [level=3] [ref=e406]
+              - generic [ref=e407]:
+                - paragraph [ref=e408]: (ระบุช่วงระยะเวลาสำหรับการเรียนการสอนดนตรีไทยของแต่ละระดับชั้นว่าในแต่ละภาคการศึกษา/ปีการศึกษา มีกี่ชั่วโมงเรียน)
+                - generic [ref=e409]:
+                  - generic [ref=e410]:
+                    - generic [ref=e411]:
+                      - generic [ref=e412]: ระดับชั้น
+                      - textbox [ref=e413]
+                    - generic [ref=e414]:
+                      - generic [ref=e415]: เรียนดนตรีไทยจำนวน (คน)
+                      - spinbutton [ref=e416]
+                  - generic [ref=e417]:
+                    - generic [ref=e418]:
+                      - generic [ref=e419]: ชั่วโมง/ภาคการศึกษา
+                      - spinbutton [ref=e420]
+                    - generic [ref=e421]:
+                      - generic [ref=e422]: ชั่วโมง/ปีการศึกษา
+                      - spinbutton [ref=e423]
+                - button "+ เพิ่มข้อมูล" [ref=e424] [cursor=pointer]
+            - generic [ref=e425]:
+              - heading "ระยะเวลาทำการเรียนการสอนนอกเวลาราชการ" [level=3] [ref=e427]
+              - generic [ref=e428]:
+                - paragraph [ref=e429]: (ระบุช่วงเวลาสำหรับการเรียนการสอนดนตรีไทยนอกเวลาราชการว่าอยู่ในช่วงเวลาใดบ้างและใช้สถานที่ใดทำการสอน)
+                - generic [ref=e430]:
+                  - generic [ref=e431]:
+                    - generic [ref=e432]:
+                      - generic [ref=e433]: วัน
+                      - combobox [ref=e434]:
+                        - option "เลือกวัน" [selected]
+                        - option "จันทร์"
+                        - option "อังคาร"
+                        - option "พุธ"
+                        - option "พฤหัสบดี"
+                        - option "ศุกร์"
+                        - option "เสาร์"
+                        - option "อาทิตย์"
+                    - generic [ref=e435]:
+                      - generic [ref=e436]: เวลา
+                      - textbox "เช่น 08:00" [ref=e437]
+                  - generic [ref=e438]:
+                    - generic [ref=e439]:
+                      - generic [ref=e440]: ถึง
+                      - textbox "เช่น 16:00" [ref=e441]
+                    - generic [ref=e442]:
+                      - generic [ref=e443]: สถานที่
+                      - textbox [ref=e444]
+                - button "+ เพิ่มข้อมูล" [ref=e445] [cursor=pointer]
+            - generic [ref=e446]:
+              - heading "สถานที่ทำการเรียนการสอนในภาพรวมของสถานศึกษา" [level=3] [ref=e448]
+              - generic [ref=e450]:
+                - generic [ref=e451]: (ระบุ เช่น ห้องเรียนรวม ห้องประชุม ห้องดนตรีไทย หรือในแต่ละห้องเรียนตามรายวิชา เป็นต้น)
+                - textbox "กรอกรายละเอียด" [ref=e452]
+          - generic [ref=e453]:
+            - button "ย้อนกลับ" [ref=e454]
+            - button "ถัดไป" [ref=e456]
+    - contentinfo [ref=e457]:
+      - generic [ref=e458]:
+        - generic [ref=e459]:
+          - generic [ref=e460]:
+            - generic [ref=e461]:
+              - img "โลโก้โครงการ" [ref=e462]
+              - generic [ref=e463]:
+                - generic [ref=e464]: โครงการคัดเลือกสถานศึกษา
+                - generic [ref=e465]: ตามกิจกรรมโรงเรียนดนตรีไทย ๑๐๐ เปอร์เซ็นต์
+            - blockquote [ref=e466]: กรมส่งเสริมวัฒนธรรม เพื่อสืบสาน รักษา ต่อยอดวิชาดนตรีไทยให้คงอยู่คู่สังคมไทย
+          - generic [ref=e467]:
+            - heading "link ลิงก์ด่วน" [level=3] [ref=e468]:
+              - generic [ref=e469]: link
+              - text: ลิงก์ด่วน
+            - list [ref=e470]:
+              - listitem [ref=e471]:
+                - link "หน้าแรก" [ref=e472] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e473]:
+                - link "ข้อมูลโครงการ" [ref=e474] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e475]:
+                - link "ประกาศนียบัตร" [ref=e476] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e477]:
+                - link "ดาวน์โหลด" [ref=e478] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e479]:
+                - link "ติดต่อ" [ref=e480] [cursor=pointer]:
+                  - /url: "#"
+          - generic [ref=e481]:
+            - heading "map แผนที่" [level=3] [ref=e482]:
+              - generic [ref=e483]: map
+              - text: แผนที่
+            - iframe [ref=e485]:
+              - generic [ref=f1e3]:
+                - generic:
+                  - button "แป้นพิมพ์ลัด"
+                - region "แผนที่" [ref=f1e4]
+                - generic [ref=f1e5]:
+                  - iframe [ref=f1e18]:
+                    
+                  - link "ดูแผนที่ขนาดใหญ่" [ref=f1e23] [cursor=pointer]:
+                    - /url: https://maps.google.com/maps?ll=13.789848,100.484459&z=15&t=m&hl=th&gl=TH&mapclient=embed
+                  - img "Google" [ref=f1e25]
+                  - generic [ref=f1e26]:
+                    - button "แป้นพิมพ์ลัด" [ref=f1e32] [cursor=pointer]
+                    - generic [ref=f1e37]: ข้อมูลแผนที่ ©2026 Google
+                    - link "ข้อกำหนด (เปิดในแท็บใหม่)" [ref=f1e42] [cursor=pointer]:
+                      - /url: https://www.google.com/intl/th_TH/help/terms_maps.html
+                      - text: ข้อกำหนด
+                    - link "รายงานข้อผิดพลาดของแผนที่" [ref=f1e47] [cursor=pointer]:
+                      - /url: https://www.google.com/maps/@13.789848,100.4844593,15z/data=!10m1!1e1!12b1?source=apiv3&rapsrc=apiv3
+            - link "ดูแผนที่ใน Google Maps" [ref=e486] [cursor=pointer]:
+              - /url: https://maps.app.goo.gl/1EfxTnFeijfMHfrAA
+              - img [ref=e487]
+              - text: ดูแผนที่ใน Google Maps
+          - generic [ref=e490]:
+            - heading "support_agent ติดต่อเรา" [level=3] [ref=e491]:
+              - generic [ref=e492]: support_agent
+              - text: ติดต่อเรา
+            - list [ref=e493]:
+              - listitem [ref=e494]:
+                - img [ref=e495]
+                - generic [ref=e498]: กระทรวงวัฒนธรรม เลขที่ 666 ถนนบรมราชชนนี แขวงบางบำหรุ เขตบางพลัด กรุงเทพฯ 10700
+              - listitem [ref=e499]:
+                - img [ref=e500]
+                - generic [ref=e502]: 02-422-8888
+              - listitem [ref=e503]:
+                - img [ref=e504]
+                - generic [ref=e507]: contact@m-culture.go.th
+        - generic [ref=e508]:
+          - paragraph [ref=e509]: © 2569 กระทรวงวัฒนธรรม. สงวนลิขสิทธิ์.
+          - generic [ref=e510]:
+            - link "Facebook" [ref=e511] [cursor=pointer]:
+              - /url: https://www.facebook.com/DCP.culture
+              - img [ref=e512]
+            - link "Website" [ref=e514] [cursor=pointer]:
+              - /url: https://www.culture.go.th/culture_th/main.php?filename=index
+              - img [ref=e515]
+            - link "Line" [ref=e518] [cursor=pointer]:
+              - /url: https://line.me/ti/g2/4z-joEHAkGqVZuKK18e-nkbVH4F4LuPfhlgwcQ?utm_source=invitation&utm_medium=link_copy&utm_campaign=default
+              - img [ref=e519]
+  - button "Open Next.js Dev Tools" [ref=e526] [cursor=pointer]:
+    - img [ref=e527]
+  - alert [ref=e530]
+```

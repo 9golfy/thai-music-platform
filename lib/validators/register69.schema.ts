@@ -90,9 +90,7 @@ export const register69Schema = z.object({
   schoolName: z.string().min(1, 'กรุณากรอกชื่อสถานศึกษา'),
   schoolProvince: z.string().min(1, 'กรุณาเลือกจังหวัด'),
   province: z.string().optional(),
-  schoolLevel: schoolLevelEnum.refine((val) => val !== undefined && val !== '', {
-    message: 'กรุณาเลือกระดับการศึกษา',
-  }),
+  schoolLevel: schoolLevelEnum,
   affiliation: z.string().optional(),
   schoolSize: schoolSizeEnum.optional(),
   staffCount: z.coerce.number().optional(),

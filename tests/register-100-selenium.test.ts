@@ -1,4 +1,4 @@
-import { Builder, By, WebDriver } from 'selenium-webdriver';
+﻿import { Builder, By, WebDriver } from 'selenium-webdriver';
 import chrome from 'selenium-webdriver/chrome.js';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
@@ -37,8 +37,8 @@ async function runTest() {
     await driver.manage().setTimeouts({ implicit: 10000 });
     
     // Navigate to registration page
-    console.log(`🔗 Navigating to ${BASE_URL}/regist-100...`);
-    await driver.get(`${BASE_URL}/regist-100`);
+    console.log(`🔗 Navigating to ${BASE_URL}/regist100...`);
+    await driver.get(`${BASE_URL}/regist100`);
     await driver.sleep(2000);
     
     console.log('📝 Step 1: Basic Information');

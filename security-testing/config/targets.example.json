@@ -1,0 +1,46 @@
+{
+  "baseUrl": "<TARGET_BASE_URL>",
+  "publicPages": [
+    "/",
+    "/about",
+    "/contact",
+    "/services",
+    "/products"
+  ],
+  "authenticatedPages": [
+    "/dashboard",
+    "/profile",
+    "/settings",
+    "/admin"
+  ],
+  "apiEndpoints": [
+    "/api/v1/users",
+    "/api/v1/data",
+    "/api/v1/reports",
+    "/api/v1/config"
+  ],
+  "loginPath": "<LOGIN_PATH>",
+  "logoutPath": "/logout",
+  "staticAssets": [
+    "/assets/js/",
+    "/assets/css/",
+    "/static/"
+  ],
+  "excludePaths": [
+    "/logout",
+    "/delete",
+    "/remove"
+  ],
+  "testOrigins": [
+    "https://evil.example.com",
+    "https://attacker.com",
+    "null"
+  ],
+  "rateLimit": {
+    "requestsPerSecond": 1,
+    "maxConcurrent": 2
+  },
+  "timeout": 30000,
+  "followRedirects": true,
+  "verifySSL": true
+}

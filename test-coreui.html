@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoreUI Test</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@coreui/coreui@5.5.0/dist/css/coreui.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper d-flex flex-column min-vh-100 bg-light">
+        <!-- Sidebar -->
+        <div class="sidebar sidebar-fixed border-end" style="width: 256px;">
+            <div class="sidebar-brand d-none d-md-flex p-3">
+                <h5 class="mb-0">ดนตรีไทย</h5>
+                <small class="text-muted">Admin Dashboard</small>
+            </div>
+            
+            <ul class="sidebar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <span class="nav-icon">📊</span>
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-title">โรงเรียนดนตรีไทย</li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <span class="nav-icon">🎵</span>
+                        โรงเรียนดนตรีไทย 100%
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <span class="nav-icon">🏫</span>
+                        โรงเรียนสนับสนุนและส่งเสริมดนตรีไทย
+                    </a>
+                </li>
+                <li class="nav-item mt-auto">
+                    <a class="nav-link text-danger" href="#">
+                        <span class="nav-icon">🚪</span>
+                        Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="wrapper d-flex flex-column min-vh-100" style="margin-left: 256px;">
+            <!-- Header -->
+            <header class="header header-sticky mb-4">
+                <div class="container-fluid">
+                    <button class="header-toggler px-md-0 me-md-3">
+                        <span class="header-toggler-icon"></span>
+                    </button>
+                    <div class="header-nav ms-auto">
+                        <span class="text-muted">Admin</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <div class="body flex-grow-1 px-3">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12">
+                            <h2 class="mb-4">Dashboard Test</h2>
+                        </div>
+                    </div>
+
+                    <!-- Statistics Cards -->
+                    <div class="row">
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="card mb-4 text-white bg-primary">
+                                <div class="card-body pb-0 d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <div class="fs-4 fw-semibold">26</div>
+                                        <div>โรงเรียนดนตรีไทย 100%</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="card mb-4 text-white bg-info">
+                                <div class="card-body pb-0 d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <div class="fs-4 fw-semibold">0</div>
+                                        <div>โรงเรียนสนับสนุนฯ</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="card mb-4 text-white bg-warning">
+                                <div class="card-body pb-0 d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <div class="fs-4 fw-semibold">26</div>
+                                        <div>รวมทั้งหมด</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="card mb-4 text-white bg-success">
+                                <div class="card-body pb-0 d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <div class="fs-4 fw-semibold">85</div>
+                                        <div>คะแนนเฉลี่ย</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Info Card -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <strong>CoreUI Test Status</strong>
+                                </div>
+                                <div class="card-body">
+                                    <p class="text-success">✅ CoreUI CSS is loading correctly!</p>
+                                    <p>If you can see this page with:</p>
+                                    <ul>
+                                        <li>Sidebar on the left</li>
+                                        <li>4 colored statistics cards</li>
+                                        <li>Proper styling and layout</li>
+                                    </ul>
+                                    <p>Then CoreUI is working. The issue is with Next.js cache or browser cache.</p>
+                                    <hr>
+                                    <h5>Solution:</h5>
+                                    <ol>
+                                        <li>Run: <code>./restart-dashboard.ps1</code></li>
+                                        <li>Open browser in INCOGNITO mode</li>
+                                        <li>Go to: <code>http://localhost:3000/login</code></li>
+                                        <li>Login with: root / admin</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@coreui/coreui@5.5.0/dist/js/coreui.bundle.min.js"></script>
+</body>
+</html>

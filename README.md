@@ -12,7 +12,8 @@ app/
 │   ├── certificate/     # ใบรับรอง
 │   ├── download/        # ดาวน์โหลดเอกสาร
 │   ├── contract/        # สัญญา
-│   └── regist-100/      # ลงทะเบียน (from regist)
+│   ├── regist100/       # ลงทะเบียนโรงเรียนดนตรีไทย 100%
+│   └── regist-support/  # ลงทะเบียนโรงเรียนสนับสนุนฯ
 ├── (admin)/             # Admin pages
 │   ├── login/           # เข้าสู่ระบบ
 │   ├── forgetpassword/  # ลืมรหัสผ่าน
@@ -63,4 +64,5 @@ npm run dev
 
 โปรเจคนี้รวม 2 โปรเจคเดิม:
 - `/landing` → `app/(front)/` (home page และ components)
-- `/regist` → `app/(front)/regist-100/` และ `app/api/register-100/`
+- `/regist` → `app/(front)/regist100/` และ `app/api/register100/` (โรงเรียนดนตรีไทย 100%)
+- New: `app/(front)/regist-support/` และ `app/api/register-support/` (โรงเรียนสนับสนุนฯ)

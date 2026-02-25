@@ -322,3 +322,19 @@ select:valid {
   font-weight: 600 !important;
   opacity: 1 !important;
 }
+
+/* Fix Google Maps iframe display */
+iframe[src*="google.com/maps"] {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  border: 0 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Ensure map container is visible */
+.overflow-hidden iframe {
+  display: block !important;
+  visibility: visible !important;
+}

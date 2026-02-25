@@ -1,0 +1,44 @@
+{
+  "baseUrl": "http://localhost:3000",
+  "publicPages": [
+    "/",
+    "/about",
+    "/regist100",
+    "/regist-support",
+    "/certificate",
+    "/download"
+  ],
+  "authenticatedPages": [
+    "/dashboard",
+    "/dashboard/register100",
+    "/dashboard/register-support"
+  ],
+  "apiEndpoints": [
+    "/api/register100",
+    "/api/register100/list",
+    "/api/register-support",
+    "/api/register-support/list"
+  ],
+  "loginPath": "/login",
+  "logoutPath": "/logout",
+  "staticAssets": [
+    "/assets/",
+    "/_next/static/"
+  ],
+  "excludePaths": [
+    "/logout",
+    "/api/register100/[id]"
+  ],
+  "testOrigins": [
+    "https://evil.example.com",
+    "https://attacker.com",
+    "null"
+  ],
+  "rateLimit": {
+    "requestsPerSecond": 1,
+    "maxConcurrent": 2
+  },
+  "timeout": 30000,
+  "followRedirects": true,
+  "verifySSL": false
+}

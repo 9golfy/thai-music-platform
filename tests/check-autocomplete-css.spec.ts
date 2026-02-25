@@ -1,7 +1,7 @@
 import { test } from '@playwright/test';
 
 test('Check autocomplete CSS classes', async ({ page }) => {
-  await page.goto('http://localhost:3000/regist-100');
+  await page.goto('http://localhost:3000/regist100');
   await page.waitForLoadState('domcontentloaded');
   await page.waitForTimeout(2000);
 

@@ -19,7 +19,7 @@ echo.
 echo Starting Selenium test...
 echo.
 
-npx ts-node tests/register-100-selenium.test.ts
+npx ts-node tests/register100-selenium.test.ts
 
 echo.
 echo ========================================

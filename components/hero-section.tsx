@@ -71,7 +71,7 @@ export default function HeroSection() {
             transition={{ duration: 0.8, delay: 0.8 }}
           >
             <a
-              href="/regist-100"
+              href="/regist100"
               className="group relative overflow-hidden rounded-full px-8 py-3.5 text-sm sm:text-base font-semibold text-[#5a4210] transition-all duration-300 hover:shadow-[0_0_20px_rgba(180,142,62,0.4)] hover:scale-[1.02]"
               style={{
                 background: "linear-gradient(90deg, #B48E3E, #E6E39A, #B48E3E)",

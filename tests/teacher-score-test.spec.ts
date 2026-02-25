@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+﻿import { test, expect } from '@playwright/test';
 import path from 'path';
 import { MongoClient } from 'mongodb';
 
@@ -71,7 +71,7 @@ test.describe('Teacher Score Calculation Tests', () => {
       }
     });
     
-    await page.goto('http://localhost:3000/regist-100');
+    await page.goto('http://localhost:3000/regist100');
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(2000);
 
@@ -167,7 +167,7 @@ test.describe('Teacher Score Calculation Tests', () => {
     
     console.log('🧪 Test Case 2: 4 Teachers = 20 Points');
     
-    await page.goto('http://localhost:3000/regist-100');
+    await page.goto('http://localhost:3000/regist100');
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(2000);
 
@@ -300,7 +300,7 @@ test.describe('Teacher Score Calculation Tests', () => {
     
     console.log('🧪 Test Case 3: 4 Teachers + Try to Add 5th = Warning');
     
-    await page.goto('http://localhost:3000/regist-100');
+    await page.goto('http://localhost:3000/regist100');
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(2000);
 

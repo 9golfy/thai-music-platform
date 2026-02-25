@@ -1,0 +1,21 @@
+﻿# เชอมตอ MongoDB
+mongosh mongodb://localhost:27017/thai_music_school
+
+# คำสงทใชบอย:
+# 1. ดขอมลทงหมด
+db.register100_submissions.find().pretty()
+
+# 2. นบจำนวน submissions
+db.register100_submissions.countDocuments()
+
+# 3. ดขอมลลาสด
+db.register100_submissions.find().sort({_id: -1}).limit(1).pretty()
+
+# 4. ดเฉพาะชอโรงเรยนและคะแนน
+db.register100_submissions.find({}, {schoolName: 1, total_score: 1, _id: 0}).pretty()
+
+# 5. หาโรงเรยนทไดคะแนนเตม 100
+db.register100_submissions.find({total_score: 100}).pretty()
+
+# 6. เรยงตามคะแนนจากมากไปนอย
+db.register100_submissions.find().sort({total_score: -1}).pretty()

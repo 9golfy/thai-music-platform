@@ -13,7 +13,8 @@
 - ✅ `/certificate` - ใบรับรอง
 - ✅ `/download` - ดาวน์โหลดเอกสาร
 - ✅ `/contract` - สัญญา
-- ✅ `/regist-100` - ลงทะเบียน (จาก regist)
+- ✅ `/regist100` - ลงทะเบียนโรงเรียนดนตรีไทย 100%
+- ✅ `/regist-support` - ลงทะเบียนโรงเรียนสนับสนุนฯ
 
 ### 3. Admin Routes (admin)
 - ✅ `/login` - เข้าสู่ระบบ
@@ -24,7 +25,8 @@
 - ✅ `/dashboard/schools/[id]` - รายละเอียดโรงเรียน
 
 ### 4. API Routes
-- ✅ `/api/register-100` - API สำหรับลงทะเบียน (เปลี่ยนจาก register-69)
+- ✅ `/api/register100` - API สำหรับลงทะเบียนโรงเรียนดนตรีไทย 100%
+- ✅ `/api/register-support` - API สำหรับลงทะเบียนโรงเรียนสนับสนุนฯ
 
 ### 5. Components & Assets
 - ✅ คัดลอก components จาก landing → `app/components/`
@@ -59,7 +61,8 @@ npm run dev
 
 เปิดเบราว์เซอร์:
 - http://localhost:3000 - Home page
-- http://localhost:3000/regist-100 - Registration form
+- http://localhost:3000/regist100 - Registration form (โรงเรียนดนตรีไทย 100%)
+- http://localhost:3000/regist-support - Registration form (โรงเรียนสนับสนุนฯ)
 - http://localhost:3000/login - Admin login
 
 ### 4. Implement Admin Features
