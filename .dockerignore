@@ -1,12 +1,55 @@
+# Dependencies
 node_modules
+.pnp
+.pnp.*
+
+# Build outputs
 .next
+out
+build
+
+# Git
 .git
 .gitignore
-*.md
+
+# Environment files
 .env.local
+.env*.local
+
+# IDE
 .vscode
+.idea
+
+# Documentation
+*.md
+
+# Test files and reports
+tests/
+*.spec.ts
+*.test.ts
+playwright-report/
+test-results/
+coverage/
+
+# Scripts
+*.ps1
+check-*.js
+clear-*.js
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# OS files
+.DS_Store
+*.pem
+
+# Development folders
 landing
 regist
-npm-debug.log
-yarn-error.log
-.DS_Store
+regist-support
+
+# Vercel
+.vercel

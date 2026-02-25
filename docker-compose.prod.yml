@@ -1,21 +1,20 @@
 services:
   web:
-    build: .
-    container_name: thai-music-web
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: thai-music-web-prod
     ports:
       - "3000:3000"
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/.next
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=production
       - MONGODB_URI=${MONGODB_URI:-mongodb://mongodb:27017/thai-music-platform}
-      - NEXT_PUBLIC_API_URL=http://localhost:3000
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:3000}
     depends_on:
       - mongodb
     networks:
       - thai-music-network
+    restart: unless-stopped
 
   mongodb:
     image: mongo:7
@@ -28,6 +27,7 @@ services:
       - MONGO_INITDB_DATABASE=thai-music-platform
     networks:
       - thai-music-network
+    restart: unless-stopped
 
   mongo-express:
     image: mongo-express:1
@@ -42,6 +42,7 @@ services:
       - mongodb
     networks:
       - thai-music-network
+    restart: unless-stopped
 
 volumes:
   mongodb_data:

@@ -9,11 +9,11 @@ RUN npm ci
 # Copy application files
 COPY . .
 
-# Create uploads directory
-RUN mkdir -p public/uploads
+# Create uploads directory with proper permissions
+RUN mkdir -p public/uploads && chmod 777 public/uploads
 
 # Expose port
 EXPOSE 3000
 
 # Start development server
-CMD ["npm", "run", "dev", "--", "-H", "0.0.0.0", "-p", "3000"]
+CMD ["npm", "run", "dev"]
