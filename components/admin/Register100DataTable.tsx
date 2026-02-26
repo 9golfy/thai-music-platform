@@ -51,11 +51,21 @@ export default function Register100DataTable() {
     }
   };
 
-  const filteredSubmissions = submissions.filter(sub =>
-    sub.schoolName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    sub.schoolProvince?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    sub.mgtFullName?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Helper function to safely normalize values for comparison
+  const normalize = (value: unknown): string => {
+    if (typeof value === 'string') return value.toLowerCase();
+    if (value == null) return '';
+    return String(value).toLowerCase();
+  };
+
+  const filteredSubmissions = submissions.filter(sub => {
+    const query = normalize(searchTerm);
+    return (
+      normalize(sub.schoolName).includes(query) ||
+      normalize(sub.schoolProvince).includes(query) ||
+      normalize(sub.mgtFullName).includes(query)
+    );
+  });
 
   const getScoreBadgeColor = (score: number) => {
     if (score >= 90) return 'bg-green-100 text-green-800';
