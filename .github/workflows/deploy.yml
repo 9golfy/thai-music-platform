@@ -2,7 +2,7 @@ name: Build & Deploy to EC2 (ECR)
 
 on:
   push:
-    branches: ["main"]   # ถ้า repo ใช้ master ให้เปลี่ยนเป็น master
+    branches: ["master"]   # ถ้า repo ใช้ master ให้เปลี่ยนเป็น master
 
 env:
   AWS_REGION: ap-southeast-1
