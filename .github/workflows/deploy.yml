@@ -1,0 +1,52 @@
+name: Build & Deploy to EC2 (ECR)
+
+on:
+  push:
+    branches: ["main"]   # ถ้า repo ใช้ master ให้เปลี่ยนเป็น master
+
+env:
+  AWS_REGION: ap-southeast-1
+  ECR_REGISTRY: 889976851669.dkr.ecr.ap-southeast-1.amazonaws.com
+  ECR_REPOSITORY: thai-music-platform
+  CONTAINER_NAME: thai-music-web
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag, and push image to ECR
+        run: |
+          docker build -t $ECR_REPOSITORY:${{ github.sha }} .
+          docker tag $ECR_REPOSITORY:${{ github.sha }} $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
+          docker tag $ECR_REPOSITORY:${{ github.sha }} $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+      - name: Deploy on EC2 (pull & restart)
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -e
+            aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 889976851669.dkr.ecr.ap-southeast-1.amazonaws.com
+            docker pull 889976851669.dkr.ecr.ap-southeast-1.amazonaws.com/thai-music-platform:latest
+            docker stop thai-music-web || true
+            docker rm thai-music-web || true
+            docker run -d --restart unless-stopped -p 3000:3000 --name thai-music-web 889976851669.dkr.ecr.ap-southeast-1.amazonaws.com/thai-music-platform:latest
+            docker ps | head
