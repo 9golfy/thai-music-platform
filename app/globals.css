@@ -338,3 +338,15 @@ iframe[src*="google.com/maps"] {
   display: block !important;
   visibility: visible !important;
 }
+
+/* Hide Next.js development indicator */
+#__next-build-watcher,
+.__next-build-watcher,
+[id*="next-build"],
+[class*="next-build"],
+nextjs-portal {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
