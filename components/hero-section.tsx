@@ -84,7 +84,7 @@ export default function HeroSection() {
 
             <a
               href="/regist-support"
-              className="group relative overflow-hidden rounded-full border-2 border-[#B48E3E]/60 bg-transparent px-8 py-3.5 text-sm sm:text-base font-semibold text-[#E6E39A] transition-all duration-300 hover:border-[#E6E39A] hover:shadow-[0_0_20px_rgba(180,142,62,0.3)] hover:scale-[1.02]"
+              className="group relative overflow-hidden rounded-full border-2 border-[#B48E3E]/60 bg-transparent px-6 py-3.5 text-sm sm:text-base font-semibold text-[#E6E39A] transition-all duration-300 hover:border-[#E6E39A] hover:shadow-[0_0_20px_rgba(180,142,62,0.3)] hover:scale-[1.02]"
             >
               <span className="relative z-10">
                 {"สมัครประเภทโรงเรียนสนับสนุนและส่งเสริมดนตรีไทย"}
