@@ -25,34 +25,17 @@ services:
     ports:
       - "8081:8081"
 
-  api:
-    build:
-      context: ./api
-    container_name: thai-music-api
-    restart: unless-stopped
-    depends_on:
-      - mongo
-    environment:
-      MONGO_URI: "mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongo:27017/?authSource=admin"
-      MONGO_DB: ${MONGO_DB}
-      UPLOAD_DIR: "/var/www/html/uploads"
-    ports:
-      - "8080:80"
-    volumes:
-      - api_uploads:/var/www/html/uploads
-
   web:
-    image: 889976851669.dkr.ecr.ap-southeast-1.amazonaws.com/thai-music-platform:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: thai-music-web
     ports:
       - "3000:3000"
-    environment:
-      - NODE_ENV=production
-      - MONGODB_URI=mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongo:27017/${MONGO_DB}?authSource=admin
-      - NEXT_PUBLIC_API_URL=http://localhost:3000
+    env_file:
+      - .env
     depends_on:
       - mongo
 
 volumes:
   mongo_data:
-  api_uploads:

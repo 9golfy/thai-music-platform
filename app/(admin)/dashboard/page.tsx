@@ -134,7 +134,7 @@ export default function DashboardPage() {
               href="/dashboard/register100"
               className="block w-full text-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
             >
-              ดูรายการทั้งหมด
+              ดูรายการทั้งหมด คลิกที่นี่
             </a>
           </div>
         </div>
@@ -155,7 +155,7 @@ export default function DashboardPage() {
               href="/dashboard/register-support"
               className="block w-full text-center px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition-colors font-medium"
             >
-              ดูรายการทั้งหมด
+              ดูรายการทั้งหมด คลิกที่นี่
             </a>
           </div>
         </div>
