@@ -96,23 +96,32 @@ export async function PUT(
 
   try {
     const body = await request.json();
+    console.log('PUT request body:', JSON.stringify(body, null, 2));
 
     // ลบ _id ออกจาก body ก่อน update เพราะ MongoDB ไม่อนุญาตให้แก้ไข _id
     const { _id, ...updateData } = body;
+
+    // Clean up data - remove any nested ObjectId or invalid MongoDB types
+    const cleanData = JSON.parse(JSON.stringify(updateData));
 
     await client.connect();
     const database = client.db(dbName);
     const collection = database.collection('register_support_submissions');
 
+    console.log('Updating document with ID:', id);
+    console.log('Update data:', JSON.stringify(cleanData, null, 2));
+
     const result = await collection.updateOne(
       { _id: new ObjectId(id) },
       {
         $set: {
-          ...updateData,
+          ...cleanData,
           updatedAt: new Date(),
         },
       }
     );
+
+    console.log('Update result:', result);
 
     if (result.matchedCount === 0) {
       return NextResponse.json(
@@ -127,6 +136,7 @@ export async function PUT(
     });
   } catch (error) {
     console.error('Error updating submission:', error);
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
     return NextResponse.json(
       {
         success: false,
