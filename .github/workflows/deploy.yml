@@ -2,7 +2,7 @@ name: Build & Deploy to EC2 (ECR)
 
 on:
   push:
-    branches: ["master"]   # ถ้า repo ใช้ master ให้เปลี่ยนเป็น master
+    branches: ["master"]
 
 env:
   AWS_REGION: ap-southeast-1
@@ -45,8 +45,7 @@ jobs:
           script: |
             set -e
             aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 889976851669.dkr.ecr.ap-southeast-1.amazonaws.com
-            docker pull 889976851669.dkr.ecr.ap-southeast-1.amazonaws.com/thai-music-platform:latest
-            docker stop thai-music-web || true
-            docker rm thai-music-web || true
-            docker run -d --restart unless-stopped -p 3000:3000 --name thai-music-web 889976851669.dkr.ecr.ap-southeast-1.amazonaws.com/thai-music-platform:latest
-            docker ps | head
+            cd ~/registerForm-platform
+            docker compose pull web
+            docker compose up -d
+            docker compose ps
