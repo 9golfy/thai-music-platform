@@ -26,9 +26,7 @@ services:
       - "8081:8081"
 
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: 889976851669.dkr.ecr.ap-southeast-1.amazonaws.com/thai-music-platform:latest
     container_name: thai-music-web
     ports:
       - "3000:3000"

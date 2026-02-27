@@ -12,7 +12,7 @@ Test แสดงว่า:
 ### 1. MongoDB ไม่ทำงาน
 ```bash
 # SSH เข้า AWS EC2
-ssh -i your-key.pem ubuntu@13.212.254.184
+ssh -i your-key.pem ubuntu@13.228.225.47
 
 # ตรวจสอบ Docker containers
 docker ps

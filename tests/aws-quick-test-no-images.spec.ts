@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-const AWS_URL = 'http://13.212.254.184:3000';
+const AWS_URL = 'http://13.228.225.47:3000';
 
 test.describe('AWS Quick Test - No Images', () => {
   test('should submit form without images to test API speed', async ({ page }) => {

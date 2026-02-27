@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import path from 'path';
 
-const AWS_URL = 'http://13.212.254.184:3000';
+const AWS_URL = 'http://13.228.225.47:3000';
 
 test.describe('AWS Production - Full Test with 9 Teachers', () => {
   test('should fill ALL fields with 9 teachers and submit successfully', async ({ page }) => {

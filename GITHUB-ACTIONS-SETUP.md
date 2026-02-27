@@ -17,7 +17,7 @@
 
 #### Secret 1: EC2_HOST
 - Name: `EC2_HOST`
-- Value: `13.212.254.184`
+- Value: `13.228.225.47`
 
 #### Secret 2: EC2_USERNAME
 - Name: `EC2_USERNAME`
