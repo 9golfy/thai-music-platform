@@ -96,18 +96,21 @@ export async function PUT(
 
   try {
     const body = await request.json();
-    
+
+    // ลบ _id ออกจาก body ก่อน update เพราะ MongoDB ไม่อนุญาตให้แก้ไข _id
+    const { _id, ...updateData } = body;
+
     await client.connect();
     const database = client.db(dbName);
     const collection = database.collection('register_support_submissions');
 
     const result = await collection.updateOne(
       { _id: new ObjectId(id) },
-      { 
+      {
         $set: {
-          ...body,
+          ...updateData,
           updatedAt: new Date(),
-        }
+        },
       }
     );
 
