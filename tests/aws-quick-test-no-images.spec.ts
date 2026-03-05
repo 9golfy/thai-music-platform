@@ -124,8 +124,8 @@ test.describe('AWS Quick Test - No Images', () => {
       
       if (response.status() === 200) {
         const data = await response.json();
-        console.log(`✅ Success! ID: ${data.submissionId}`);
-        console.log(`🔗 ${AWS_URL}/dashboard/register-support/${data.submissionId}`);
+        console.log(`✅ Success! ID: ${data.id}`);
+        console.log(`🔗 ${AWS_URL}/dashboard/register-support/${data.id}`);
       }
       
       expect(response.status()).toBe(200);
