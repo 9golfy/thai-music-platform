@@ -48,14 +48,14 @@ export default function Step5({ form }: Step5Props) {
     
     // Set the selected one
     if (value === 'ผู้บริหารสถานศึกษา') {
-      setValue(`supportFactors.${index}.sup_supportByAdmin`, value, { shouldDirty: true });
+      setValue(`reg100_supportFactors.${index}.sup_supportByAdmin`, value, { shouldDirty: true });
       setOtherSelectedIndices(prev => {
         const newSet = new Set(prev);
         newSet.delete(index);
         return newSet;
       });
     } else if (value === 'กรรมการสถานศึกษา') {
-      setValue(`supportFactors.${index}.sup_supportBySchoolBoard`, value, { shouldDirty: true });
+      setValue(`reg100_supportFactors.${index}.sup_supportBySchoolBoard`, value, { shouldDirty: true });
       setOtherSelectedIndices(prev => {
         const newSet = new Set(prev);
         newSet.delete(index);
@@ -82,11 +82,11 @@ export default function Step5({ form }: Step5Props) {
           {supportFactorFields.length === 0 && (
             <Controller
               control={control}
-              name={`supportFactors.0.sup_supportByAdmin`}
+              name={`reg100_supportFactors.0.sup_supportByAdmin`}
               render={({ field: adminField }) => {
                 const adminValue = adminField.value || '';
-                const schoolBoardValue = form.getValues(`supportFactors.0.sup_supportBySchoolBoard`) || '';
-                const othersValue = form.getValues(`supportFactors.0.sup_supportByOthers`) || '';
+                const schoolBoardValue = form.getValues(`reg100_supportFactors.0.sup_supportBySchoolBoard`) || '';
+                const othersValue = form.getValues(`reg100_supportFactors.0.sup_supportByOthers`) || '';
                 
                 const currentOrgType = adminValue || schoolBoardValue || othersValue;
                 const isOtherSelected = otherSelectedIndices.has(0);
@@ -117,7 +117,7 @@ export default function Step5({ form }: Step5Props) {
                           placeholder="ระบุชื่อองค์กร เช่น วัด สมาคม มูลนิธิ"
                           className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
                           onChange={(e) => {
-                            setValue(`supportFactors.0.sup_supportByOthers`, e.target.value, { shouldDirty: true });
+                            setValue(`reg100_supportFactors.0.sup_supportByOthers`, e.target.value, { shouldDirty: true });
                           }}
                         />
                       </div>
@@ -171,11 +171,11 @@ export default function Step5({ form }: Step5Props) {
             <Controller
               key={field.id}
               control={control}
-              name={`supportFactors.${index}.sup_supportByAdmin`}
+              name={`reg100_supportFactors.${index}.sup_supportByAdmin`}
               render={({ field: adminField }) => {
                 const adminValue = adminField.value || '';
-                const schoolBoardValue = form.getValues(`supportFactors.${index}.sup_supportBySchoolBoard`) || '';
-                const othersValue = form.getValues(`supportFactors.${index}.sup_supportByOthers`) || '';
+                const schoolBoardValue = form.getValues(`reg100_supportFactors.${index}.sup_supportBySchoolBoard`) || '';
+                const othersValue = form.getValues(`reg100_supportFactors.${index}.sup_supportByOthers`) || '';
                 
                 const currentOrgType = adminValue || schoolBoardValue || othersValue;
                 const isOtherSelected = otherSelectedIndices.has(index);
@@ -216,7 +216,7 @@ export default function Step5({ form }: Step5Props) {
                           placeholder="ระบุชื่อองค์กร เช่น วัด สมาคม มูลนิธิ"
                           className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
                           onChange={(e) => {
-                            setValue(`supportFactors.${index}.sup_supportByOthers`, e.target.value, { shouldDirty: true });
+                            setValue(`reg100_supportFactors.${index}.sup_supportByOthers`, e.target.value, { shouldDirty: true });
                           }}
                         />
                       </div>

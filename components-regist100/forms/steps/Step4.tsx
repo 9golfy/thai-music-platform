@@ -318,9 +318,9 @@ export default function Step4({ form, teacherImageFiles, setTeacherImageFiles, m
                   type="email"
                   className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
                 />
-                {errors.thaiMusicTeachers?.[index]?.teacherEmail && (
+                {errors.reg100_thaiMusicTeachers?.[index]?.teacherEmail && (
                   <p className="text-red-500 text-sm mt-1">
-                    {errors.thaiMusicTeachers[index]?.teacherEmail?.message}
+                    {errors.reg100_thaiMusicTeachers[index]?.teacherEmail?.message}
                   </p>
                 )}
               </div>

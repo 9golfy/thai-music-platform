@@ -42,20 +42,20 @@ export default function Step5({ form }: Step5Props) {
   // Handle organization type change
   const handleOrgTypeChange = (index: number, value: string) => {
     // Clear all three fields first
-    setValue(`regsup_supportFactors.${index}.regsup_supportByAdmin`, '');
-    setValue(`regsup_supportFactors.${index}.regsup_supportBySchoolBoard`, '');
-    setValue(`regsup_supportFactors.${index}.regsup_supportByOthers`, '');
+    setValue(`regsup_supportFactors.${index}.sup_supportByAdmin`, '');
+    setValue(`regsup_supportFactors.${index}.sup_supportBySchoolBoard`, '');
+    setValue(`regsup_supportFactors.${index}.sup_supportByOthers`, '');
     
     // Set the selected one
     if (value === 'ผู้บริหารสถานศึกษา') {
-      setValue(`regsup_supportFactors.${index}.regsup_supportByAdmin`, value, { shouldDirty: true });
+      setValue(`regsup_supportFactors.${index}.sup_supportByAdmin`, value, { shouldDirty: true });
       setOtherSelectedIndices(prev => {
         const newSet = new Set(prev);
         newSet.delete(index);
         return newSet;
       });
     } else if (value === 'กรรมการสถานศึกษา') {
-      setValue(`regsup_supportFactors.${index}.regsup_supportBySchoolBoard`, value, { shouldDirty: true });
+      setValue(`regsup_supportFactors.${index}.sup_supportBySchoolBoard`, value, { shouldDirty: true });
       setOtherSelectedIndices(prev => {
         const newSet = new Set(prev);
         newSet.delete(index);
@@ -82,11 +82,11 @@ export default function Step5({ form }: Step5Props) {
           {supportFactorFields.length === 0 && (
             <Controller
               control={control}
-              name={`regsup_supportFactors.0.regsup_supportByAdmin`}
+              name={`regsup_supportFactors.0.sup_supportByAdmin`}
               render={({ field: adminField }) => {
                 const adminValue = adminField.value || '';
-                const schoolBoardValue = form.getValues(`regsup_supportFactors.0.regsup_supportBySchoolBoard`) || '';
-                const othersValue = form.getValues(`regsup_supportFactors.0.regsup_supportByOthers`) || '';
+                const schoolBoardValue = form.getValues(`regsup_supportFactors.0.sup_supportBySchoolBoard`) || '';
+                const othersValue = form.getValues(`regsup_supportFactors.0.sup_supportByOthers`) || '';
                 
                 const currentOrgType = adminValue || schoolBoardValue || othersValue;
                 const isOtherSelected = otherSelectedIndices.has(0);
@@ -112,12 +112,12 @@ export default function Step5({ form }: Step5Props) {
                     {isOtherSelected && (
                       <div>
                         <input
-                          {...register(`regsup_supportFactors.0.regsup_supportByOthers`)}
+                          {...register(`regsup_supportFactors.0.sup_supportByOthers`)}
                           type="text"
                           placeholder="ระบุชื่อองค์กร เช่น วัด สมาคม มูลนิธิ"
                           className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
                           onChange={(e) => {
-                            setValue(`regsup_supportFactors.0.regsup_supportByOthers`, e.target.value, { shouldDirty: true });
+                            setValue(`regsup_supportFactors.0.sup_supportByOthers`, e.target.value, { shouldDirty: true });
                           }}
                         />
                       </div>
@@ -128,7 +128,7 @@ export default function Step5({ form }: Step5Props) {
                         รายละเอียด
                       </label>
                       <input
-                        {...register(`regsup_supportFactors.0.regsup_supportByDescription`)}
+                        {...register(`regsup_supportFactors.0.sup_supportByDescription`)}
                         type="text"
                         placeholder="รายละเอียดการสนับสนุน"
                         className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
@@ -140,7 +140,7 @@ export default function Step5({ form }: Step5Props) {
                         วันที่ (ที่ได้รับการสนับสนุน)
                       </label>
                       <input
-                        {...register(`regsup_supportFactors.0.regsup_supportByDate`)}
+                        {...register(`regsup_supportFactors.0.sup_supportByDate`)}
                         type="text"
                         placeholder="กรอกวันที่ (เช่น 15/02/2026)"
                         className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
@@ -155,7 +155,7 @@ export default function Step5({ form }: Step5Props) {
                         (Link ในแชร์ drive เพื่อแนบไฟล์ PDF และ JPG)
                       </p>
                       <input
-                        {...register(`regsup_supportFactors.0.regsup_supportByDriveLink`)}
+                        {...register(`regsup_supportFactors.0.sup_supportByDriveLink`)}
                         type="text"
                         placeholder="หรือใส่ลิงก์ Google Drive / Dropbox"
                         className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
@@ -171,11 +171,11 @@ export default function Step5({ form }: Step5Props) {
             <Controller
               key={field.id}
               control={control}
-              name={`regsup_supportFactors.${index}.regsup_supportByAdmin`}
+              name={`regsup_supportFactors.${index}.sup_supportByAdmin`}
               render={({ field: adminField }) => {
                 const adminValue = adminField.value || '';
-                const schoolBoardValue = form.getValues(`regsup_supportFactors.${index}.regsup_supportBySchoolBoard`) || '';
-                const othersValue = form.getValues(`regsup_supportFactors.${index}.regsup_supportByOthers`) || '';
+                const schoolBoardValue = form.getValues(`regsup_supportFactors.${index}.sup_supportBySchoolBoard`) || '';
+                const othersValue = form.getValues(`regsup_supportFactors.${index}.sup_supportByOthers`) || '';
                 
                 const currentOrgType = adminValue || schoolBoardValue || othersValue;
                 const isOtherSelected = otherSelectedIndices.has(index);
@@ -211,12 +211,12 @@ export default function Step5({ form }: Step5Props) {
                     {isOtherSelected && (
                       <div>
                         <input
-                          {...register(`regsup_supportFactors.${index}.regsup_supportByOthers`)}
+                          {...register(`regsup_supportFactors.${index}.sup_supportByOthers`)}
                           type="text"
                           placeholder="ระบุชื่อองค์กร เช่น วัด สมาคม มูลนิธิ"
                           className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
                           onChange={(e) => {
-                            setValue(`regsup_supportFactors.${index}.regsup_supportByOthers`, e.target.value, { shouldDirty: true });
+                            setValue(`regsup_supportFactors.${index}.sup_supportByOthers`, e.target.value, { shouldDirty: true });
                           }}
                         />
                       </div>
@@ -227,7 +227,7 @@ export default function Step5({ form }: Step5Props) {
                         รายละเอียด
                       </label>
                       <input
-                        {...register(`regsup_supportFactors.${index}.regsup_supportByDescription`)}
+                        {...register(`regsup_supportFactors.${index}.sup_supportByDescription`)}
                         type="text"
                         placeholder="รายละเอียดการสนับสนุน"
                         className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
@@ -239,7 +239,7 @@ export default function Step5({ form }: Step5Props) {
                         วันที่ (ที่ได้รับการสนับสนุน)
                       </label>
                       <input
-                        {...register(`regsup_supportFactors.${index}.regsup_supportByDate`)}
+                        {...register(`regsup_supportFactors.${index}.sup_supportByDate`)}
                         type="text"
                         placeholder="กรอกวันที่ (เช่น 15/02/2026)"
                         className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
@@ -254,7 +254,7 @@ export default function Step5({ form }: Step5Props) {
                         (Link ในแชร์ drive เพื่อแนบไฟล์ PDF และ JPG)
                       </p>
                       <input
-                        {...register(`regsup_supportFactors.${index}.regsup_supportByDriveLink`)}
+                        {...register(`regsup_supportFactors.${index}.sup_supportByDriveLink`)}
                         type="text"
                         placeholder="หรือใส่ลิงก์ Google Drive / Dropbox"
                         className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
@@ -269,12 +269,12 @@ export default function Step5({ form }: Step5Props) {
           <button
             type="button"
             onClick={() => appendSupportFactor({
-              regsup_supportByAdmin: '',
-              regsup_supportBySchoolBoard: '',
-              regsup_supportByOthers: '',
-              regsup_supportByDescription: '',
-              regsup_supportByDate: '',
-              regsup_supportByDriveLink: '',
+              sup_supportByAdmin: '',
+              sup_supportBySchoolBoard: '',
+              sup_supportByOthers: '',
+              sup_supportByDescription: '',
+              sup_supportByDate: '',
+              sup_supportByDriveLink: '',
             })}
             className="w-full py-2 px-4 border-2 border-dashed border-primary text-primary rounded-lg hover:bg-green-50 cursor-pointer font-medium transition-colors"
           >

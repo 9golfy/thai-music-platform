@@ -469,7 +469,7 @@ export default function Step4({ form, teacherImageFiles, setTeacherImageFiles, m
                 <div>
                   <label className="block text-sm font-medium text-gray-900 mb-1">ชั่วโมง/ภาคการศึกษา</label>
                   <input
-                    {...register(`inClassInstructionDurations.0.inClassHoursPerSemester`)}
+                    {...register(`regsup_inClassInstructionDurations.0.inClassHoursPerSemester`)}
                     type="number"
                     min="0"
                     placeholder='จำนวน (ชั่วโมง/ภาคการศึกษา)'
@@ -479,7 +479,7 @@ export default function Step4({ form, teacherImageFiles, setTeacherImageFiles, m
                 <div>
                   <label className="block text-sm font-medium text-gray-900 mb-1">ชั่วโมง/ปีการศึกษา</label>
                   <input
-                    {...register(`inClassInstructionDurations.0.inClassHoursPerYear`)}
+                    {...register(`regsup_inClassInstructionDurations.0.inClassHoursPerYear`)}
                     type="number"
                     min="0"
                     placeholder='จำนวน (ชั่วโมง/ปีการศึกษา)'
@@ -506,7 +506,7 @@ export default function Step4({ form, teacherImageFiles, setTeacherImageFiles, m
                 <div>
                   <label className="block text-sm font-medium text-gray-900 mb-1">ระดับชั้น</label>
                   <input
-                    {...register(`inClassInstructionDurations.${index}.inClassGradeLevel`)}
+                    {...register(`regsup_inClassInstructionDurations.${index}.inClassGradeLevel`)}
                     type="text"
                     className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
                   />
@@ -514,7 +514,7 @@ export default function Step4({ form, teacherImageFiles, setTeacherImageFiles, m
                 <div>
                   <label className="block text-sm font-medium text-gray-900 mb-1">เรียนดนตรีไทยจำนวน (คน)</label>
                   <input
-                    {...register(`inClassInstructionDurations.${index}.inClassStudentCount`)}
+                    {...register(`regsup_inClassInstructionDurations.${index}.inClassStudentCount`)}
                     type="number"
                     min="0"
                     placeholder='จำนวนนักเรียน (คน)'
@@ -527,7 +527,7 @@ export default function Step4({ form, teacherImageFiles, setTeacherImageFiles, m
                 <div>
                   <label className="block text-sm font-medium text-gray-900 mb-1">ชั่วโมง/ภาคการศึกษา</label>
                   <input
-                    {...register(`inClassInstructionDurations.${index}.inClassHoursPerSemester`)}
+                    {...register(`regsup_inClassInstructionDurations.${index}.inClassHoursPerSemester`)}
                     type="number"
                     min="0"
                     placeholder='จำนวน (ชั่วโมง/ภาคการศึกษา)'
@@ -537,7 +537,7 @@ export default function Step4({ form, teacherImageFiles, setTeacherImageFiles, m
                 <div>
                   <label className="block text-sm font-medium text-gray-900 mb-1">ชั่วโมง/ปีการศึกษา</label>
                   <input
-                    {...register(`inClassInstructionDurations.${index}.inClassHoursPerYear`)}
+                    {...register(`regsup_inClassInstructionDurations.${index}.inClassHoursPerYear`)}
                     type="number"
                     min="0"
                     placeholder='จำนวน (ชั่วโมง/ปีการศึกษา)'
@@ -578,7 +578,7 @@ export default function Step4({ form, teacherImageFiles, setTeacherImageFiles, m
                 <div>
                   <label className="block text-sm font-medium text-gray-900 mb-1">วัน</label>
                   <select
-                    {...register(`outOfClassInstructionDurations.0.outDay`)}
+                    {...register(`regsup_outOfClassInstructionDurations.0.outDay`)}
                     className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
                   >
                     <option value="">เลือกวัน</option>
@@ -594,7 +594,7 @@ export default function Step4({ form, teacherImageFiles, setTeacherImageFiles, m
                 <div>
                   <label className="block text-sm font-medium text-gray-900 mb-1">เวลา</label>
                   <input
-                    {...register(`outOfClassInstructionDurations.0.outTimeFrom`)}
+                    {...register(`regsup_outOfClassInstructionDurations.0.outTimeFrom`)}
                     type="text"
                     placeholder="เช่น 08:00"
                     className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
@@ -606,7 +606,7 @@ export default function Step4({ form, teacherImageFiles, setTeacherImageFiles, m
                 <div>
                   <label className="block text-sm font-medium text-gray-900 mb-1">ถึง</label>
                   <input
-                    {...register(`outOfClassInstructionDurations.0.outTimeTo`)}
+                    {...register(`regsup_outOfClassInstructionDurations.0.outTimeTo`)}
                     type="text"
                     placeholder="เช่น 16:00"
                     className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
@@ -615,7 +615,7 @@ export default function Step4({ form, teacherImageFiles, setTeacherImageFiles, m
                 <div>
                   <label className="block text-sm font-medium text-gray-900 mb-1">สถานที่</label>
                   <input
-                    {...register(`outOfClassInstructionDurations.0.outLocation`)}
+                    {...register(`regsup_outOfClassInstructionDurations.0.outLocation`)}
                     type="text"
                     className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
                   />
@@ -640,7 +640,7 @@ export default function Step4({ form, teacherImageFiles, setTeacherImageFiles, m
                 <div>
                   <label className="block text-sm font-medium text-gray-900 mb-1">วัน</label>
                   <select
-                    {...register(`outOfClassInstructionDurations.${index}.outDay`)}
+                    {...register(`regsup_outOfClassInstructionDurations.${index}.outDay`)}
                     className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
                   >
                     <option value="">เลือกวัน</option>
@@ -656,7 +656,7 @@ export default function Step4({ form, teacherImageFiles, setTeacherImageFiles, m
                 <div>
                   <label className="block text-sm font-medium text-gray-900 mb-1">เวลา</label>
                   <input
-                    {...register(`outOfClassInstructionDurations.${index}.outTimeFrom`)}
+                    {...register(`regsup_outOfClassInstructionDurations.${index}.outTimeFrom`)}
                     type="text"
                     placeholder="เช่น 08:00"
                     className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
@@ -668,7 +668,7 @@ export default function Step4({ form, teacherImageFiles, setTeacherImageFiles, m
                 <div>
                   <label className="block text-sm font-medium text-gray-900 mb-1">ถึง</label>
                   <input
-                    {...register(`outOfClassInstructionDurations.${index}.outTimeTo`)}
+                    {...register(`regsup_outOfClassInstructionDurations.${index}.outTimeTo`)}
                     type="text"
                     placeholder="เช่น 16:00"
                     className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
@@ -677,7 +677,7 @@ export default function Step4({ form, teacherImageFiles, setTeacherImageFiles, m
                 <div>
                   <label className="block text-sm font-medium text-gray-900 mb-1">สถานที่</label>
                   <input
-                    {...register(`outOfClassInstructionDurations.${index}.outLocation`)}
+                    {...register(`regsup_outOfClassInstructionDurations.${index}.outLocation`)}
                     type="text"
                     className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
                   />
