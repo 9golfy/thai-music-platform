@@ -1,0 +1,50 @@
+services:
+  mongo-dev:
+    image: mongo:7
+    container_name: thai-music-mongo-dev
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+    ports:
+      - "27018:27017"  # ใช้ port อื่นเพื่อไม่ชนกับ production
+    volumes:
+      - mongo_data_dev:/data/db
+
+  mongo-express-dev:
+    image: mongo-express:1
+    container_name: thai-music-mongo-express-dev
+    restart: unless-stopped
+    depends_on:
+      - mongo-dev
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_ROOT_USERNAME}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_ROOT_PASSWORD}
+      ME_CONFIG_MONGODB_SERVER: mongo-dev
+      ME_CONFIG_BASICAUTH: "false"
+    ports:
+      - "8082:8081"  # ใช้ port อื่นเพื่อไม่ชนกับ production
+
+  web-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: thai-music-web-dev
+    ports:
+      - "3001:3000"  # ใช้ port อื่นเพื่อไม่ชนกับ production
+    environment:
+      - NODE_ENV=development
+      - MONGO_URI=mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongo-dev:27017/${MONGO_DB}_dev?authSource=admin
+      - MONGODB_URI=mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongo-dev:27017/${MONGO_DB}_dev?authSource=admin
+      - JWT_SECRET=${JWT_SECRET}
+      - GMAIL_USER=${GMAIL_USER}
+      - GMAIL_APP_PASSWORD=${GMAIL_APP_PASSWORD}
+      - NEXT_PUBLIC_APP_URL=http://localhost:3000
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      - mongo-dev
+
+volumes:
+  mongo_data_dev:

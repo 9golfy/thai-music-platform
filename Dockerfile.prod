@@ -1,0 +1,35 @@
+# Multi-stage build for production (Next.js: next build + next start)
+FROM node:20-alpine AS builder
+WORKDIR /app
+
+# Install deps
+COPY package*.json ./
+RUN npm ci
+
+# Copy source and build
+COPY . .
+RUN npm run build
+
+# ---- Runner ----
+FROM node:20-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+
+# Install only production deps
+COPY package*.json ./
+RUN npm ci --omit=dev && npm cache clean --force
+
+# Copy build artifacts
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/next.config.* ./ 2>/dev/null || true
+COPY --from=builder /app/package.json ./package.json
+
+# If you have these, keep them (optional)
+COPY --from=builder /app/app ./app 2>/dev/null || true
+
+EXPOSE 3000
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+
+CMD ["npm","run","start"]

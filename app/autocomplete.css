@@ -1,0 +1,101 @@
+/* Autocomplete styles with black text - Override all default styles */
+
+/* Twitter Typeahead container */
+.twitter-typeahead {
+  width: 100%;
+}
+
+/* Autocomplete menu */
+.tt-menu {
+  width: 100%;
+  margin-top: 4px;
+  padding: 8px 0;
+  background-color: #ffffff !important;
+  border: 1px solid #d4d4d4 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+  max-height: 300px !important;
+  overflow-y: auto !important;
+  color: #000000 !important;
+}
+
+/* Dataset container */
+.tt-dataset,
+.tt-dataset-0,
+.tt-dataset-1,
+.tt-dataset-2,
+.tt-dataset-3 {
+  color: #000000 !important;
+}
+
+/* Suggestion items */
+.tt-suggestion,
+.tt-selectable {
+  padding: 10px 12px !important;
+  cursor: pointer !important;
+  color: #000000 !important;
+  opacity: 1 !important;
+  background-color: #ffffff !important;
+}
+
+/* All children of suggestions */
+.tt-suggestion *,
+.tt-dataset *,
+.tt-menu * {
+  color: #000000 !important;
+  opacity: 1 !important;
+}
+
+/* Highlighted text */
+.tt-highlight,
+strong.tt-highlight {
+  color: #000000 !important;
+  opacity: 1 !important;
+}
+
+/* Hover state */
+.tt-suggestion:hover,
+.tt-cursor {
+  background-color: #e5e7eb !important;
+  color: #000000 !important;
+}
+
+.tt-suggestion:hover *,
+.tt-cursor * {
+  color: #000000 !important;
+}
+
+/* Twitter typeahead span and pre elements */
+.twitter-typeahead span,
+.twitter-typeahead pre {
+  color: #000000 !important;
+}
+
+/* jQuery UI autocomplete (fallback) */
+.ui-autocomplete {
+  max-height: 300px !important;
+  overflow-y: auto !important;
+  background-color: #ffffff !important;
+  border: 1px solid #d4d4d4 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+  z-index: 9999 !important;
+}
+
+.ui-menu-item,
+.ui-menu-item *,
+.ui-menu-item-wrapper,
+.ui-menu-item-wrapper *,
+.ui-widget-content,
+.ui-widget-content * {
+  color: #000000 !important;
+  opacity: 1 !important;
+}
+
+.ui-state-active,
+.ui-state-active *,
+.ui-state-focus,
+.ui-state-focus * {
+  background-color: #e5e7eb !important;
+  color: #000000 !important;
+}
