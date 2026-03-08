@@ -9,7 +9,7 @@ interface Submission {
   [key: string]: any;
 }
 
-export default function RegisterSupportDetailView({ id, hideScores = false, readOnly = false }: { id: string; hideScores?: boolean; readOnly?: boolean }) {
+export default function RegisterSupportDetailView({ id, hideScores = false, readOnly = false, hideDelete = false }: { id: string; hideScores?: boolean; readOnly?: boolean; hideDelete?: boolean }) {
   const router = useRouter();
   
   const [submission, setSubmission] = useState<Submission | null>(null);
@@ -215,7 +215,9 @@ export default function RegisterSupportDetailView({ id, hideScores = false, read
 
   const handleExportExcel = async () => {
     try {
-      const response = await fetch(`/api/register-support/${id}/export/excel`, {
+      // Add cache busting parameter
+      const timestamp = Date.now();
+      const response = await fetch(`/api/register-support/${id}/export/excel?t=${timestamp}`, {
         method: 'GET',
       });
       
@@ -224,7 +226,8 @@ export default function RegisterSupportDetailView({ id, hideScores = false, read
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `register-support-${displayData?.schoolName || id}.xlsx`;
+        const fileTimestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+        a.download = `register-support-${displayData?.schoolName || id}-${fileTimestamp}.csv`;
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
@@ -601,7 +604,7 @@ export default function RegisterSupportDetailView({ id, hideScores = false, read
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                Export Excel
+                Export CSV
               </button>
               <button
                 onClick={handleEdit}
@@ -612,15 +615,17 @@ export default function RegisterSupportDetailView({ id, hideScores = false, read
                 </svg>
                 EDIT
               </button>
-              <button
-                onClick={() => setShowDeleteModal(true)}
-                className="px-6 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg hover:from-red-600 hover:to-pink-600 transition-all flex items-center gap-2 shadow-md"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-                DELETE
-              </button>
+              {!hideDelete && (
+                <button
+                  onClick={() => setShowDeleteModal(true)}
+                  className="px-6 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg hover:from-red-600 hover:to-pink-600 transition-all flex items-center gap-2 shadow-md"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  DELETE
+                </button>
+              )}
             </>
           ) : (
             <>

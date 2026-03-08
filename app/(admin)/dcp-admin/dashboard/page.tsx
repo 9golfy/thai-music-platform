@@ -38,10 +38,18 @@ export default function DashboardPage() {
       const countSupport = dataSupport.success ? dataSupport.submissions.length : 0;
       const countCerts = dataCerts.success ? dataCerts.certificates.length : 0;
       
-      // Calculate total score
-      const totalScore = data100.success && data100.submissions.length > 0
-        ? data100.submissions.reduce((sum: number, s: any) => sum + (s.total_score || 0), 0)
-        : 0;
+      // Calculate total score from both register100 and register-support
+      let totalScore = 0;
+      
+      // Add register100 scores
+      if (data100.success && data100.submissions.length > 0) {
+        totalScore += data100.submissions.reduce((sum: number, s: any) => sum + (s.total_score || 0), 0);
+      }
+      
+      // Add register-support scores
+      if (dataSupport.success && dataSupport.submissions.length > 0) {
+        totalScore += dataSupport.submissions.reduce((sum: number, s: any) => sum + (s.total_score || 0), 0);
+      }
 
       setStats({
         register100: count100,
@@ -61,7 +69,7 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-2xl font-bold text-gray-800">
-          ระบบบริหารจัดการข้อมูลกิจกรรมโรงเรียนดนตรีไทย ๑๐๐ เปอร์เซ็นต์
+          จำนวนโรงเรียนที่ลงทะเบียนทั้งหมด {loading ? '...' : (stats.register100 + stats.registerSupport)} โรงเรียน
         </h1>
       </div>
 

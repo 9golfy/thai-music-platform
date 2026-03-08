@@ -142,8 +142,8 @@ export default async function TeacherCertificatePage() {
                   <p className="text-xs text-gray-500 mb-1">ประเภท</p>
                   <p className="font-medium text-gray-900">
                     {(certificate as any).certificateType === 'register100'
-                      ? 'โรงเรียนดนตรีไทย 100%'
-                      : 'โรงเรียนสนับสนุนฯ'}
+                      ? 'โรงเรียนดนตรีไทย ๑๐๐ เปอร์เซ็นต์'
+                      : 'โรงเรียนสนับสนุนและส่งเสริมดนตรีไทย'}
                   </p>
                 </div>
                 <div className="bg-gray-50 rounded-lg p-4">

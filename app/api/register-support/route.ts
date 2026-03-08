@@ -102,8 +102,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Save teacher images
-    if (data.thaiMusicTeachers && Array.isArray(data.thaiMusicTeachers)) {
-      for (let i = 0; i < data.thaiMusicTeachers.length; i++) {
+    if (data.regsup_thaiMusicTeachers && Array.isArray(data.regsup_thaiMusicTeachers)) {
+      for (let i = 0; i < data.regsup_thaiMusicTeachers.length; i++) {
         const fileKey = `teacherImage_${i}`;
         if (files[fileKey]) {
           const file = files[fileKey];
@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
           const buffer = Buffer.from(bytes);
           await writeFile(filepath, buffer);
           
-          data.thaiMusicTeachers[i].teacherImage = `/uploads/${filename}`;
+          data.regsup_thaiMusicTeachers[i].teacherImage = `/uploads/${filename}`;
           console.log(`✅ Saved teacherImage_${i}:`, filename);
         }
       }
@@ -371,7 +371,7 @@ export async function POST(request: NextRequest) {
       () => sendTeacherLoginInfoEmail(
         teacherEmail,
         teacherPhone,
-        data.schoolName,
+        data.regsup_schoolName || data.schoolName, // Try regsup_schoolName first, fallback to schoolName
         data.schoolId,
         teacherPassword,
         'register_support',

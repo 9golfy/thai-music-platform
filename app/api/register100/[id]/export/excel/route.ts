@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { MongoClient, ObjectId } from 'mongodb';
-import * as XLSX from 'xlsx';
 
 const uri = process.env.MONGODB_URI || 'mongodb://root:rootpass@localhost:27017/thai_music_school?authSource=admin';
 const dbName = process.env.MONGO_DB || 'thai_music_school';
@@ -30,362 +29,236 @@ export async function GET(
     };
 
     const schoolName = getFieldValue('schoolName') || 'ไม่ระบุ';
-    const schoolProvince = getFieldValue('schoolProvince') || 'ไม่ระบุ';
-    const schoolLevel = getFieldValue('schoolLevel') || 'ไม่ระบุ';
     const totalScore = submission.total_score || 0;
 
-    // Get comprehensive data from all steps - using correct field names from database
-    const schoolAddress = `${getFieldValue('addressNo') || ''} หมู่ ${getFieldValue('moo') || ''} ${getFieldValue('road') || ''} ตำบล${getFieldValue('subDistrict') || ''} อำเภอ${getFieldValue('district') || ''} ${getFieldValue('provinceAddress') || ''} ${getFieldValue('postalCode') || ''}`.trim() || 'ไม่ระบุ';
-    const schoolPhone = getFieldValue('phone') || 'ไม่ระบุ';
-    const schoolEmail = getFieldValue('email') || 'ไม่ระบุ';
-    const schoolWebsite = getFieldValue('website') || 'ไม่ระบุ';
-    const principalName = getFieldValue('mgtFullName') || 'ไม่ระบุ';
-    const principalPhone = getFieldValue('mgtPhone') || 'ไม่ระบุ';
-    const principalEmail = getFieldValue('mgtEmail') || 'ไม่ระบุ';
-    const contactPersonName = getFieldValue('contactPersonName') || principalName;
-    const contactPersonPhone = getFieldValue('contactPersonPhone') || principalPhone;
-    const contactPersonEmail = getFieldValue('contactPersonEmail') || principalEmail;
-    
-    const teachers = getFieldValue('thaiMusicTeachers') || [];
-    const awards = getFieldValue('awards') || [];
-    const supportFromOrg = getFieldValue('supportFromOrg') || [];
-    const supportFromExternal = getFieldValue('supportFromExternal') || [];
-    const activitiesInternal = getFieldValue('activitiesWithinProvinceInternal') || [];
-    const activitiesExternal = getFieldValue('activitiesWithinProvinceExternal') || [];
-    const activitiesOutside = getFieldValue('activitiesOutsideProvince') || [];
-    const prActivities = getFieldValue('prActivities') || [];
-    const readinessItems = getFieldValue('readinessItems') || [];
-    const informationSources = getFieldValue('informationSources') || [];
-    const obstacles = getFieldValue('obstacles') || 'ไม่ระบุ';
-    const suggestions = getFieldValue('suggestions') || 'ไม่ระบุ';
-    const certification = getFieldValue('certification') || false;
+    // Helper function to format teachers data for CSV
+    const formatTeachersData = (teachers: any[]) => {
+      if (!teachers || teachers.length === 0) return [['ไม่มีข้อมูลครู']];
+      
+      const teacherRows: any[][] = [];
+      teachers.forEach((teacher, index) => {
+        teacherRows.push([`ครูคนที่ ${index + 1}`]);
+        teacherRows.push(['คุณลักษณะ', teacher.teacherQualification || '-']);
+        teacherRows.push(['ชื่อ-นามสกุล', teacher.teacherName || '-']);
+        teacherRows.push(['ตำแหน่ง', teacher.teacherPosition || '-']);
+        teacherRows.push(['วุฒิการศึกษา', teacher.teacherEducation || '-']);
+        teacherRows.push(['โทรศัพท์', teacher.teacherPhone || '-']);
+        teacherRows.push(['อีเมล', teacher.teacherEmail || '-']);
+        if (index < teachers.length - 1) teacherRows.push(['']);
+      });
+      return teacherRows;
+    };
 
-    // Create step-by-step Excel data
-    const worksheetData = [
-      ['รายงานข้อมูลโรงเรียน'],
-      [''],
-      ['คะแนนรวม', `${totalScore} / 100 คะแนน`],
+    // Helper function to format instruments data for CSV
+    const formatInstrumentsData = (instruments: any[]) => {
+      if (!instruments || instruments.length === 0) return [['ไม่มีข้อมูลเครื่องดนตรี']];
+      
+      const instrumentRows: any[][] = [['ชื่อเครื่องดนตรี', 'จำนวน', 'หมายเหตุ']];
+      instruments.forEach(instrument => {
+        instrumentRows.push([
+          instrument.instrumentName || '-',
+          instrument.quantity || '-',
+          instrument.note || '-'
+        ]);
+      });
+      return instrumentRows;
+    };
+
+    // Helper function to format activities data for CSV
+    const formatActivitiesData = (activities: any[], title: string) => {
+      if (!activities || activities.length === 0) return [[title], ['ไม่มีข้อมูล']];
+      
+      const activityRows: any[][] = [[title], ['ชื่อกิจกรรม', 'วันที่', 'ลิงก์หลักฐาน']];
+      activities.forEach(activity => {
+        activityRows.push([
+          activity.activityName || '-',
+          activity.activityDate || activity.publishDate || '-',
+          activity.evidenceLink || '-'
+        ]);
+      });
+      return activityRows;
+    };
+
+    // Helper function to format support organizations data for CSV
+    const formatSupportOrgsData = (orgs: any[], title: string) => {
+      if (!orgs || orgs.length === 0) return [[title], ['ไม่มีข้อมูล']];
+      
+      const orgRows: any[][] = [[title], ['องค์กร/หน่วยงาน', 'รายละเอียด', 'ลิงก์หลักฐาน']];
+      orgs.forEach(org => {
+        orgRows.push([
+          org.organization || '-',
+          org.details || '-',
+          org.evidenceLink || '-'
+        ]);
+      });
+      return orgRows;
+    };
+
+    // Helper function to format awards data for CSV
+    const formatAwardsData = (awards: any[]) => {
+      if (!awards || awards.length === 0) return [['ไม่มีข้อมูลรางวัล']];
+      
+      const awardRows: any[][] = [['ระดับ', 'ชื่อรางวัล', 'วันที่ได้รับ', 'หลักฐาน']];
+      awards.forEach(award => {
+        awardRows.push([
+          award.awardLevel || '-',
+          award.awardName || '-',
+          award.awardDate || '-',
+          award.awardEvidenceLink || '-'
+        ]);
+      });
+      return awardRows;
+    };
+
+    // Create comprehensive CSV content with all step data
+    const csvContent: any[][] = [
+      ['รายงานข้อมูลโรงเรียนดนตรีไทย 100%'],
+      ['ชื่อสถานศึกษา:', getFieldValue('schoolName')],
       [''],
       
       // Step 1: ข้อมูลพื้นฐาน
-      ['Step 1: ข้อมูลพื้นฐาน'],
-      ['ชื่อสถานศึกษา', schoolName],
-      ['จังหวัด', schoolProvince],
-      ['ระดับการศึกษา', schoolLevel],
+      ['=== STEP 1: ข้อมูลพื้นฐาน ==='],
+      ['ชื่อสถานศึกษา', getFieldValue('schoolName')],
+      ['จังหวัด', getFieldValue('schoolProvince')],
+      ['ระดับการศึกษา', getFieldValue('schoolLevel')],
       ['สังกัด', getFieldValue('affiliation')],
       ['ขนาดโรงเรียน', getFieldValue('schoolSize')],
       ['จำนวนบุคลากร', getFieldValue('staffCount')],
       ['จำนวนนักเรียน', getFieldValue('studentCount')],
-      [''],
-      ['สถานที่ตั้ง'],
-      ['ที่อยู่', schoolAddress],
-      ['โทรศัพท์', schoolPhone],
-      ['โทรสาร', getFieldValue('fax')],
-      ['อีเมล', schoolEmail],
-      ['เว็บไซต์', schoolWebsite],
+      ['จำนวนนักเรียนแต่ละชั้น', getFieldValue('studentCountByGrade')],
+      ['ที่อยู่', `เลขที่ ${getFieldValue('mgtAddress')} หมู่ ${getFieldValue('mgtVillage')} ถนน ${getFieldValue('mgtRoad')} ตำบล/แขวง ${getFieldValue('mgtSubdistrict')} อำเภอ/เขต ${getFieldValue('mgtDistrict')} จังหวัด ${getFieldValue('mgtProvince')} รหัสไปรษณีย์ ${getFieldValue('mgtPostalCode')}`],
+      ['โทรศัพท์', getFieldValue('mgtPhone')],
+      ['โทรสาร', getFieldValue('mgtFax')],
       [''],
       
       // Step 2: ผู้บริหารสถานศึกษา
-      ['Step 2: ผู้บริหารสถานศึกษา'],
-      ['ชื่อ-นามสกุล', principalName],
+      ['=== STEP 2: ผู้บริหารสถานศึกษา ==='],
+      ['ชื่อ-นามสกุล', getFieldValue('mgtFullName')],
       ['ตำแหน่ง', getFieldValue('mgtPosition')],
       ['ที่อยู่', getFieldValue('mgtAddress')],
-      ['โทรศัพท์', principalPhone],
-      ['อีเมล', principalEmail],
+      ['โทรศัพท์', getFieldValue('mgtPhone')],
+      ['อีเมล', getFieldValue('mgtEmail')],
       [''],
       
       // Step 3: แผนการสอนดนตรีไทย
-      ['Step 3: แผนการสอนดนตรีไทย'],
-      ['สภาวการณ์การเรียนการสอน'],
-    ];
-
-    // Add current music types if available
-    const currentMusicTypes = getFieldValue('currentMusicTypes') || [];
-    if (currentMusicTypes.length > 0) {
-      currentMusicTypes.forEach((item: any, index: number) => {
-        worksheetData.push([`${index + 1}. ระดับชั้น: ${item.grade || 'ไม่ระบุ'} - ${item.details || 'ไม่ระบุ'}`]);
-      });
-    } else {
-      worksheetData.push(['ไม่มีข้อมูล']);
-    }
-    worksheetData.push(['']);
-
-    // ความพร้อมเครื่องดนตรี
-    worksheetData.push(['ความพร้อมเครื่องดนตรี']);
-    if (readinessItems.length > 0) {
-      worksheetData.push(['ลำดับ', 'ชื่อเครื่องดนตรี', 'จำนวน', 'หมายเหตุ']);
-      readinessItems.forEach((item: any, index: number) => {
-        worksheetData.push([
-          index + 1,
-          item.instrumentName || 'ไม่ระบุ',
-          item.quantity || 'ไม่ระบุ',
-          item.note || '-'
-        ]);
-      });
-    } else {
-      worksheetData.push(['ไม่มีข้อมูล']);
-    }
-    worksheetData.push(['']);
-
-    // การเรียนการสอน
-    worksheetData.push(['การเรียนการสอน']);
-    worksheetData.push(['วิชาบังคับ', getFieldValue('isCompulsorySubject') ? 'มี' : 'ไม่มี']);
-    worksheetData.push(['สอนหลังเลิกเรียน', getFieldValue('hasAfterSchoolTeaching') ? 'มี' : 'ไม่มี']);
-    worksheetData.push(['วิชาเลือก', getFieldValue('hasElectiveSubject') ? 'มี' : 'ไม่มี']);
-    worksheetData.push(['หลักสูตรท้องถิ่น', getFieldValue('hasLocalCurriculum') ? 'มี' : 'ไม่มี']);
-    worksheetData.push(['สถานที่สอน', getFieldValue('teachingLocation')]);
-    worksheetData.push(['']);
-
-    // Step 4: ข้อมูลครูผู้สอนดนตรีไทย
-    worksheetData.push(['Step 4: ข้อมูลครูผู้สอนดนตรีไทย']);
-    if (teachers.length > 0) {
-      worksheetData.push(['ลำดับ', 'ชื่อ-นามสกุล', 'ตำแหน่ง', 'คุณลักษณะ', 'การศึกษา']);
-      teachers.forEach((teacher: any, index: number) => {
-        worksheetData.push([
-          index + 1,
-          teacher.teacherFullName || teacher.teacherName || 'ไม่ระบุ',
-          teacher.teacherPosition || 'ไม่ระบุ',
-          teacher.teacherQualification || 'ไม่ระบุ',
-          teacher.teacherEducation || 'ไม่ระบุ'
-        ]);
-      });
-    } else {
-      worksheetData.push(['ไม่มีข้อมูล']);
-    }
-    worksheetData.push(['']);
-
-    // Step 5: การสนับสนุนและรางวัล
-    worksheetData.push(['Step 5: การสนับสนุนและรางวัล']);
-    
-    // การสนับสนุนจากต้นสังกัด
-    worksheetData.push(['การสนับสนุนจากต้นสังกัด']);
-    if (supportFromOrg.length > 0) {
-      worksheetData.push(['ลำดับ', 'รายการสนับสนุน', 'ประเภท']);
-      supportFromOrg.forEach((support: any, index: number) => {
-        worksheetData.push([
-          index + 1,
-          support.supportName || support.supportType || 'ไม่ระบุ',
-          support.supportCategory || 'ไม่ระบุ'
-        ]);
-      });
-    } else {
-      worksheetData.push(['ไม่มีข้อมูล']);
-    }
-    worksheetData.push(['']);
-
-    // การสนับสนุนจากภายนอก
-    worksheetData.push(['การสนับสนุนจากภายนอก']);
-    if (supportFromExternal.length > 0) {
-      worksheetData.push(['ลำดับ', 'หน่วยงาน', 'รายการสนับสนุน']);
-      supportFromExternal.forEach((support: any, index: number) => {
-        worksheetData.push([
-          index + 1,
-          support.organizationName || 'ไม่ระบุ',
-          support.supportDetails || 'ไม่ระบุ'
-        ]);
-      });
-    } else {
-      worksheetData.push(['ไม่มีข้อมูล']);
-    }
-    worksheetData.push(['']);
-
-    // รางวัลและเกียรติคุณ
-    worksheetData.push(['รางวัลและเกียรติคุณ']);
-    if (awards.length > 0) {
-      worksheetData.push(['ลำดับ', 'ชื่อรางวัล', 'ระดับ', 'ปี']);
-      awards.forEach((award: any, index: number) => {
-        worksheetData.push([
-          index + 1,
-          award.awardName || 'ไม่ระบุ',
-          award.awardLevel || 'ไม่ระบุ',
-          award.awardYear || award.awardDate || 'ไม่ระบุ'
-        ]);
-      });
-    } else {
-      worksheetData.push(['ไม่มีข้อมูล']);
-    }
-    worksheetData.push(['']);
-
-    // กรอบหลักสูตรและผลการเรียนรู้
-    worksheetData.push(['กรอบหลักสูตรและผลการเรียนรู้']);
-    worksheetData.push(['กรอบหลักสูตร', getFieldValue('curriculumFramework')]);
-    worksheetData.push(['ผลการเรียนรู้', getFieldValue('learningOutcomes')]);
-    worksheetData.push(['บริบทการจัดการ', getFieldValue('managementContext')]);
-    worksheetData.push(['']);
-
-    // Step 6: สื่อและเทคโนโลยี
-    worksheetData.push(['Step 6: สื่อและเทคโนโลยี']);
-    worksheetData.push(['ลิงก์แกลเลอรี่รูปภาพ', getFieldValue('photoGalleryLink') || 'ไม่มีข้อมูล']);
-    worksheetData.push(['ลิงก์วิดีโอ', getFieldValue('videoLink') || 'ไม่มีข้อมูล']);
-    worksheetData.push(['']);
-
-    // Step 7: กิจกรรมดนตรีไทย
-    worksheetData.push(['Step 7: กิจกรรมดนตรีไทย']);
-    
-    // กิจกรรมภายในสถานศึกษา
-    worksheetData.push(['กิจกรรมภายในสถานศึกษา']);
-    if (activitiesInternal.length > 0) {
-      worksheetData.push(['ลำดับ', 'ชื่อกิจกรรม', 'วันที่จัด']);
-      activitiesInternal.forEach((activity: any, index: number) => {
-        worksheetData.push([
-          index + 1,
-          activity.activityName || 'ไม่ระบุ',
-          activity.activityDate || 'ไม่ระบุ'
-        ]);
-      });
-    } else {
-      worksheetData.push(['ไม่มีข้อมูล']);
-    }
-    worksheetData.push(['']);
-
-    // กิจกรรมภายนอกสถานศึกษา
-    worksheetData.push(['กิจกรรมภายนอกสถานศึกษา']);
-    if (activitiesExternal.length > 0) {
-      worksheetData.push(['ลำดับ', 'ชื่อกิจกรรม', 'วันที่จัด']);
-      activitiesExternal.forEach((activity: any, index: number) => {
-        worksheetData.push([
-          index + 1,
-          activity.activityName || 'ไม่ระบุ',
-          activity.activityDate || 'ไม่ระบุ'
-        ]);
-      });
-    } else {
-      worksheetData.push(['ไม่มีข้อมูล']);
-    }
-    worksheetData.push(['']);
-
-    // กิจกรรมนอกจังหวัด
-    worksheetData.push(['กิจกรรมนอกจังหวัด']);
-    if (activitiesOutside.length > 0) {
-      worksheetData.push(['ลำดับ', 'ชื่อกิจกรรม', 'วันที่จัด']);
-      activitiesOutside.forEach((activity: any, index: number) => {
-        worksheetData.push([
-          index + 1,
-          activity.activityName || 'ไม่ระบุ',
-          activity.activityDate || 'ไม่ระบุ'
-        ]);
-      });
-    } else {
-      worksheetData.push(['ไม่มีข้อมูล']);
-    }
-    worksheetData.push(['']);
-
-    // Step 8: การประชาสัมพันธ์และข้อมูลเพิ่มเติม
-    worksheetData.push(['Step 8: การประชาสัมพันธ์และข้อมูลเพิ่มเติม']);
-    
-    // กิจกรรมประชาสัมพันธ์
-    worksheetData.push(['กิจกรรมประชาสัมพันธ์']);
-    if (prActivities.length > 0) {
-      worksheetData.push(['ลำดับ', 'ชื่อกิจกรรม', 'ช่องทาง']);
-      prActivities.forEach((activity: any, index: number) => {
-        worksheetData.push([
-          index + 1,
-          activity.activityName || 'ไม่ระบุ',
-          activity.prChannel || 'ไม่ระบุ'
-        ]);
-      });
-    } else {
-      worksheetData.push(['ไม่มีข้อมูล']);
-    }
-    worksheetData.push(['']);
-
-    // แหล่งข้อมูลที่ใช้ในการสมัคร
-    worksheetData.push(['แหล่งข้อมูลที่ใช้ในการสมัคร']);
-    if (informationSources.length > 0) {
-      informationSources.forEach((source: string, index: number) => {
-        worksheetData.push([index + 1, source]);
-      });
-    } else {
-      worksheetData.push(['ไม่มีข้อมูล']);
-    }
-    worksheetData.push(['']);
-
-    // ข้อมูลเพิ่มเติม
-    worksheetData.push(['ข้อมูลเพิ่มเติม']);
-    worksheetData.push(['อุปสรรคในการดำเนินงาน', obstacles]);
-    worksheetData.push(['ข้อเสนอแนะ', suggestions]);
-    worksheetData.push(['การรับรองความถูกต้อง', certification ? 'ได้รับรองความถูกต้องแล้ว' : 'ยังไม่ได้รับรอง']);
-    worksheetData.push(['']);
-
-    // Footer
-    worksheetData.push(['สร้างเมื่อ', new Date().toLocaleDateString('th-TH', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })]);
-    worksheetData.push(['ระบบบริหารจัดการข้อมูลกิจกรรมโรงเรียนดนตรีไทย ๑๐๐ เปอร์เซ็นต์']);
-          activity.activityName || 'ไม่ระบุ',
-          activity.prChannel || 'ไม่ระบุ',
-          activity.activityNote || '-'
-        ]);
-      });
-      worksheetData.push(['']);
-    }
-
-    if (readinessItems.length > 0) {
-      worksheetData.push(['ความพร้อมในการดำเนินงาน'], ['ลำดับ', 'รายการ', 'สถานะ', 'หมายเหตุ']);
-      readinessItems.forEach((item: any, index: number) => {
-        worksheetData.push([
-          index + 1,
-          item.itemName || 'ไม่ระบุ',
-          item.readinessStatus || 'ไม่ระบุ',
-          item.itemNote || '-'
-        ]);
-      });
-      worksheetData.push(['']);
-    }
-
-    if (informationSources.length > 0) {
-      worksheetData.push(['แหล่งข้อมูลที่ใช้ในการสมัคร']);
-      informationSources.forEach((source: string, index: number) => {
-        worksheetData.push([`${index + 1}. ${source}`]);
-      });
-      worksheetData.push(['']);
-    }
-
-    worksheetData.push(
-      ['ข้อมูลเพิ่มเติม'],
-      ['อุปสรรคในการดำเนินงาน', obstacles],
-      ['ข้อเสนอแนะ', suggestions],
-      ['การรับรองความถูกต้อง', certification ? 'ได้รับรองความถูกต้องแล้ว' : 'ยังไม่ได้รับรอง'],
+      ['=== STEP 3: แผนการสอนดนตรีไทย ==='],
+      ['สภาวการณ์การเรียนการสอน ม.1-3', getFieldValue('teachingSituation_M1_M3')],
+      ['สภาวการณ์การเรียนการสอน ม.4-6', getFieldValue('teachingSituation_M4_M6')],
       [''],
-      ['สร้างเมื่อ', new Date().toLocaleDateString('th-TH')]
-    );
-
-    // Create workbook and worksheet
-    const workbook = XLSX.utils.book_new();
-    const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
-    
-    // Set column widths
-    worksheet['!cols'] = [
-      { width: 30 },
-      { width: 20 },
-      { width: 15 },
-      { width: 15 }
+      ['ความพร้อมเครื่องดนตรี'],
+      ...formatInstrumentsData(submission.reg100_readinessItems || submission.readinessItems),
+      [''],
+      
+      // Step 4: ผู้สอนดนตรีไทย
+      ['=== STEP 4: ผู้สอนดนตรีไทย ==='],
+      ['การเรียนการสอน'],
+      ['วิชาบังคับ', getFieldValue('isCompulsorySubject') ? 'มี' : 'ไม่มี'],
+      ['สอนหลังเลิกเรียน', getFieldValue('hasAfterSchoolTeaching') ? 'มี' : 'ไม่มี'],
+      ['วิชาเลือก', getFieldValue('hasElectiveSubject') ? 'มี' : 'ไม่มี'],
+      ['หลักสูตรท้องถิ่น', getFieldValue('hasLocalCurriculum') ? 'มี' : 'ไม่มี'],
+      [''],
+      ['สถานที่สอน', getFieldValue('teachingLocation')],
+      [''],
+      ['รายชื่อครู'],
+      ...formatTeachersData(submission.reg100_thaiMusicTeachers || submission.thaiMusicTeachers),
+      [''],
+      
+      // Step 5: การสนับสนุนและรางวัล
+      ['=== STEP 5: การสนับสนุนและรางวัล ==='],
+      ...formatSupportOrgsData(submission.reg100_supportFromOrg || submission.supportFromOrg, 'การสนับสนุนจากต้นสังกัด'),
+      [''],
+      ...formatSupportOrgsData(submission.reg100_supportFromExternal || submission.supportFromExternal, 'การสนับสนุนจากภายนอก'),
+      [''],
+      ['กรอบหลักสูตร', getFieldValue('curriculumFramework')],
+      ['ผลการเรียนรู้', getFieldValue('learningOutcomes')],
+      ['บริบทการจัดการ', getFieldValue('managementContext')],
+      [''],
+      ['รางวัลและเกียรติคุณ'],
+      ...formatAwardsData(submission.reg100_awards || submission.awards),
+      [''],
+      
+      // Step 6: สื่อและวิดีโอ
+      ['=== STEP 6: สื่อและวิดีโอ ==='],
+      ['ลิงก์แกลเลอรี่รูปภาพ', getFieldValue('photoGalleryLink')],
+      ['ลิงก์วิดีโอ', getFieldValue('videoLink')],
+      [''],
+      
+      // Step 7: กิจกรรมและการเผยแพร่
+      ['=== STEP 7: กิจกรรมและการเผยแพร่ ==='],
+      ...formatActivitiesData(submission.reg100_activitiesWithinProvinceInternal || submission.activitiesWithinProvinceInternal, 'กิจกรรมภายในจังหวัด (ภายใน)'),
+      [''],
+      ...formatActivitiesData(submission.reg100_activitiesWithinProvinceExternal || submission.activitiesWithinProvinceExternal, 'กิจกรรมภายในจังหวัด (ภายนอก)'),
+      [''],
+      ...formatActivitiesData(submission.reg100_activitiesOutsideProvince || submission.activitiesOutsideProvince, 'กิจกรรมนอกจังหวัด'),
+      [''],
+      
+      // Step 8: ประชาสัมพันธ์และแหล่งข้อมูล
+      ['=== STEP 8: ประชาสัมพันธ์และแหล่งข้อมูล ==='],
+      ...formatActivitiesData(submission.reg100_prActivities || submission.prActivities, 'กิจกรรมประชาสัมพันธ์'),
+      [''],
+      ['แหล่งที่มาของข้อมูล'],
+      ['โรงเรียน', getFieldValue('heardFromSchoolName')],
+      ['สำนักงานวัฒนธรรม', getFieldValue('heardFromCulturalOfficeName')],
+      ['สำนักงานเขตพื้นที่', getFieldValue('heardFromEducationAreaName')],
+      ['อื่นๆ', getFieldValue('heardFromOtherDetail')],
+      [''],
+      ['ปัญหาอุปสรรค', getFieldValue('obstacles')],
+      ['ข้อเสนอแนะ', getFieldValue('suggestions')],
+      [''],
+      
+      // Score Summary
+      ['=== สรุปคะแนน ==='],
+      ['หมวด', 'คะแนนที่ได้', 'คะแนนเต็ม'],
+      ['การเรียนการสอนดนตรีไทย', submission.teacher_training_score || 0, 20],
+      ['คุณลักษณะครูผู้สอน', submission.teacher_qualification_score || 0, 20],
+      ['การสนับสนุนจากต้นสังกัด', submission.support_from_org_score || 0, 5],
+      ['การสนับสนุนจากภายนอก', submission.support_from_external_score || 0, 15],
+      ['รางวัลและเกียรติคุณ', submission.award_score || 0, 20],
+      ['กิจกรรมภายในสถานศึกษา', submission.activity_within_province_internal_score || 0, 5],
+      ['กิจกรรมภายนอกสถานศึกษา', submission.activity_within_province_external_score || 0, 5],
+      ['กิจกรรมนอกจังหวัด', submission.activity_outside_province_score || 0, 5],
+      ['การประชาสัมพันธ์', submission.pr_activity_score || 0, 5],
+      ['รวมทั้งหมด', totalScore, 100],
+      [''],
+      
+      // Footer
+      ['สร้างเมื่อ', new Date().toLocaleDateString('th-TH', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })],
+      ['ระบบบริหารจัดการข้อมูลกิจกรรมโรงเรียนดนตรีไทย ๑๐๐ เปอร์เซ็นต์']
     ];
-    
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Report');
-    
+
+    // Convert to CSV format
+    const csv = csvContent.map(row => 
+      row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')
+    ).join('\n');
+
     await client.close();
     
-    // Generate Excel buffer with proper encoding
-    const excelBuffer = XLSX.write(workbook, { 
-      type: 'buffer', 
-      bookType: 'xlsx',
-      compression: true
-    });
+    // Add BOM for UTF-8 Excel compatibility
+    const bom = '\uFEFF';
+    const csvWithBom = bom + csv;
     
-    return new NextResponse(excelBuffer, {
+    // Add timestamp to filename
+    const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+    
+    return new NextResponse(csvWithBom, {
       headers: {
-        'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'Content-Disposition': `attachment; filename="register100-${encodeURIComponent(schoolName)}.xlsx"`,
+        'Content-Type': 'text/csv; charset=utf-8',
+        'Content-Disposition': `attachment; filename="register100-${encodeURIComponent(schoolName)}-${timestamp}.csv"`,
       },
     });
     
   } catch (error) {
     console.error('Error generating Excel:', error);
-    return NextResponse.json({ success: false, message: 'เกิดข้อผิดพลาดในการสร้าง Excel' }, { status: 500 });
+    return NextResponse.json({ 
+      success: false, 
+      message: 'เกิดข้อผิดพลาดในการสร้าง Excel', 
+      error: error instanceof Error ? error.message : 'Unknown error' 
+    }, { status: 500 });
   }
 }

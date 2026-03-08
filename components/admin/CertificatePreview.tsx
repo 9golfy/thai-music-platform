@@ -40,16 +40,21 @@ export default function CertificatePreview({
       const opt = {
         margin: 0,
         filename: `certificate-${certificateNumber}.pdf`,
-        image: { type: 'jpeg' as const, quality: 0.98 },
+        image: { type: 'jpeg' as const, quality: 1.0 },
         html2canvas: { 
-          scale: 2,
+          scale: 3,
           useCORS: true,
+          allowTaint: true,
           logging: false,
+          backgroundColor: '#ffffff',
+          width: width,
+          height: height,
         },
         jsPDF: { 
           unit: 'px', 
           format: [width, height] as [number, number], 
-          orientation: 'landscape' as const
+          orientation: 'landscape' as const,
+          compress: false
         },
       };
 
@@ -83,10 +88,11 @@ export default function CertificatePreview({
       {/* Certificate Display */}
       <div
         ref={certificateRef}
+        id="certificate-preview"
         className="relative mx-auto bg-white shadow-lg"
         style={{
-          width: `${width * 0.8}px`,
-          height: `${height * 0.8}px`,
+          width: `${width}px`,
+          height: `${height}px`,
           maxWidth: '100%',
           aspectRatio: `${width} / ${height}`,
         }}
@@ -124,18 +130,25 @@ export default function CertificatePreview({
         <div
           className="absolute"
           style={{
-            top: '45%',
+            top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            fontSize: '42px',
+            fontSize: '32px',
             fontFamily: 'Sarabun, sans-serif',
             color: '#1a1a1a',
             textAlign: 'center',
-            fontWeight: '600',
-            maxWidth: '80%',
+            fontWeight: '700',
+            maxWidth: '85%',
             lineHeight: '1.4',
             width: '100%',
-            padding: '0 20px',
+            padding: '12px 16px',
+            whiteSpace: 'nowrap',
+            overflow: 'visible',
+            minHeight: '50px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            textShadow: '1px 1px 2px rgba(0,0,0,0.1)',
           }}
         >
           {schoolName}
@@ -216,17 +229,40 @@ export default function CertificatePreview({
           body * {
             visibility: hidden;
           }
-          ${certificateRef.current ? `
           #certificate-preview,
           #certificate-preview * {
-            visibility: visible;
+            visibility: visible !important;
           }
           #certificate-preview {
-            position: absolute;
-            left: 0;
-            top: 0;
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            box-shadow: none !important;
+            transform: none !important;
           }
-          ` : ''}
+          
+          /* Ensure background images print */
+          #certificate-preview * {
+            -webkit-print-color-adjust: exact !important;
+            color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          
+          /* Hide action buttons when printing */
+          button {
+            display: none !important;
+          }
+          
+          /* Ensure certificate fills the page */
+          @page {
+            margin: 0;
+            size: landscape;
+          }
         }
       `}</style>
     </div>

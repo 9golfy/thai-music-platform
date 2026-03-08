@@ -134,10 +134,18 @@ export async function POST(request: Request) {
       const certificateNumber = `CERT-${year}-${timestamp}${random}${extraRandom}`;
     }
 
+    // Get school name based on certificate type
+    let schoolName = school.schoolName;
+    if (certificateType === 'register-support' && school.regsup_schoolName) {
+      schoolName = school.regsup_schoolName;
+    } else if (certificateType === 'register100' && school.reg100_schoolName) {
+      schoolName = school.reg100_schoolName;
+    }
+
     // Create certificate
     const newCertificate = {
       schoolId: schoolId.toString(),
-      schoolName: school.schoolName,
+      schoolName: schoolName,
       certificateType,
       templateName, // Store template name instead of ID
       certificateNumber,

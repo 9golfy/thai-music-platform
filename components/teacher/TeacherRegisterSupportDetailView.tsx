@@ -8,5 +8,7 @@ interface TeacherRegisterSupportDetailViewProps {
 }
 
 export default function TeacherRegisterSupportDetailView({ id }: TeacherRegisterSupportDetailViewProps) {
-  return <RegisterSupportDetailView id={id} hideScores={true} readOnly={true} />;
+  // Teachers should have export and edit functionality, but not delete
+  // hideScores=true to hide scoring details, readOnly=false to allow editing, hideDelete=true to hide delete button
+  return <RegisterSupportDetailView id={id} hideScores={true} readOnly={false} hideDelete={true} />;
 }
