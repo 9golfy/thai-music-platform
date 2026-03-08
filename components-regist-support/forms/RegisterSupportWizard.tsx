@@ -42,9 +42,9 @@ export default function RegisterSupportWizard() {
     // Get current form values - React Hook Form now has correct values
     const formValues = form.getValues();
     console.log('📋 Form values from React Hook Form:', {
-      supportType: formValues.supportType,
-      supportTypeMemberCount: formValues.supportTypeMemberCount,
-      schoolName: formValues.schoolName
+      supportType: formValues.regsup_supportType,
+      supportTypeMemberCount: formValues.regsup_supportTypeMemberCount,
+      schoolName: formValues.regsup_schoolName
     });
     
     return formValues;
@@ -56,39 +56,39 @@ export default function RegisterSupportWizard() {
   const form = useForm<RegisterSupportFormData>({
     mode: 'onBlur',
     defaultValues: {
-      thaiMusicTeachers: [],
-      readinessItems: [],
-      inClassInstructionDurations: [],
-      outOfClassInstructionDurations: [],
-      supportFactors: [],
-      supportFromOrg: [],
-      supportFromExternal: [],
-      awards: [],
-      activitiesWithinProvinceInternal: [],
-      activitiesWithinProvinceExternal: [],
-      activitiesOutsideProvince: [],
-      prActivities: [],
-      isCompulsorySubject: false,
-      hasAfterSchoolTeaching: false,
-      hasElectiveSubject: false,
-      hasLocalCurriculum: false,
-      hasSupportFromOrg: false,
-      hasSupportFromExternal: false,
-      DCP_PR_Channel_FACEBOOK: false,
-      DCP_PR_Channel_YOUTUBE: false,
-      DCP_PR_Channel_Tiktok: false,
-      heardFromOther: false,
-      certifiedINFOByAdminName: false,
-      teacher_training_score: 0,
-      teacher_qualification_score: 0,
-      support_from_org_score: 0,
-      support_from_external_score: 0,
-      award_score: 0,
-      activity_within_province_internal_score: 0,
-      activity_within_province_external_score: 0,
-      activity_outside_province_score: 0,
-      pr_activity_score: 0,
-      total_score: 0,
+      regsup_thaiMusicTeachers: [],
+      regsup_readinessItems: [],
+      regsup_inClassInstructionDurations: [],
+      regsup_outOfClassInstructionDurations: [],
+      regsup_supportFactors: [],
+      regsup_supportFromOrg: [],
+      regsup_supportFromExternal: [],
+      regsup_awards: [],
+      regsup_activitiesWithinProvinceInternal: [],
+      regsup_activitiesWithinProvinceExternal: [],
+      regsup_activitiesOutsideProvince: [],
+      regsup_prActivities: [],
+      regsup_isCompulsorySubject: false,
+      regsup_hasAfterSchoolTeaching: false,
+      regsup_hasElectiveSubject: false,
+      regsup_hasLocalCurriculum: false,
+      regsup_hasSupportFromOrg: false,
+      regsup_hasSupportFromExternal: false,
+      regsup_DCP_PR_Channel_FACEBOOK: false,
+      regsup_DCP_PR_Channel_YOUTUBE: false,
+      regsup_DCP_PR_Channel_Tiktok: false,
+      regsup_heardFromOther: false,
+      regsup_certifiedINFOByAdminName: false,
+      regsup_teacher_training_score: 0,
+      regsup_teacher_qualification_score: 0,
+      regsup_support_from_org_score: 0,
+      regsup_support_from_external_score: 0,
+      regsup_award_score: 0,
+      regsup_activity_within_province_internal_score: 0,
+      regsup_activity_within_province_external_score: 0,
+      regsup_activity_outside_province_score: 0,
+      regsup_pr_activity_score: 0,
+      regsup_total_score: 0,
     },
   });
 
@@ -148,7 +148,7 @@ export default function RegisterSupportWizard() {
                 
                 // Method 1: Set critical fields first
                 if (processedData.supportType) {
-                  form.setValue('supportType', processedData.supportType, { 
+                  form.setValue('regsup_supportType', processedData.supportType, { 
                     shouldValidate: false,
                     shouldDirty: true,
                     shouldTouch: true
@@ -159,7 +159,7 @@ export default function RegisterSupportWizard() {
                 // Note: supportTypeTitle removed - using specific fields instead
                 
                 if (processedData.schoolName) {
-                  form.setValue('schoolName', processedData.schoolName, { 
+                  form.setValue('regsup_schoolName', processedData.schoolName, { 
                     shouldValidate: false,
                     shouldDirty: true,
                     shouldTouch: true
@@ -224,12 +224,12 @@ export default function RegisterSupportWizard() {
                 setTimeout(() => {
                   const finalValues = form.getValues();
                   console.log('✅ Form restoration completed from API (register-support):', {
-                    schoolName: finalValues.schoolName,
-                    success: finalValues.schoolName === result.formData.schoolName
+                    schoolName: finalValues.regsup_schoolName,
+                    success: finalValues.regsup_schoolName === result.formData.schoolName
                   });
                   
                   // DOM fallback if needed
-                  if (!finalValues.schoolName && result.formData.schoolName) {
+                  if (!finalValues.regsup_schoolName && result.formData.schoolName) {
                     console.log('🔧 Applying DOM fallback...');
                     const schoolNameInput = document.querySelector('input[name="schoolName"]') as HTMLInputElement;
                     if (schoolNameInput) {
@@ -285,7 +285,7 @@ export default function RegisterSupportWizard() {
           
           // Method 1: Set critical fields first
           if (processedData.supportType) {
-            form.setValue('supportType', processedData.supportType, { 
+            form.setValue('regsup_supportType', processedData.supportType, { 
               shouldValidate: false,
               shouldDirty: true,
               shouldTouch: true
@@ -294,7 +294,7 @@ export default function RegisterSupportWizard() {
           }
           
           if (processedData.supportTypeName) {
-            form.setValue('supportTypeName', processedData.supportTypeName, { 
+            form.setValue('regsup_supportTypeName', processedData.supportTypeName, { 
               shouldValidate: false,
               shouldDirty: true,
               shouldTouch: true
@@ -303,7 +303,7 @@ export default function RegisterSupportWizard() {
           }
           
           if (processedData.schoolName) {
-            form.setValue('schoolName', processedData.schoolName, { 
+            form.setValue('regsup_schoolName', processedData.schoolName, { 
               shouldValidate: false,
               shouldDirty: true,
               shouldTouch: true
@@ -346,7 +346,7 @@ export default function RegisterSupportWizard() {
           // IMPORTANT: Set supportTypeName AFTER form.trigger() to avoid being cleared by Step1 useEffect
           setTimeout(() => {
             if (processedData.supportType === 'สถานศึกษา' && processedData.supportTypeName) {
-              form.setValue('supportTypeName', processedData.supportTypeName, { 
+              form.setValue('regsup_supportTypeName', processedData.supportTypeName, { 
                 shouldValidate: false,
                 shouldDirty: true,
                 shouldTouch: true
@@ -369,12 +369,12 @@ export default function RegisterSupportWizard() {
           setTimeout(() => {
             const finalValues = form.getValues();
             console.log('✅ Form restoration completed from localStorage (register-support):', {
-              schoolName: finalValues.schoolName,
-              success: finalValues.schoolName === draft.formData.schoolName
+              schoolName: finalValues.regsup_schoolName,
+              success: finalValues.regsup_schoolName === draft.formData.schoolName
             });
             
             // DOM fallback if needed
-            if (!finalValues.schoolName && draft.formData.schoolName) {
+            if (!finalValues.regsup_schoolName && draft.formData.schoolName) {
               console.log('🔧 Applying DOM fallback...');
               const schoolNameInput = document.querySelector('input[name="schoolName"]') as HTMLInputElement;
               if (schoolNameInput) {
@@ -417,16 +417,16 @@ export default function RegisterSupportWizard() {
       return;
     }
 
-    // Validate required fields for current step
+    // Validate required fields for current step - use regsup_ prefix for register-support form
     let requiredFields: any[] = [];
     
     if (currentStep === 1) {
-      requiredFields = ['schoolName', 'schoolProvince', 'schoolLevel'];
+      requiredFields = ['regsup_schoolName', 'regsup_schoolProvince', 'regsup_schoolLevel'];
     } else if (currentStep === 2) {
-      requiredFields = ['mgtFullName', 'mgtPosition', 'mgtPhone'];
-      const emailValue = form.getValues('mgtEmail');
+      requiredFields = ['regsup_mgtFullName', 'regsup_mgtPosition', 'regsup_mgtPhone'];
+      const emailValue = form.getValues('regsup_mgtEmail');
       if (emailValue && emailValue.trim() !== '') {
-        requiredFields.push('mgtEmail');
+        requiredFields.push('regsup_mgtEmail');
       }
     }
     
@@ -515,7 +515,7 @@ export default function RegisterSupportWizard() {
     console.log('🚀 Submitting form:', data);
     
     // Check certification checkbox first
-    if (!data.certifiedINFOByAdminName) {
+    if (!data.regsup_certifiedINFOByAdminName) {
       const missing: string[] = [];
       missing.push('การรับรองข้อมูล - กรุณาติ๊กถูกเพื่อรับรองว่าข้อมูลเป็นความจริง (Step 8)');
       setMissingFields(missing);
@@ -523,28 +523,28 @@ export default function RegisterSupportWizard() {
       return;
     }
 
-    // Validate all required fields
+    // Validate all required fields - use regsup_ prefix for register-support form
     const missing: string[] = [];
     
-    // Step 1 validation
-    if (!data.schoolName || data.schoolName.trim() === '') {
+    // Step 1 validation - use regsup_ prefixed fields
+    if (!data.regsup_schoolName || data.regsup_schoolName.trim() === '') {
       missing.push('ชื่อสถานศึกษา (Step 1)');
     }
-    if (!data.schoolProvince || data.schoolProvince.trim() === '') {
+    if (!data.regsup_schoolProvince || data.regsup_schoolProvince.trim() === '') {
       missing.push('จังหวัด (Step 1)');
     }
-    if (!data.schoolLevel) {
+    if (!data.regsup_schoolLevel) {
       missing.push('ระดับสถานศึกษา (Step 1)');
     }
     
-    // Step 2 validation
-    if (!data.mgtFullName || data.mgtFullName.trim() === '') {
+    // Step 2 validation - use regsup_ prefixed fields
+    if (!data.regsup_mgtFullName || data.regsup_mgtFullName.trim() === '') {
       missing.push('ชื่อ-นามสกุล ผู้บริหาร (Step 2)');
     }
-    if (!data.mgtPosition || data.mgtPosition.trim() === '') {
+    if (!data.regsup_mgtPosition || data.regsup_mgtPosition.trim() === '') {
       missing.push('ตำแหน่ง ผู้บริหาร (Step 2)');
     }
-    if (!data.mgtPhone || data.mgtPhone.trim() === '') {
+    if (!data.regsup_mgtPhone || data.regsup_mgtPhone.trim() === '') {
       missing.push('เบอร์โทรศัพท์ ผู้บริหาร (Step 2)');
     }
     
@@ -673,94 +673,94 @@ export default function RegisterSupportWizard() {
   const calculateAllScores = (data: RegisterSupportFormData) => {
     // Teacher training score (5 points per checkbox, max 20)
     let trainingScore = 0;
-    if (data.isCompulsorySubject) trainingScore += 5;
-    if (data.hasAfterSchoolTeaching) trainingScore += 5;
-    if (data.hasElectiveSubject) trainingScore += 5;
-    if (data.hasLocalCurriculum) trainingScore += 5;
-    data.teacher_training_score = trainingScore;
+    if (data.regsup_isCompulsorySubject) trainingScore += 5;
+    if (data.regsup_hasAfterSchoolTeaching) trainingScore += 5;
+    if (data.regsup_hasElectiveSubject) trainingScore += 5;
+    if (data.regsup_hasLocalCurriculum) trainingScore += 5;
+    data.regsup_teacher_training_score = trainingScore;
 
     // Teacher qualification score (5 points per unique qualification type, max 20)
     const uniqueQualifications = new Set<string>();
-    data.thaiMusicTeachers?.forEach((teacher) => {
+    data.regsup_thaiMusicTeachers?.forEach((teacher) => {
       if (teacher.teacherQualification && teacher.teacherQualification.trim() !== '') {
         uniqueQualifications.add(teacher.teacherQualification);
       }
     });
-    data.teacher_qualification_score = uniqueQualifications.size * 5;
+    data.regsup_teacher_qualification_score = uniqueQualifications.size * 5;
 
     // Support from org score (5 if checked)
-    data.support_from_org_score = data.hasSupportFromOrg ? 5 : 0;
+    data.regsup_support_from_org_score = data.regsup_hasSupportFromOrg ? 5 : 0;
 
     // Support from external score (5/10/15 based on count)
     // Only count items that have organization filled
-    const externalCount = data.supportFromExternal?.filter(
+    const externalCount = data.regsup_supportFromExternal?.filter(
       item => item.organization && item.organization.trim() !== ''
     ).length || 0;
     if (externalCount >= 3) {
-      data.support_from_external_score = 15;
+      data.regsup_support_from_external_score = 15;
     } else if (externalCount === 2) {
-      data.support_from_external_score = 10;
+      data.regsup_support_from_external_score = 10;
     } else if (externalCount === 1) {
-      data.support_from_external_score = 5;
+      data.regsup_support_from_external_score = 5;
     } else {
-      data.support_from_external_score = 0;
+      data.regsup_support_from_external_score = 0;
     }
 
     // Award score (highest level only)
     let maxAwardScore = 0;
-    data.awards?.forEach((award) => {
+    data.regsup_awards?.forEach((award) => {
       if (award.awardLevel === 'ประเทศ') maxAwardScore = Math.max(maxAwardScore, 20);
       else if (award.awardLevel === 'ภาค') maxAwardScore = Math.max(maxAwardScore, 15);
       else if (award.awardLevel === 'จังหวัด') maxAwardScore = Math.max(maxAwardScore, 10);
       else if (award.awardLevel === 'อำเภอ') maxAwardScore = Math.max(maxAwardScore, 5);
     });
-    data.award_score = maxAwardScore;
+    data.regsup_award_score = maxAwardScore;
 
     // Activity scores (5 if >= 3 activities with actual data)
-    const internalActivitiesCount = data.activitiesWithinProvinceInternal?.filter(
+    const internalActivitiesCount = data.regsup_activitiesWithinProvinceInternal?.filter(
       item => item.activityName && item.activityName.trim() !== ''
     ).length || 0;
-    data.activity_within_province_internal_score = internalActivitiesCount >= 3 ? 5 : 0;
+    data.regsup_activity_within_province_internal_score = internalActivitiesCount >= 3 ? 5 : 0;
     
-    const externalActivitiesCount = data.activitiesWithinProvinceExternal?.filter(
+    const externalActivitiesCount = data.regsup_activitiesWithinProvinceExternal?.filter(
       item => item.activityName && item.activityName.trim() !== ''
     ).length || 0;
-    data.activity_within_province_external_score = externalActivitiesCount >= 3 ? 5 : 0;
+    data.regsup_activity_within_province_external_score = externalActivitiesCount >= 3 ? 5 : 0;
     
-    const outsideActivitiesCount = data.activitiesOutsideProvince?.filter(
+    const outsideActivitiesCount = data.regsup_activitiesOutsideProvince?.filter(
       item => item.activityName && item.activityName.trim() !== ''
     ).length || 0;
-    data.activity_outside_province_score = outsideActivitiesCount >= 3 ? 5 : 0;
+    data.regsup_activity_outside_province_score = outsideActivitiesCount >= 3 ? 5 : 0;
 
     // PR activity score (5 if >= 3 activities with actual data)
-    const prActivitiesCount = data.prActivities?.filter(
+    const prActivitiesCount = data.regsup_prActivities?.filter(
       item => item.activityName && item.activityName.trim() !== ''
     ).length || 0;
-    data.pr_activity_score = prActivitiesCount >= 3 ? 5 : 0;
+    data.regsup_pr_activity_score = prActivitiesCount >= 3 ? 5 : 0;
 
     // Calculate total score
-    data.total_score = 
-      data.teacher_training_score +
-      data.teacher_qualification_score +
-      data.support_from_org_score +
-      data.support_from_external_score +
-      data.award_score +
-      data.activity_within_province_internal_score +
-      data.activity_within_province_external_score +
-      data.activity_outside_province_score +
-      data.pr_activity_score;
+    data.regsup_total_score = 
+      data.regsup_teacher_training_score +
+      data.regsup_teacher_qualification_score +
+      data.regsup_support_from_org_score +
+      data.regsup_support_from_external_score +
+      data.regsup_award_score +
+      data.regsup_activity_within_province_internal_score +
+      data.regsup_activity_within_province_external_score +
+      data.regsup_activity_outside_province_score +
+      data.regsup_pr_activity_score;
 
     console.log('📊 Calculated scores:', {
-      teacher_training_score: data.teacher_training_score,
-      teacher_qualification_score: data.teacher_qualification_score,
-      support_from_org_score: data.support_from_org_score,
-      support_from_external_score: data.support_from_external_score,
-      award_score: data.award_score,
-      activity_within_province_internal_score: data.activity_within_province_internal_score,
-      activity_within_province_external_score: data.activity_within_province_external_score,
-      activity_outside_province_score: data.activity_outside_province_score,
-      pr_activity_score: data.pr_activity_score,
-      total_score: data.total_score,
+      teacher_training_score: data.regsup_teacher_training_score,
+      teacher_qualification_score: data.regsup_teacher_qualification_score,
+      support_from_org_score: data.regsup_support_from_org_score,
+      support_from_external_score: data.regsup_support_from_external_score,
+      award_score: data.regsup_award_score,
+      activity_within_province_internal_score: data.regsup_activity_within_province_internal_score,
+      activity_within_province_external_score: data.regsup_activity_within_province_external_score,
+      activity_outside_province_score: data.regsup_activity_outside_province_score,
+      pr_activity_score: data.regsup_pr_activity_score,
+      total_score: data.regsup_total_score,
     });
   };
 
