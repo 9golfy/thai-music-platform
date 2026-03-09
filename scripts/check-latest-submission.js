@@ -1,76 +1,76 @@
+require('dotenv').config();
+const { MongoClient } = require('mongodb');
+
+// Use localhost instead of docker container name for local scripts
+const uri = 'mongodb://root:rootpass@localhost:27017/thai_music_school?authSource=admin';
+const dbName = 'thai_music_school';
+
 async function checkLatestSubmission() {
+  console.log('🔍 Checking latest submission and email status...\n');
+
+  const client = new MongoClient(uri);
   try {
-    // Get list of submissions to find the latest one
-    const response = await fetch('http://localhost:3000/api/register-support/list');
-    const data = await response.json();
+    await client.connect();
+    const database = client.db(dbName);
     
-    if (!data.success || !data.submissions || data.submissions.length === 0) {
-      console.log('❌ No submissions found');
-      return;
-    }
+    // Check latest register100 submission
+    const register100Collection = database.collection('register100_submissions');
+    const latestSubmission = await register100Collection
+      .findOne({}, { sort: { createdAt: -1 } });
     
-    // Get the latest submission (first in the list)
-    const latestSubmission = data.submissions[0];
-    console.log('🔍 ตรวจสอบ submission ล่าสุด:');
-    console.log('- ID:', latestSubmission._id);
-    console.log('- School Name:', latestSubmission.regsup_schoolName);
-    console.log('- Created:', latestSubmission.createdAt);
-    
-    // Now get detailed data for this submission
-    const detailResponse = await fetch(`http://localhost:3000/api/register-support/${latestSubmission._id}`);
-    const detailData = await detailResponse.json();
-    
-    if (!detailData.success) {
-      console.log('❌ Failed to get submission details');
-      return;
-    }
-    
-    const submission = detailData.submission;
-    
-    console.log('\n📚 ข้อมูลสถานศึกษา:', submission.regsup_schoolName);
-    console.log('👥 จำนวนครู:', submission.regsup_thaiMusicTeachers?.length || 0);
-    
-    // ตรวจสอบรูปผู้บริหาร
-    console.log('\n📸 รูปผู้บริหาร:');
-    if (submission.mgtImage) {
-      console.log('✅ มี path ในฐานข้อมูล:', submission.mgtImage);
-      console.log('🌐 URL:', `http://localhost:3000${submission.mgtImage}`);
+    if (latestSubmission) {
+      console.log('📋 Latest Register100 Submission:');
+      console.log('ID:', latestSubmission._id);
+      console.log('School:', latestSubmission.reg100_schoolName || latestSubmission.schoolName || 'N/A');
+      console.log('School ID:', latestSubmission.schoolId || 'N/A');
+      console.log('Created:', latestSubmission.createdAt);
+      console.log('Status:', latestSubmission.status || 'N/A');
+      console.log('Total Score:', latestSubmission.total_score || 'N/A');
+      console.log('');
     } else {
-      console.log('❌ ไม่มี path รูปผู้บริหารในฐานข้อมูล');
+      console.log('❌ No register100 submissions found');
     }
+
+    // Check latest user
+    const usersCollection = database.collection('users');
+    const latestUser = await usersCollection
+      .findOne({ role: 'teacher' }, { sort: { createdAt: -1 } });
     
-    // ตรวจสอบรูปครู
-    console.log('\n👨‍🏫 รูปครู:');
-    if (submission.regsup_thaiMusicTeachers && Array.isArray(submission.regsup_thaiMusicTeachers)) {
-      let teacherImagesCount = 0;
+    if (latestUser) {
+      console.log('👨‍🏫 Latest Teacher User:');
+      console.log('Email:', latestUser.email);
+      console.log('School ID:', latestUser.schoolId || 'N/A');
+      console.log('Created:', latestUser.createdAt);
+      console.log('Active:', latestUser.isActive);
+      console.log('');
+    } else {
+      console.log('❌ No teacher users found');
+    }
+
+    // Check if latest submission and user match
+    if (latestSubmission && latestUser) {
+      const submissionTime = new Date(latestSubmission.createdAt);
+      const userTime = new Date(latestUser.createdAt);
+      const timeDiff = Math.abs(submissionTime - userTime);
       
-      submission.regsup_thaiMusicTeachers.forEach((teacher, index) => {
-        console.log(`\n  ครูคนที่ ${index + 1}: ${teacher.teacherFullName}`);
-        
-        if (teacher.teacherImage) {
-          teacherImagesCount++;
-          console.log('  ✅ มี path ในฐานข้อมูล:', teacher.teacherImage);
-          console.log('  🌐 URL:', `http://localhost:3000${teacher.teacherImage}`);
-        } else {
-          console.log('  ❌ ไม่มี path รูปในฐานข้อมูล');
-        }
-      });
+      console.log('🔗 Submission and User Correlation:');
+      console.log('Time difference:', timeDiff, 'ms');
+      console.log('School ID match:', latestSubmission.schoolId === latestUser.schoolId);
+      console.log('');
       
-      console.log(`\n📊 สรุป: มีรูปครู ${teacherImagesCount}/${submission.regsup_thaiMusicTeachers.length} คน`);
-      
-      if (teacherImagesCount === submission.regsup_thaiMusicTeachers.length) {
-        console.log('🎉 รูปครูครบทุกคน!');
-      } else if (teacherImagesCount > 0) {
-        console.log('⚠️ รูปครูไม่ครบ');
+      if (timeDiff < 10000 && latestSubmission.schoolId === latestUser.schoolId) {
+        console.log('✅ Latest submission and user appear to be related');
+        console.log('📧 Email should have been sent to:', latestUser.email);
+        console.log('🔑 Password should have been generated for login');
       } else {
-        console.log('🚨 ไม่มีรูปครูเลย');
+        console.log('⚠️ Latest submission and user do not appear to be related');
       }
-    } else {
-      console.log('❌ ไม่มีข้อมูลครูในฐานข้อมูล');
     }
-    
+
   } catch (error) {
-    console.error('❌ เกิดข้อผิดพลาด:', error.message);
+    console.error('❌ Database error:', error);
+  } finally {
+    await client.close();
   }
 }
 

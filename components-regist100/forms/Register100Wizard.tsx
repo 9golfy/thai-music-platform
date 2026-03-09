@@ -517,8 +517,17 @@ export default function Register100Wizard() {
         setIsSubmitting(false);
         setShowTeacherInfoModal(false); // Close teacher info modal
         setShowSuccessModal(true);
+        
+        // Log email status
+        if (result.emailSent) {
+          console.log('📧 Teacher login email sent successfully');
+        } else {
+          console.warn('⚠️ Form submitted but email failed to send');
+          // Still show success modal since submission was successful
+        }
       } else {
         setIsSubmitting(false);
+        console.error('❌ Form submission failed:', result.message);
         alert('เกิดข้อผิดพลาด: ' + result.message);
       }
     } catch (error) {
