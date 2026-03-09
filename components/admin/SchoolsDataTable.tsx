@@ -5,9 +5,9 @@ import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Eye, Pencil, Trash2, Download } from 'lucide-react';
+import { Download, ChevronLeft, ChevronRight } from 'lucide-react';
 import DeleteSchoolButton from './DeleteSchoolButton';
-import { calculateGrade, getGradeColor, getGradeBgColor } from '@/lib/utils/gradeCalculator';
+import { calculateGrade } from '@/lib/utils/gradeCalculator';
 
 interface SchoolsDataTableProps {
   type: 'register100' | 'register-support';
@@ -21,6 +21,12 @@ export default function SchoolsDataTable({
   const [schools, setSchools] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [provinceFilter, setProvinceFilter] = useState('');
+  const [levelFilter, setLevelFilter] = useState('');
+  const [gradeFilter, setGradeFilter] = useState('');
 
   useEffect(() => {
     fetchSchools();
@@ -53,6 +59,158 @@ export default function SchoolsDataTable({
       setLoading(false);
     }
   };
+
+  // Get unique values for filters
+  const uniqueProvinces = [...new Set(schools.map(school => 
+    school.reg100_schoolProvince || school.regsup_schoolProvince || ''
+  ).filter(Boolean))].sort();
+
+  const uniqueLevels = [...new Set(schools.map(school => 
+    school.reg100_schoolLevel || school.regsup_schoolLevel || ''
+  ).filter(Boolean))].sort();
+
+  const uniqueGrades = ['A', 'B', 'C', 'F'];
+
+  // Filter schools based on all criteria
+  const filteredSchools = schools.filter(school => {
+    // Search term filter
+    if (searchTerm) {
+      const schoolName = school.reg100_schoolName || school.regsup_schoolName || '';
+      const province = school.reg100_schoolProvince || school.regsup_schoolProvince || '';
+      const searchMatch = schoolName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         province.toLowerCase().includes(searchTerm.toLowerCase());
+      if (!searchMatch) return false;
+    }
+
+    // Province filter
+    if (provinceFilter) {
+      const schoolProvince = school.reg100_schoolProvince || school.regsup_schoolProvince || '';
+      if (schoolProvince !== provinceFilter) return false;
+    }
+
+    // Level filter
+    if (levelFilter) {
+      const schoolLevel = school.reg100_schoolLevel || school.regsup_schoolLevel || '';
+      if (schoolLevel !== levelFilter) return false;
+    }
+
+    // Grade filter
+    if (gradeFilter) {
+      const totalScore = school.total_score || 0;
+      const grade = calculateGrade(totalScore);
+      if (grade !== gradeFilter) return false;
+    }
+
+    return true;
+  });
+
+  // Pagination calculations
+  const totalItems = filteredSchools.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentSchools = filteredSchools.slice(startIndex, endIndex);
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, itemsPerPage, provinceFilter, levelFilter, gradeFilter]);
+
+  const handleDeleteSuccess = () => {
+    fetchSchools(); // Refresh data after successful delete
+  };
+
+  const handleExportExcel = async () => {
+    try {
+      console.log('🔄 Starting Excel export...');
+      
+      // Create Excel data from current filtered schools
+      const excelData = filteredSchools.map((school, index) => {
+        const totalScore = school.total_score || 0;
+        const grade = calculateGrade(totalScore);
+        
+        return {
+          'ลำดับ': index + 1,
+          'วันที่บันทึก': school.createdAt 
+            ? new Date(school.createdAt).toLocaleDateString('th-TH', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+              })
+            : '-',
+          'ชื่อโรงเรียน': school.reg100_schoolName || school.regsup_schoolName || '-',
+          'จังหวัด': school.reg100_schoolProvince || school.regsup_schoolProvince || '-',
+          'ระดับการศึกษา': school.reg100_schoolLevel || school.regsup_schoolLevel || 'ไม่ระบุ',
+          'คะแนนรวม': totalScore,
+          'เกรด': grade,
+          'School ID': school.schoolId || '-',
+          'อีเมลครู': school.teacherEmail || '-',
+          'เบอร์โทรศัพท์': school.teacherPhone || '-'
+        };
+      });
+
+      if (excelData.length === 0) {
+        alert('ไม่มีข้อมูลสำหรับ Export');
+        return;
+      }
+
+      // Convert to CSV format (simple Excel export)
+      const headers = Object.keys(excelData[0]);
+      const csvContent = [
+        headers.join(','),
+        ...excelData.map(row => 
+          headers.map(header => {
+            const value = (row as any)[header];
+            // Escape commas and quotes in CSV
+            if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
+              return `"${value.replace(/"/g, '""')}"`;
+            }
+            return value;
+          }).join(',')
+        )
+      ].join('\n');
+
+      // Create and download file
+      const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      
+      link.setAttribute('href', url);
+      const fileName = `${type === 'register100' ? 'Register100' : 'RegisterSupport'}_Export_${new Date().toISOString().split('T')[0]}.csv`;
+      link.setAttribute('download', fileName);
+      link.style.visibility = 'hidden';
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      console.log('✅ Excel export completed:', fileName);
+      
+    } catch (error) {
+      console.error('❌ Export failed:', error);
+      alert('เกิดข้อผิดพลาดในการ Export ข้อมูล');
+    }
+  };
+
+  const basePath = type === 'register100' ? 'register100' : 'register-support';
+
+  // Function to get grade styling for display
+  const getGradeStyle = (score: number) => {
+    const grade = calculateGrade(score);
+    switch (grade) {
+      case 'A':
+        return { grade: 'A', color: 'bg-green-100 text-green-800' };
+      case 'B':
+        return { grade: 'B', color: 'bg-blue-100 text-blue-800' };
+      case 'C':
+        return { grade: 'C', color: 'bg-orange-100 text-orange-800' };
+      case 'F':
+        return { grade: 'F', color: 'bg-red-100 text-red-800' };
+      default:
+        return { grade: 'F', color: 'bg-red-100 text-red-800' };
+    }
+  };
+
   if (loading) {
     return (
       <Card>
@@ -94,41 +252,88 @@ export default function SchoolsDataTable({
     );
   }
 
-  const basePath = type === 'register100' ? 'register100' : 'register-support';
-
-  // Function to get grade styling for display
-  const getGradeStyle = (score: number) => {
-    const grade = calculateGrade(score);
-    switch (grade) {
-      case 'A':
-        return { grade: 'A', color: 'bg-green-100 text-green-800' };
-      case 'B':
-        return { grade: 'B', color: 'bg-blue-100 text-blue-800' };
-      case 'C':
-        return { grade: 'C', color: 'bg-orange-100 text-orange-800' };
-      case 'F':
-        return { grade: 'F', color: 'bg-red-100 text-red-800' };
-      default:
-        return { grade: 'F', color: 'bg-red-100 text-red-800' };
-    }
-  };
-
   return (
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>รายการโรงเรียน ({schools.length})</CardTitle>
-          <div className="flex items-center space-x-2">
-            <Input
-              type="search"
-              placeholder="ค้นหาโรงเรียน..."
-              className="w-64"
-            />
-            <button className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all flex items-center gap-2 shadow-md">
+          <CardTitle>รายการโรงเรียน ({totalItems})</CardTitle>
+          <div className="flex items-center gap-6">
+            {/* Grade Legend */}
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <span className="inline-block w-3 h-3 rounded-full bg-green-500"></span>
+                <span className="text-sm text-gray-600">A: 90-100 คะแนน</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="inline-block w-3 h-3 rounded-full bg-blue-500"></span>
+                <span className="text-sm text-gray-600">B: 70-89 คะแนน</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="inline-block w-3 h-3 rounded-full bg-orange-500"></span>
+                <span className="text-sm text-gray-600">C: 50-69 คะแนน</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="inline-block w-3 h-3 rounded-full bg-red-500"></span>
+                <span className="text-sm text-gray-600">F: 0-49 คะแนน</span>
+              </div>
+            </div>
+            <button 
+              onClick={handleExportExcel}
+              className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all flex items-center gap-2 shadow-md"
+            >
               <Download className="w-4 h-4" />
-              Export
+              Export Excel
             </button>
           </div>
+        </div>
+        
+        {/* Search and Filters */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+          <Input
+            type="search"
+            placeholder="ค้นหาโรงเรียน..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          
+          <select 
+            value={provinceFilter} 
+            onChange={(e) => setProvinceFilter(e.target.value)}
+            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <option value="">ทุกจังหวัด</option>
+            {uniqueProvinces.map((province) => (
+              <option key={province} value={province}>
+                {province}
+              </option>
+            ))}
+          </select>
+
+          <select 
+            value={levelFilter} 
+            onChange={(e) => setLevelFilter(e.target.value)}
+            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <option value="">ทุกระดับ</option>
+            {uniqueLevels.map((level) => (
+              <option key={level} value={level}>
+                {level}
+              </option>
+            ))}
+          </select>
+
+          <select 
+            value={gradeFilter} 
+            onChange={(e) => setGradeFilter(e.target.value)}
+            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <option value="">ทุก Grade</option>
+            {uniqueGrades.map((grade) => (
+              <option key={grade} value={grade}>
+                Grade {grade}
+              </option>
+            ))}
+          </select>
         </div>
       </CardHeader>
       <CardContent>
@@ -163,26 +368,32 @@ export default function SchoolsDataTable({
               </tr>
             </thead>
             <tbody>
-              {schools.length === 0 ? (
+              {currentSchools.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="text-center py-12 text-gray-500">
                     <div className="flex flex-col items-center space-y-2">
                       <p className="text-lg">ไม่พบข้อมูล</p>
-                      <p className="text-sm">ยังไม่มีโรงเรียนลงทะเบียน</p>
+                      <p className="text-sm">
+                        {searchTerm || provinceFilter || levelFilter || gradeFilter 
+                          ? 'ไม่พบข้อมูลที่ตรงกับเงื่อนไขการค้นหา' 
+                          : 'ยังไม่มีโรงเรียนลงทะเบียน'}
+                      </p>
                     </div>
                   </td>
                 </tr>
               ) : (
-                schools.map((school: any, index: number) => {
+                currentSchools.map((school: any, index: number) => {
                   const totalScore = school.total_score || 0;
                   const gradeInfo = getGradeStyle(totalScore);
+                  const globalIndex = startIndex + index + 1;
+                  
                   return (
                     <tr
                       key={school._id}
                       className="border-b border-gray-100 hover:bg-gray-50"
                     >
                       <td className="py-3 px-4 text-center text-sm text-gray-900">
-                        {index + 1}
+                        {globalIndex}
                       </td>
                       <td className="py-3 px-4 text-sm text-gray-900">
                         <div>
@@ -243,6 +454,7 @@ export default function SchoolsDataTable({
                             schoolId={school._id}
                             schoolName={school.reg100_schoolName || school.regsup_schoolName || 'ไม่ระบุชื่อ'}
                             type={type}
+                            onDeleteSuccess={handleDeleteSuccess}
                           />
                         </div>
                       </td>
@@ -254,31 +466,95 @@ export default function SchoolsDataTable({
           </table>
         </div>
 
-        {schools.length > 0 && (
-          <div className="mt-4 flex items-center justify-between text-sm">
-            <div className="text-gray-600">
-              แสดง {schools.length} รายการ จากทั้งหมด {schools.length} รายการ
+        {/* Bottom Controls and Pagination */}
+        <div className="mt-6 space-y-4">
+          {/* Items per page selector */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-gray-600">แสดง</span>
+              <select 
+                value={itemsPerPage.toString()} 
+                onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                className="w-20 h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              >
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <span className="inline-block w-3 h-3 rounded-full bg-green-500"></span>
-                <span className="text-gray-600">90-100 คะแนน</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="inline-block w-3 h-3 rounded-full bg-blue-500"></span>
-                <span className="text-gray-600">70-89 คะแนน</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="inline-block w-3 h-3 rounded-full bg-orange-500"></span>
-                <span className="text-gray-600">50-69 คะแนน</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="inline-block w-3 h-3 rounded-full bg-red-500"></span>
-                <span className="text-gray-600">0-49 คะแนน</span>
-              </div>
+            
+            <div className="text-sm text-gray-600">
+              แสดง {startIndex + 1}-{Math.min(endIndex, totalItems)} จาก {totalItems} รายการ
             </div>
           </div>
-        )}
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center">
+              <div className="flex items-center space-x-1">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(1)}
+                  disabled={currentPage === 1}
+                >
+                  หน้าแรก
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+                
+                {/* Page numbers */}
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  let pageNum;
+                  if (totalPages <= 5) {
+                    pageNum = i + 1;
+                  } else if (currentPage <= 3) {
+                    pageNum = i + 1;
+                  } else if (currentPage >= totalPages - 2) {
+                    pageNum = totalPages - 4 + i;
+                  } else {
+                    pageNum = currentPage - 2 + i;
+                  }
+                  
+                  return (
+                    <Button
+                      key={pageNum}
+                      variant={currentPage === pageNum ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setCurrentPage(pageNum)}
+                    >
+                      {pageNum}
+                    </Button>
+                  );
+                })}
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(totalPages)}
+                  disabled={currentPage === totalPages}
+                >
+                  หน้าสุดท้าย
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
       </CardContent>
     </Card>
   );

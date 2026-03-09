@@ -20,12 +20,14 @@ interface DeleteSchoolButtonProps {
   schoolId: string;
   schoolName: string;
   type: 'register100' | 'register-support';
+  onDeleteSuccess?: () => void;
 }
 
 export default function DeleteSchoolButton({
   schoolId,
   schoolName,
   type,
+  onDeleteSuccess,
 }: DeleteSchoolButtonProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -41,7 +43,13 @@ export default function DeleteSchoolButton({
       const data = await response.json();
 
       if (data.success) {
-        router.refresh();
+        // Call the callback to refresh parent component
+        if (onDeleteSuccess) {
+          onDeleteSuccess();
+        } else {
+          // Fallback to router refresh if no callback provided
+          router.refresh();
+        }
       } else {
         alert('เกิดข้อผิดพลาด: ' + data.message);
       }

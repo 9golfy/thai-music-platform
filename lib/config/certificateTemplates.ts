@@ -57,7 +57,7 @@ export const certificateTemplates: CertificateTemplate[] = [
     height: 800,
     textPositions: {
       schoolName: {
-        top: '45%',
+        top: '38.75%',
         left: '50%',
         fontSize: '42px',
         fontFamily: 'Sarabun, sans-serif',
@@ -97,7 +97,7 @@ export const certificateTemplates: CertificateTemplate[] = [
     height: 800,
     textPositions: {
       schoolName: {
-        top: '48%',
+        top: '41.75%',
         left: '50%',
         fontSize: '48px',
         fontFamily: 'Sarabun, sans-serif',
@@ -137,7 +137,7 @@ export const certificateTemplates: CertificateTemplate[] = [
     height: 800,
     textPositions: {
       schoolName: {
-        top: '46%',
+        top: '39.75%',
         left: '50%',
         fontSize: '44px',
         fontFamily: 'Sarabun, sans-serif',
