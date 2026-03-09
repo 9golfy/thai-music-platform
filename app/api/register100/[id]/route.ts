@@ -61,6 +61,19 @@ export async function DELETE(
     const database = client.db(dbName);
     const collection = database.collection('register100_submissions');
 
+    // First, get the submission to find the schoolId
+    const submission = await collection.findOne({
+      _id: new ObjectId(id)
+    });
+
+    if (!submission) {
+      return NextResponse.json(
+        { success: false, message: 'ไม่พบข้อมูลที่ต้องการลบ' },
+        { status: 404 }
+      );
+    }
+
+    // Delete the submission
     const result = await collection.deleteOne({
       _id: new ObjectId(id)
     });
@@ -71,6 +84,12 @@ export async function DELETE(
         { status: 404 }
       );
     }
+
+    // Also delete associated certificates
+    const certificatesCollection = database.collection('certificates');
+    await certificatesCollection.deleteMany({
+      schoolId: submission.schoolId || id
+    });
 
     return NextResponse.json({
       success: true,
