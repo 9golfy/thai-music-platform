@@ -15,6 +15,10 @@ FROM node:20-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 
+# Create a non-root user
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
 # Install only production deps
 COPY package*.json ./
 RUN npm ci --omit=dev && npm cache clean --force
@@ -25,8 +29,11 @@ COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/next.config.* ./ 2>/dev/null || true
 COPY --from=builder /app/package.json ./package.json
 
-# If you have these, keep them (optional)
-COPY --from=builder /app/app ./app 2>/dev/null || true
+# Create uploads directory with proper permissions
+RUN mkdir -p public/uploads && chown nextjs:nodejs public/uploads
+
+# Switch to non-root user
+USER nextjs
 
 EXPOSE 3000
 ENV PORT=3000
