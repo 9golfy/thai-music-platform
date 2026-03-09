@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ทดสอบ Export Excel</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        .test-button {
+            display: inline-block;
+            padding: 12px 24px;
+            margin: 10px;
+            background: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .test-button:hover {
+            background: #45a049;
+        }
+        .excel-button {
+            background: #1f7a1f;
+        }
+        .excel-button:hover {
+            background: #0f5f0f;
+        }
+        .info {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 ทดสอบ Export Excel</h1>
+        
+        <div class="info">
+            <strong>📋 ข้อมูลการทดสอบ:</strong><br>
+            • Submission ID: 69ad8158fcaa2809454bab8d<br>
+            • โรงเรียน: โรงเรียนทดสอบ Register100 Full Fields Complete<br>
+            • คะแนน: 100/100
+        </div>
+
+        <div class="test-section">
+            <h3>🔗 ลิงก์ทดสอบ Direct API</h3>
+            <p>คลิกลิงก์เหล่านี้เพื่อทดสอบ API โดยตรง:</p>
+            
+            <a href="http://localhost:3000/api/register100/69ad8158fcaa2809454bab8d/export/excel" 
+               class="test-button excel-button" target="_blank">
+                📊 Export Register100 Excel (CSV)
+            </a>
+            
+            <a href="http://localhost:3000/api/register100/69ad8158fcaa2809454bab8d/export/pdf" 
+               class="test-button" target="_blank">
+                📄 Export Register100 PDF
+            </a>
+        </div>
+
+        <div class="test-section">
+            <h3>🔗 ลิงก์ทดสอบ Register Support</h3>
+            <p>ทดสอบ export สำหรับ register support (ถ้ามีข้อมูล):</p>
+            
+            <a href="http://localhost:3000/api/register-support/latest/export/excel" 
+               class="test-button excel-button" target="_blank">
+                📊 Export Register Support Excel (CSV)
+            </a>
+        </div>
+
+        <div class="warning">
+            <strong>✅ สถานะการแก้ไข:</strong><br>
+            • แก้ไข syntax errors ใน export functions แล้ว<br>
+            • เปลี่ยนนามสกุลไฟล์จาก .xlsx เป็น .csv<br>
+            • เปลี่ยนข้อความปุ่มเป็น "Export CSV"<br>
+            • API ส่ง CSV format พร้อม UTF-8 BOM<br>
+            • ไฟล์ที่ download ควรเปิดใน Excel ได้แล้ว
+        </div>
+
+        <div class="test-section">
+            <h3>🛠️ การแก้ไขปัญหา</h3>
+            <p>ถ้าไฟล์ยังเปิดไม่ได้:</p>
+            <ol>
+                <li>ลองเปลี่ยนนามสกุลไฟล์จาก .xlsx เป็น .csv</li>
+                <li>เปิดด้วย Notepad เพื่อดูเนื้อหา</li>
+                <li>Import ใน Excel แทนการเปิดโดยตรง</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // Add timestamp to avoid cache
+        document.addEventListener('DOMContentLoaded', function() {
+            const links = document.querySelectorAll('a[href*="/api/"]');
+            links.forEach(link => {
+                const url = new URL(link.href);
+                url.searchParams.set('t', Date.now());
+                link.href = url.toString();
+            });
+        });
+    </script>
+</body>
+</html>

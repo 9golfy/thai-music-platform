@@ -1,55 +1,76 @@
-const { MongoClient } = require('mongodb');
-
 async function checkLatestSubmission() {
-  const client = new MongoClient(process.env.MONGODB_URI || 'mongodb://localhost:27017/thai_music_school');
-  
   try {
-    await client.connect();
-    console.log('✅ Connected to MongoDB');
+    // Get list of submissions to find the latest one
+    const response = await fetch('http://localhost:3000/api/register-support/list');
+    const data = await response.json();
     
-    const db = client.db('thai_music_school');
-    const collection = db.collection('register_support_submissions');
-    
-    // Find the latest submission
-    const latestSubmission = await collection.findOne(
-      {},
-      { sort: { createdAt: -1 } }
-    );
-    
-    if (latestSubmission) {
-      console.log('✅ Latest submission found:');
-      console.log('🆔 ID:', latestSubmission._id);
-      console.log('🏫 School ID:', latestSubmission.schoolId);
-      console.log('🏫 School Name:', latestSubmission.schoolName);
-      console.log('📧 Manager Email:', latestSubmission.mgtEmail);
-      console.log('📱 Manager Phone:', latestSubmission.mgtPhone);
-      console.log('👥 Teachers Count:', latestSubmission.thaiMusicTeachers?.length || 0);
-      console.log('📅 Created At:', latestSubmission.createdAt);
-      console.log('📊 Status:', latestSubmission.status);
-      
-      // Check if it has all required fields
-      const requiredFields = [
-        'schoolName', 'mgtEmail', 'mgtPhone', 'thaiMusicTeachers',
-        'schoolProvince', 'supportType'
-      ];
-      
-      const missingFields = requiredFields.filter(field => !latestSubmission[field]);
-      
-      if (missingFields.length === 0) {
-        console.log('✅ All required fields are present');
-      } else {
-        console.log('⚠️ Missing fields:', missingFields);
-      }
-      
-    } else {
+    if (!data.success || !data.submissions || data.submissions.length === 0) {
       console.log('❌ No submissions found');
+      return;
+    }
+    
+    // Get the latest submission (first in the list)
+    const latestSubmission = data.submissions[0];
+    console.log('🔍 ตรวจสอบ submission ล่าสุด:');
+    console.log('- ID:', latestSubmission._id);
+    console.log('- School Name:', latestSubmission.regsup_schoolName);
+    console.log('- Created:', latestSubmission.createdAt);
+    
+    // Now get detailed data for this submission
+    const detailResponse = await fetch(`http://localhost:3000/api/register-support/${latestSubmission._id}`);
+    const detailData = await detailResponse.json();
+    
+    if (!detailData.success) {
+      console.log('❌ Failed to get submission details');
+      return;
+    }
+    
+    const submission = detailData.submission;
+    
+    console.log('\n📚 ข้อมูลสถานศึกษา:', submission.regsup_schoolName);
+    console.log('👥 จำนวนครู:', submission.regsup_thaiMusicTeachers?.length || 0);
+    
+    // ตรวจสอบรูปผู้บริหาร
+    console.log('\n📸 รูปผู้บริหาร:');
+    if (submission.mgtImage) {
+      console.log('✅ มี path ในฐานข้อมูล:', submission.mgtImage);
+      console.log('🌐 URL:', `http://localhost:3000${submission.mgtImage}`);
+    } else {
+      console.log('❌ ไม่มี path รูปผู้บริหารในฐานข้อมูล');
+    }
+    
+    // ตรวจสอบรูปครู
+    console.log('\n👨‍🏫 รูปครู:');
+    if (submission.regsup_thaiMusicTeachers && Array.isArray(submission.regsup_thaiMusicTeachers)) {
+      let teacherImagesCount = 0;
+      
+      submission.regsup_thaiMusicTeachers.forEach((teacher, index) => {
+        console.log(`\n  ครูคนที่ ${index + 1}: ${teacher.teacherFullName}`);
+        
+        if (teacher.teacherImage) {
+          teacherImagesCount++;
+          console.log('  ✅ มี path ในฐานข้อมูล:', teacher.teacherImage);
+          console.log('  🌐 URL:', `http://localhost:3000${teacher.teacherImage}`);
+        } else {
+          console.log('  ❌ ไม่มี path รูปในฐานข้อมูล');
+        }
+      });
+      
+      console.log(`\n📊 สรุป: มีรูปครู ${teacherImagesCount}/${submission.regsup_thaiMusicTeachers.length} คน`);
+      
+      if (teacherImagesCount === submission.regsup_thaiMusicTeachers.length) {
+        console.log('🎉 รูปครูครบทุกคน!');
+      } else if (teacherImagesCount > 0) {
+        console.log('⚠️ รูปครูไม่ครบ');
+      } else {
+        console.log('🚨 ไม่มีรูปครูเลย');
+      }
+    } else {
+      console.log('❌ ไม่มีข้อมูลครูในฐานข้อมูล');
     }
     
   } catch (error) {
-    console.error('❌ Error:', error);
-  } finally {
-    await client.close();
-    console.log('✅ Connection closed');
+    console.error('❌ เกิดข้อผิดพลาด:', error.message);
   }
 }
 

@@ -1,4 +1,6 @@
-import { MongoClient, ObjectId } from 'mongodb';
+'use client';
+
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,60 +9,91 @@ import { Eye, Pencil, Trash2, Download } from 'lucide-react';
 import DeleteSchoolButton from './DeleteSchoolButton';
 import { calculateGrade, getGradeColor, getGradeBgColor } from '@/lib/utils/gradeCalculator';
 
-const uri = process.env.MONGODB_URI || 'mongodb://root:rootpass@localhost:27017/thai_music_school?authSource=admin';
-const dbName = process.env.MONGO_DB || 'thai_music_school';
-
 interface SchoolsDataTableProps {
   type: 'register100' | 'register-support';
   searchQuery?: string;
 }
 
-async function getSchools(type: string, searchQuery?: string) {
-  const client = new MongoClient(uri);
-
-  try {
-    await client.connect();
-    const database = client.db(dbName);
-    const collectionName =
-      type === 'register100' ? 'register100_submissions' : 'register_support_submissions';
-    const collection = database.collection(collectionName);
-
-    let query = {};
-    if (searchQuery) {
-      query = {
-        $or: [
-          { reg100_schoolName: { $regex: searchQuery, $options: 'i' } },
-          { reg100_schoolProvince: { $regex: searchQuery, $options: 'i' } },
-          { regsup_schoolName: { $regex: searchQuery, $options: 'i' } },
-          { regsup_schoolProvince: { $regex: searchQuery, $options: 'i' } },
-          { schoolName: { $regex: searchQuery, $options: 'i' } },
-          { schoolProvince: { $regex: searchQuery, $options: 'i' } },
-        ],
-      };
-    }
-
-    const schools = await collection
-      .find(query)
-      .sort({ createdAt: -1 })
-      .toArray();
-
-    return schools.map((school) => ({
-      ...school,
-      _id: school._id.toString(),
-    }));
-  } catch (error) {
-    console.error('Error fetching schools:', error);
-    return [];
-  } finally {
-    await client.close();
-  }
-}
-
-export default async function SchoolsDataTable({
+export default function SchoolsDataTable({
   type,
   searchQuery,
 }: SchoolsDataTableProps) {
-  const schools = await getSchools(type, searchQuery);
+  const [schools, setSchools] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchSchools();
+  }, [type, searchQuery]);
+
+  const fetchSchools = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const endpoint = type === 'register100' ? '/api/register100/list' : '/api/register-support/list';
+      const response = await fetch(endpoint);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setSchools(data.submissions || []);
+      } else {
+        throw new Error(data.message || 'Failed to fetch data');
+      }
+    } catch (error) {
+      console.error('Error fetching schools:', error);
+      setError(error instanceof Error ? error.message : 'Unknown error');
+      setSchools([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>รายการโรงเรียน</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center py-12">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
+              <p className="text-gray-500">กำลังโหลดข้อมูล...</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>รายการโรงเรียน</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center py-12">
+            <div className="text-center">
+              <p className="text-red-500 mb-2">เกิดข้อผิดพลาด: {error}</p>
+              <button 
+                onClick={fetchSchools}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+              >
+                ลองใหม่
+              </button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   const basePath = type === 'register100' ? 'register100' : 'register-support';
 
   // Function to get grade styling for display

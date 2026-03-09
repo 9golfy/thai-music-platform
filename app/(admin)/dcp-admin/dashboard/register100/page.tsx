@@ -1,6 +1,4 @@
-import { Suspense } from 'react';
 import SchoolsDataTable from '@/components/admin/SchoolsDataTable';
-import { Loading } from '@/components/ui/loading';
 
 export default function Register100Page() {
   return (
@@ -10,9 +8,7 @@ export default function Register100Page() {
         <p className="text-gray-600 mt-1">จัดการข้อมูลโรงเรียนที่สอนดนตรีไทย 100%</p>
       </div>
 
-      <Suspense fallback={<Loading message="กำลังโหลดข้อมูลโรงเรียน..." />}>
-        <SchoolsDataTable type="register100" />
-      </Suspense>
+      <SchoolsDataTable type="register100" />
     </div>
   );
 }
