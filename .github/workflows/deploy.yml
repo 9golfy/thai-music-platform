@@ -46,12 +46,22 @@ jobs:
             set -e
             cd ~/registerForm-platform
 
+            # Pull latest code from repository
+            git fetch origin
+            git reset --hard origin/master
+            
+            # Verify we have the latest Dockerfile.prod
+            echo "=== Current Dockerfile.prod content ==="
+            head -30 Dockerfile.prod
+            echo "=== End Dockerfile.prod ==="
+
             ls -la docker-compose.prod.yml
 
             aws ecr get-login-password --region ${{ env.AWS_REGION }} \
               | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
 
-            # Force rebuild without cache to ensure latest Dockerfile.prod is used
+            # Clean all Docker cache and force rebuild
+            docker system prune -af
             docker compose -f docker-compose.prod.yml build --no-cache web
             docker compose -f docker-compose.prod.yml up -d --remove-orphans
 
