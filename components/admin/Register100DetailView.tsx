@@ -725,11 +725,22 @@ export default function Register100DetailView({ id, hideScores = false, readOnly
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">รูปภาพผู้บริหาร</label>
                   <div 
-                    onClick={() => handleImageClick(submission.reg100_mgtImage || submission.mgtImage)}
+                    onClick={() => handleImageClick(
+                      (submission.reg100_mgtImage || submission.mgtImage).startsWith('http') 
+                        ? (submission.reg100_mgtImage || submission.mgtImage)
+                        : (submission.reg100_mgtImage || submission.mgtImage).startsWith('/uploads/') 
+                          ? (submission.reg100_mgtImage || submission.mgtImage).replace('/uploads/', '/api/uploads/')
+                          : (submission.reg100_mgtImage || submission.mgtImage)
+                    )}
                     className="cursor-pointer hover:opacity-80 transition-opacity inline-block"
                   >
                     <img 
-                      src={(submission.reg100_mgtImage || submission.mgtImage).startsWith('http') ? (submission.reg100_mgtImage || submission.mgtImage) : (submission.reg100_mgtImage || submission.mgtImage)}
+                      src={(submission.reg100_mgtImage || submission.mgtImage).startsWith('http') 
+                        ? (submission.reg100_mgtImage || submission.mgtImage) 
+                        : (submission.reg100_mgtImage || submission.mgtImage).startsWith('/uploads/') 
+                          ? (submission.reg100_mgtImage || submission.mgtImage).replace('/uploads/', '/api/uploads/')
+                          : (submission.reg100_mgtImage || submission.mgtImage)
+                      }
                       alt="ผู้บริหาร" 
                       className="rounded-lg border border-gray-300 w-[200px] h-[200px] object-cover"
                     />
@@ -926,11 +937,22 @@ export default function Register100DetailView({ id, hideScores = false, readOnly
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">รูปภาพครู</label>
                             <div 
-                              onClick={() => handleImageClick(teacher.teacherImage)}
+                              onClick={() => handleImageClick(
+                                teacher.teacherImage.startsWith('http') 
+                                  ? teacher.teacherImage 
+                                  : teacher.teacherImage.startsWith('/uploads/') 
+                                    ? teacher.teacherImage.replace('/uploads/', '/api/uploads/')
+                                    : teacher.teacherImage
+                              )}
                               className="cursor-pointer hover:opacity-80 transition-opacity inline-block"
                             >
                               <img 
-                                src={teacher.teacherImage.startsWith('http') ? teacher.teacherImage : teacher.teacherImage}
+                                src={teacher.teacherImage.startsWith('http') 
+                                  ? teacher.teacherImage 
+                                  : teacher.teacherImage.startsWith('/uploads/') 
+                                    ? teacher.teacherImage.replace('/uploads/', '/api/uploads/')
+                                    : teacher.teacherImage
+                                }
                                 alt={`ครู ${index + 1}`}
                                 className="rounded-lg border border-gray-300 w-[150px] h-[150px] object-cover"
                               />

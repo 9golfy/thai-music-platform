@@ -709,11 +709,22 @@ export default function RegisterSupportDetailView({ id, hideScores = false, read
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">รูปภาพผู้บริหาร</label>
                   <div 
-                    onClick={() => handleImageClick(displayData?.mgtImage)}
+                    onClick={() => handleImageClick(
+                      displayData?.mgtImage?.startsWith('http') 
+                        ? displayData?.mgtImage 
+                        : displayData?.mgtImage?.startsWith('/uploads/') 
+                          ? displayData?.mgtImage.replace('/uploads/', '/api/uploads/')
+                          : displayData?.mgtImage
+                    )}
                     className="cursor-pointer hover:opacity-80 transition-opacity inline-block"
                   >
                     <img 
-                      src={displayData?.mgtImage?.startsWith('http') ? displayData?.mgtImage : displayData?.mgtImage}
+                      src={displayData?.mgtImage?.startsWith('http') 
+                        ? displayData?.mgtImage 
+                        : displayData?.mgtImage?.startsWith('/uploads/') 
+                          ? displayData?.mgtImage.replace('/uploads/', '/api/uploads/')
+                          : displayData?.mgtImage
+                      }
                       alt="ผู้บริหาร" 
                       className="rounded-lg border border-gray-300 w-[200px] h-[200px] object-cover"
                     />
@@ -837,11 +848,22 @@ export default function RegisterSupportDetailView({ id, hideScores = false, read
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">รูปภาพครู</label>
                             <div 
-                              onClick={() => handleImageClick(teacher.teacherImage)}
+                              onClick={() => handleImageClick(
+                                teacher.teacherImage.startsWith('http') 
+                                  ? teacher.teacherImage 
+                                  : teacher.teacherImage.startsWith('/uploads/') 
+                                    ? teacher.teacherImage.replace('/uploads/', '/api/uploads/')
+                                    : teacher.teacherImage
+                              )}
                               className="cursor-pointer hover:opacity-80 transition-opacity inline-block"
                             >
                               <img 
-                                src={teacher.teacherImage.startsWith('http') ? teacher.teacherImage : teacher.teacherImage}
+                                src={teacher.teacherImage.startsWith('http') 
+                                  ? teacher.teacherImage 
+                                  : teacher.teacherImage.startsWith('/uploads/') 
+                                    ? teacher.teacherImage.replace('/uploads/', '/api/uploads/')
+                                    : teacher.teacherImage
+                                }
                                 alt={`ครู ${index + 1}`}
                                 className="rounded-lg border border-gray-300 w-[150px] h-[150px] object-cover"
                               />
