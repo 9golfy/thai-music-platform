@@ -8,8 +8,12 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=production
-      - MONGODB_URI=${MONGODB_URI:-mongodb://mongodb:27017/thai-music-platform}
-      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:3000}
+      - MONGODB_URI=mongodb://mongodb:27017/thai_music_school
+      - MONGO_DB=thai_music_school
+      - JWT_SECRET=thai_music_platform_super_secure_jwt_secret_2024
+      - GMAIL_USER=thaimusicplatform@gmail.com
+      - GMAIL_APP_PASSWORD=heqwnhneswksqlze
+      - NEXT_PUBLIC_APP_URL=http://18.138.63.84:3000
     depends_on:
       - mongodb
     networks:
@@ -24,7 +28,7 @@ services:
     volumes:
       - mongodb_data:/data/db
     environment:
-      - MONGO_INITDB_DATABASE=thai-music-platform
+      - MONGO_INITDB_DATABASE=thai_music_school
     networks:
       - thai-music-network
     restart: unless-stopped
