@@ -30,7 +30,7 @@ jobs:
 
       - name: Build, tag, and push image to ECR
         run: |
-          docker build -t $ECR_REPOSITORY:${{ github.sha }} .
+          docker build --no-cache -f Dockerfile.prod -t $ECR_REPOSITORY:${{ github.sha }} .
           docker tag $ECR_REPOSITORY:${{ github.sha }} $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
           docker tag $ECR_REPOSITORY:${{ github.sha }} $ECR_REGISTRY/$ECR_REPOSITORY:latest
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
@@ -51,7 +51,8 @@ jobs:
             aws ecr get-login-password --region ${{ env.AWS_REGION }} \
               | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
 
-            docker compose -f docker-compose.prod.yml pull web
+            # Force rebuild without cache to ensure latest Dockerfile.prod is used
+            docker compose -f docker-compose.prod.yml build --no-cache web
             docker compose -f docker-compose.prod.yml up -d --remove-orphans
 
             docker ps --format "table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}"
