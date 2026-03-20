@@ -45,6 +45,8 @@ yarn-error.log*
 DEPLOYMENT-STEPS-REAL.md
 DEPLOYMENT-ISSUES.md
 AWS-DEPLOY-STEPS.md
+AWS-CONFIG-ISSUE.md
+DEPLOYMENT-SUCCESS.md
 deploy-to-aws.sh
 quick-commands.sh
 

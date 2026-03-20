@@ -173,25 +173,6 @@ export default function AdminLoginPage() {
                 <br />
                 สำหรับผู้ดูแลระบบเท่านั้น
               </p>
-              <div className="bg-white/10 rounded-lg p-4 backdrop-blur-sm">
-                <div className="text-sm text-white/75 mb-2">
-                  <strong className="text-white">System Admin:</strong>
-                </div>
-                <div className="text-sm space-y-1 mb-3">
-                  <div>Email: <span className="font-mono font-semibold">root@thaimusic.com</span></div>
-                  <div>Password: <span className="font-mono font-semibold">P@sswordAdmin123</span></div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEmail('root@thaimusic.com');
-                    setPassword('P@sswordAdmin123');
-                  }}
-                  className="w-full py-2 px-3 bg-white/20 hover:bg-white/30 text-white text-sm rounded-lg transition-colors font-medium"
-                >
-                  กรอกข้อมูลอัตโนมัติ
-                </button>
-              </div>
             </div>
           </div>
         </div>
