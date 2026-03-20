@@ -9,6 +9,7 @@ env:
   ECR_REGISTRY: 889976851669.dkr.ecr.ap-southeast-1.amazonaws.com
   ECR_REPOSITORY: thai-music-platform
   CONTAINER_NAME: thai-music-web
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   build_and_deploy:
@@ -46,6 +47,10 @@ jobs:
             set -e
             cd ~/registerForm-platform
 
+            # Clean any local changes and untracked files
+            git clean -fd
+            git reset --hard HEAD
+            
             # Pull latest code from repository
             git fetch origin
             git reset --hard origin/master
@@ -55,18 +60,35 @@ jobs:
             head -30 Dockerfile.prod
             echo "=== End Dockerfile.prod ==="
 
-            ls -la docker-compose.prod.yml
+            # Check if docker-compose.prod.yml exists
+            if [ ! -f docker-compose.prod.yml ]; then
+              echo "ERROR: docker-compose.prod.yml not found!"
+              exit 1
+            fi
 
+            # Login to ECR
             aws ecr get-login-password --region ${{ env.AWS_REGION }} \
               | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
 
-            # Clean all Docker cache and force rebuild
+            # Stop and remove old containers
+            docker compose -f docker-compose.prod.yml down || true
+
+            # Clean Docker cache
             docker system prune -af
+
+            # Build and start services
             docker compose -f docker-compose.prod.yml build --no-cache web
             docker compose -f docker-compose.prod.yml up -d --remove-orphans
 
+            # Show status
+            echo "=== Container Status ==="
             docker ps --format "table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}"
 
+            # Show recent logs
+            echo "=== Recent Logs ==="
+            docker compose -f docker-compose.prod.yml logs --tail 50 web
+
+            # Clean unused images
             docker image prune -f
 
 
