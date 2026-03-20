@@ -44,6 +44,7 @@ yarn-error.log*
 # deployment files with real credentials
 DEPLOYMENT-STEPS-REAL.md
 DEPLOYMENT-ISSUES.md
+AWS-DEPLOY-STEPS.md
 deploy-to-aws.sh
 quick-commands.sh
 
