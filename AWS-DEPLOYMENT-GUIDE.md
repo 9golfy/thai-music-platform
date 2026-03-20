@@ -1,343 +1,920 @@
-# AWS Deployment Guide
+# คู่มือการ Deploy Thai Music Platform ขึ้น AWS
 
-## ตัวเลือกการ Deploy บน AWS
-
-### 1. AWS ECS (Elastic Container Service) - แนะนำ
-ใช้ Docker container, auto-scaling, managed service
-
-### 2. AWS EC2 + Docker
-ควบคุมได้มากที่สุด, ต้องจัดการ server เอง
-
-### 3. AWS App Runner
-ง่ายที่สุด, deploy จาก Docker image โดยตรง
+## สารบัญ
+1. [ข้อกำหนดเบื้องต้น](#ข้อกำหนดเบื้องต้น)
+2. [สถาปัตยกรรมระบบ](#สถาปัตยกรรมระบบ)
+3. [การเตรียม AWS Services](#การเตรียม-aws-services)
+4. [การ Deploy ด้วย Docker](#การ-deploy-ด้วย-docker)
+5. [การตั้งค่า Environment Variables](#การตั้งค่า-environment-variables)
+6. [การตั้งค่า MongoDB](#การตั้งค่า-mongodb)
+7. [การตั้งค่า Domain และ SSL](#การตั้งค่า-domain-และ-ssl)
+8. [การ Monitor และ Maintenance](#การ-monitor-และ-maintenance)
+9. [Troubleshooting](#troubleshooting)
 
 ---
 
-## วิธีที่ 1: AWS ECS (แนะนำ)
+## ข้อกำหนดเบื้องต้น
 
-### ขั้นตอนการ Deploy
+### เครื่องมือที่ต้องมี
+- AWS Account พร้อม IAM User ที่มีสิทธิ์เหมาะสม
+- AWS CLI ติดตั้งและตั้งค่าแล้ว
+- Docker และ Docker Compose
+- Git
+- SSH Key สำหรับเข้า EC2
 
-#### 1. สร้าง ECR Repository (เก็บ Docker image)
+### ความรู้พื้นฐาน
+- Linux command line
+- Docker basics
+- AWS EC2, RDS, S3
+- MongoDB
 
-```bash
-# Login to AWS
-aws configure
+---
 
-# Create ECR repository
-aws ecr create-repository --repository-name thai-music-platform --region ap-southeast-1
+## สถาปัตยกรรมระบบ
 
-# Get login command
-aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin <your-account-id>.dkr.ecr.ap-southeast-1.amazonaws.com
+```
+┌─────────────────────────────────────────────────────────┐
+│                    Route 53 (DNS)                       │
+└────────────────────┬────────────────────────────────────┘
+                     │
+┌────────────────────▼────────────────────────────────────┐
+│              CloudFront (CDN + SSL)                     │
+└────────────────────┬────────────────────────────────────┘
+                     │
+┌────────────────────▼────────────────────────────────────┐
+│         Application Load Balancer (ALB)                 │
+└────────────────────┬────────────────────────────────────┘
+                     │
+┌────────────────────▼────────────────────────────────────┐
+│              EC2 Instance(s)                            │
+│         (Next.js App in Docker)                         │
+└────────────────────┬────────────────────────────────────┘
+                     │
+        ┌────────────┴────────────┐
+        │                         │
+┌───────▼────────┐      ┌────────▼────────┐
+│  MongoDB Atlas │      │   S3 Bucket     │
+│  or RDS        │      │  (File Storage) │
+└────────────────┘      └─────────────────┘
 ```
 
-#### 2. Build และ Push Docker Image
+---
 
+## การเตรียม AWS Services
+
+### 1. สร้าง VPC และ Security Groups
+
+#### สร้าง VPC
 ```bash
-# Build production image
-docker build -f Dockerfile.prod -t thai-music-platform:latest .
+# สร้าง VPC
+aws ec2 create-vpc \
+  --cidr-block 10.0.0.0/16 \
+  --tag-specifications 'ResourceType=vpc,Tags=[{Key=Name,Value=thai-music-vpc}]'
 
-# Tag image
-docker tag thai-music-platform:latest <your-account-id>.dkr.ecr.ap-southeast-1.amazonaws.com/thai-music-platform:latest
+# สร้าง Subnet (Public)
+aws ec2 create-subnet \
+  --vpc-id <VPC_ID> \
+  --cidr-block 10.0.1.0/24 \
+  --availability-zone ap-southeast-1a \
+  --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=thai-music-public-subnet}]'
 
-# Push to ECR
-docker push <your-account-id>.dkr.ecr.ap-southeast-1.amazonaws.com/thai-music-platform:latest
+# สร้าง Internet Gateway
+aws ec2 create-internet-gateway \
+  --tag-specifications 'ResourceType=internet-gateway,Tags=[{Key=Name,Value=thai-music-igw}]'
+
+# Attach Internet Gateway
+aws ec2 attach-internet-gateway \
+  --vpc-id <VPC_ID> \
+  --internet-gateway-id <IGW_ID>
 ```
 
-#### 3. สร้าง MongoDB (เลือก 1 ใน 2)
-
-**Option A: MongoDB Atlas (แนะนำ)**
-- ไปที่ https://www.mongodb.com/cloud/atlas
-- สร้าง Free Tier cluster
-- Get connection string
-
-**Option B: AWS DocumentDB**
+#### สร้าง Security Group
 ```bash
-aws docdb create-db-cluster \
-  --db-cluster-identifier thai-music-db \
-  --engine docdb \
-  --master-username admin \
-  --master-user-password YourPassword123
-```
+# Security Group สำหรับ EC2
+aws ec2 create-security-group \
+  --group-name thai-music-app-sg \
+  --description "Security group for Thai Music Platform" \
+  --vpc-id <VPC_ID>
 
-#### 4. สร้าง ECS Task Definition
-
-สร้างไฟล์ `ecs-task-definition.json`:
-
-```json
-{
-  "family": "thai-music-platform",
-  "networkMode": "awsvpc",
-  "requiresCompatibilities": ["FARGATE"],
-  "cpu": "512",
-  "memory": "1024",
-  "containerDefinitions": [
-    {
-      "name": "web",
-      "image": "<your-account-id>.dkr.ecr.ap-southeast-1.amazonaws.com/thai-music-platform:latest",
-      "portMappings": [
-        {
-          "containerPort": 3000,
-          "protocol": "tcp"
-        }
-      ],
-      "environment": [
-        {
-          "name": "NODE_ENV",
-          "value": "production"
-        },
-        {
-          "name": "MONGODB_URI",
-          "value": "mongodb+srv://username:password@cluster.mongodb.net/thai-music-platform"
-        },
-        {
-          "name": "NEXT_PUBLIC_API_URL",
-          "value": "https://your-domain.com"
-        }
-      ],
-      "logConfiguration": {
-        "logDriver": "awslogs",
-        "options": {
-          "awslogs-group": "/ecs/thai-music-platform",
-          "awslogs-region": "ap-southeast-1",
-          "awslogs-stream-prefix": "ecs"
-        }
-      }
-    }
-  ]
-}
-```
-
-#### 5. สร้าง ECS Service
-
-```bash
-# Create ECS cluster
-aws ecs create-cluster --cluster-name thai-music-cluster --region ap-southeast-1
-
-# Register task definition
-aws ecs register-task-definition --cli-input-json file://ecs-task-definition.json
-
-# Create service
-aws ecs create-service \
-  --cluster thai-music-cluster \
-  --service-name thai-music-service \
-  --task-definition thai-music-platform \
-  --desired-count 1 \
-  --launch-type FARGATE \
-  --network-configuration "awsvpcConfiguration={subnets=[subnet-xxx],securityGroups=[sg-xxx],assignPublicIp=ENABLED}"
-```
-
-#### 6. สร้าง Application Load Balancer (ALB)
-
-```bash
-# Create ALB
-aws elbv2 create-load-balancer \
-  --name thai-music-alb \
-  --subnets subnet-xxx subnet-yyy \
-  --security-groups sg-xxx
-
-# Create target group
-aws elbv2 create-target-group \
-  --name thai-music-targets \
-  --protocol HTTP \
-  --port 3000 \
-  --vpc-id vpc-xxx \
-  --target-type ip
-
-# Create listener
-aws elbv2 create-listener \
-  --load-balancer-arn <alb-arn> \
-  --protocol HTTP \
+# เปิด Port 80 (HTTP)
+aws ec2 authorize-security-group-ingress \
+  --group-id <SG_ID> \
+  --protocol tcp \
   --port 80 \
-  --default-actions Type=forward,TargetGroupArn=<target-group-arn>
+  --cidr 0.0.0.0/0
+
+# เปิด Port 443 (HTTPS)
+aws ec2 authorize-security-group-ingress \
+  --group-id <SG_ID> \
+  --protocol tcp \
+  --port 443 \
+  --cidr 0.0.0.0/0
+
+# เปิด Port 22 (SSH) - จำกัดเฉพาะ IP ของคุณ
+aws ec2 authorize-security-group-ingress \
+  --group-id <SG_ID> \
+  --protocol tcp \
+  --port 22 \
+  --cidr <YOUR_IP>/32
+
+# เปิด Port 3000 (Next.js App)
+aws ec2 authorize-security-group-ingress \
+  --group-id <SG_ID> \
+  --protocol tcp \
+  --port 3000 \
+  --cidr 0.0.0.0/0
+```
+
+### 2. สร้าง EC2 Instance
+
+#### เลือก AMI และ Instance Type
+- **AMI**: Ubuntu Server 22.04 LTS
+- **Instance Type**: t3.medium (2 vCPU, 4 GB RAM) หรือสูงกว่า
+- **Storage**: 30 GB gp3 SSD ขึ้นไป
+
+#### สร้าง Instance ผ่าน AWS Console
+1. ไปที่ EC2 Dashboard
+2. คลิก "Launch Instance"
+3. เลือก Ubuntu Server 22.04 LTS
+4. เลือก Instance Type: t3.medium
+5. เลือก VPC และ Subnet ที่สร้างไว้
+6. เลือก Security Group ที่สร้างไว้
+7. เพิ่ม Storage: 30 GB
+8. สร้าง Key Pair หรือใช้ที่มีอยู่
+9. Launch Instance
+
+#### หรือสร้างผ่าน CLI
+```bash
+aws ec2 run-instances \
+  --image-id ami-0c55b159cbfafe1f0 \
+  --instance-type t3.medium \
+  --key-name <YOUR_KEY_NAME> \
+  --security-group-ids <SG_ID> \
+  --subnet-id <SUBNET_ID> \
+  --block-device-mappings '[{"DeviceName":"/dev/sda1","Ebs":{"VolumeSize":30,"VolumeType":"gp3"}}]' \
+  --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=thai-music-app}]'
+```
+
+### 3. Elastic IP (Optional แต่แนะนำ)
+```bash
+# จอง Elastic IP
+aws ec2 allocate-address --domain vpc
+
+# Attach กับ Instance
+aws ec2 associate-address \
+  --instance-id <INSTANCE_ID> \
+  --allocation-id <ALLOCATION_ID>
 ```
 
 ---
 
-## วิธีที่ 2: AWS EC2 + Docker (ง่ายกว่า)
+## การตั้งค่า EC2 Instance
 
-### ขั้นตอน
-
-#### 1. สร้าง EC2 Instance
-
+### 1. เชื่อมต่อกับ EC2
 ```bash
-# Launch EC2 instance (Ubuntu 22.04)
-# Instance type: t3.small หรือ t3.medium
-# Security Group: เปิด port 22 (SSH), 80 (HTTP), 443 (HTTPS)
+ssh -i <YOUR_KEY.pem> ubuntu@<EC2_PUBLIC_IP>
 ```
 
-#### 2. เชื่อมต่อและติดตั้ง Docker
-
+### 2. Update System
 ```bash
-# SSH to EC2
-ssh -i your-key.pem ubuntu@<ec2-public-ip>
+sudo apt update && sudo apt upgrade -y
+```
 
-# Install Docker
-sudo apt update
-sudo apt install -y docker.io docker-compose
-sudo usermod -aG docker ubuntu
+### 3. ติดตั้ง Docker
+```bash
+# ติดตั้ง Docker
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
 
-# Install Docker Compose V2
+# เพิ่ม user ปัจจุบันเข้า docker group
+sudo usermod -aG docker $USER
+
+# ติดตั้ง Docker Compose
 sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
+
+# Logout และ Login ใหม่เพื่อให้ group มีผล
+exit
 ```
 
-#### 3. Clone Repository
-
+### 4. ติดตั้ง Git และ Node.js (สำหรับ build)
 ```bash
+# Git
+sudo apt install git -y
+
+# Node.js 22.x
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+sudo apt install -y nodejs
+
+# ตรวจสอบ version
+node --version
+npm --version
+```
+
+### 5. ติดตั้ง Nginx (Reverse Proxy)
+```bash
+sudo apt install nginx -y
+sudo systemctl enable nginx
+sudo systemctl start nginx
+```
+
+---
+
+## การ Deploy ด้วย Docker
+
+### 1. Clone Repository
+```bash
+cd /home/ubuntu
 git clone https://github.com/9golfy/thai-music-platform.git
 cd thai-music-platform
 ```
 
-#### 4. สร้าง .env.production
-
+### 2. สร้าง Environment File
 ```bash
-cat > .env.production << EOF
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/thai-music-platform
-NEXT_PUBLIC_API_URL=http://<ec2-public-ip>
+# สร้างไฟล์ .env.production
+nano .env.production
+```
+
+เพิ่มเนื้อหา:
+```env
+# Application
 NODE_ENV=production
-EOF
+NEXT_PUBLIC_API_URL=https://yourdomain.com
+PORT=3000
+
+# MongoDB
+MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/thai-music?retryWrites=true&w=majority
+
+# JWT Secret (สร้าง random string ที่ปลอดภัย)
+JWT_SECRET=<GENERATE_RANDOM_STRING_HERE>
+
+# Email Configuration (ถ้าใช้)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your-email@gmail.com
+SMTP_PASS=your-app-password
+
+# File Upload
+MAX_FILE_SIZE=10485760
+UPLOAD_DIR=/app/public/uploads
+
+# Admin
+ADMIN_EMAIL=admin@yourdomain.com
 ```
 
-#### 5. Run Docker Compose
-
+### 3. Build Docker Image
 ```bash
-# Build and start
-docker-compose -f docker-compose.prod.yml up -d
+# Build image
+docker build -t thai-music-platform:latest .
 
-# Check logs
-docker-compose -f docker-compose.prod.yml logs -f
+# ตรวจสอบ image
+docker images
 ```
 
-#### 6. ตั้งค่า Nginx (Optional - สำหรับ HTTPS)
-
+### 4. สร้าง Docker Network
 ```bash
-sudo apt install -y nginx certbot python3-certbot-nginx
+docker network create thai-music-network
+```
 
-# Create nginx config
-sudo nano /etc/nginx/sites-available/thai-music
+### 5. Run MongoDB (ถ้าใช้ local MongoDB)
+```bash
+# สร้าง volume สำหรับ MongoDB
+docker volume create mongodb-data
 
-# Add configuration:
-server {
-    listen 80;
-    server_name your-domain.com;
+# Run MongoDB container
+docker run -d \
+  --name mongodb \
+  --network thai-music-network \
+  -v mongodb-data:/data/db \
+  -e MONGO_INITDB_ROOT_USERNAME=admin \
+  -e MONGO_INITDB_ROOT_PASSWORD=<STRONG_PASSWORD> \
+  -p 27017:27017 \
+  mongo:7
+```
 
-    location / {
-        proxy_pass http://localhost:3000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-    }
-}
+### 6. Run Application Container
+```bash
+docker run -d \
+  --name thai-music-app \
+  --network thai-music-network \
+  -p 3000:3000 \
+  --env-file .env.production \
+  -v /home/ubuntu/thai-music-platform/public/uploads:/app/public/uploads \
+  --restart unless-stopped \
+  thai-music-platform:latest
+```
 
-# Enable site
-sudo ln -s /etc/nginx/sites-available/thai-music /etc/nginx/sites-enabled/
-sudo nginx -t
-sudo systemctl restart nginx
+### 7. ตรวจสอบ Container
+```bash
+# ดู logs
+docker logs -f thai-music-app
 
-# Get SSL certificate
-sudo certbot --nginx -d your-domain.com
+# ตรวจสอบสถานะ
+docker ps
+
+# ทดสอบ
+curl http://localhost:3000
 ```
 
 ---
 
-## วิธีที่ 3: AWS App Runner (ง่ายที่สุด)
+## การตั้งค่า Nginx Reverse Proxy
 
-### ขั้นตอน
+### 1. สร้าง Nginx Configuration
+```bash
+sudo nano /etc/nginx/sites-available/thai-music
+```
 
-#### 1. Push Image to ECR (เหมือนวิธีที่ 1)
+เพิ่มเนื้อหา:
+```nginx
+upstream thai_music_app {
+    server localhost:3000;
+}
 
-#### 2. สร้าง App Runner Service
+server {
+    listen 80;
+    server_name yourdomain.com www.yourdomain.com;
+
+    # Redirect HTTP to HTTPS (หลังติดตั้ง SSL)
+    # return 301 https://$server_name$request_uri;
+
+    client_max_body_size 20M;
+
+    location / {
+        proxy_pass http://thai_music_app;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+        
+        # Timeouts
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+    }
+
+    # Static files
+    location /_next/static {
+        proxy_pass http://thai_music_app;
+        proxy_cache_valid 200 60m;
+        add_header Cache-Control "public, immutable";
+    }
+
+    # Uploads
+    location /uploads {
+        proxy_pass http://thai_music_app;
+        proxy_cache_valid 200 24h;
+        add_header Cache-Control "public";
+    }
+}
+```
+
+### 2. Enable Site
+```bash
+# สร้าง symbolic link
+sudo ln -s /etc/nginx/sites-available/thai-music /etc/nginx/sites-enabled/
+
+# ลบ default site
+sudo rm /etc/nginx/sites-enabled/default
+
+# ทดสอบ configuration
+sudo nginx -t
+
+# Restart Nginx
+sudo systemctl restart nginx
+```
+
+---
+
+## การตั้งค่า SSL ด้วย Let's Encrypt
+
+### 1. ติดตั้ง Certbot
+```bash
+sudo apt install certbot python3-certbot-nginx -y
+```
+
+### 2. ขอ SSL Certificate
+```bash
+sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
+```
+
+### 3. Auto-renewal
+```bash
+# ทดสอบ renewal
+sudo certbot renew --dry-run
+
+# Certbot จะตั้ง cron job ให้อัตโนมัติ
+# ตรวจสอบได้ที่
+sudo systemctl status certbot.timer
+```
+
+---
+
+## การตั้งค่า MongoDB
+
+### Option 1: MongoDB Atlas (แนะนำ)
+
+1. ไปที่ https://www.mongodb.com/cloud/atlas
+2. สร้าง Free Cluster
+3. ตั้งค่า Network Access: เพิ่ม IP ของ EC2
+4. สร้าง Database User
+5. คัดลอก Connection String
+6. อัพเดท MONGODB_URI ใน .env.production
+
+### Option 2: MongoDB บน EC2
+
+ถ้าใช้ MongoDB container ตาม step ที่แล้ว:
 
 ```bash
-aws apprunner create-service \
-  --service-name thai-music-platform \
-  --source-configuration '{
-    "ImageRepository": {
-      "ImageIdentifier": "<your-account-id>.dkr.ecr.ap-southeast-1.amazonaws.com/thai-music-platform:latest",
-      "ImageRepositoryType": "ECR",
-      "ImageConfiguration": {
-        "Port": "3000",
-        "RuntimeEnvironmentVariables": {
-          "NODE_ENV": "production",
-          "MONGODB_URI": "mongodb+srv://...",
-          "NEXT_PUBLIC_API_URL": "https://xxx.ap-southeast-1.awsapprunner.com"
-        }
-      }
-    },
-    "AutoDeploymentsEnabled": true
-  }' \
-  --instance-configuration '{
-    "Cpu": "1 vCPU",
-    "Memory": "2 GB"
+# เข้าไปใน MongoDB container
+docker exec -it mongodb mongosh -u admin -p <PASSWORD>
+
+# สร้าง database และ user
+use thai-music
+db.createUser({
+  user: "thaimusic",
+  pwd: "<STRONG_PASSWORD>",
+  roles: [{ role: "readWrite", db: "thai-music" }]
+})
+
+# ออกจาก mongosh
+exit
+```
+
+อัพเดท MONGODB_URI:
+```env
+MONGODB_URI=mongodb://thaimusic:<PASSWORD>@mongodb:27017/thai-music?authSource=thai-music
+```
+
+---
+
+## การสร้าง Admin User แรก
+
+### 1. เข้าไปใน Application Container
+```bash
+docker exec -it thai-music-app sh
+```
+
+### 2. รัน Setup Script
+```bash
+# ถ้ามี script setup
+node scripts/create-system-admin.js
+
+# หรือใช้ API endpoint
+curl -X POST http://localhost:3000/api/admin/setup \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "admin@yourdomain.com",
+    "password": "YourStrongPassword123!",
+    "name": "System Admin"
   }'
 ```
 
 ---
 
-## ⚠️ สิ่งสำคัญที่ต้องแก้ไข
+## Docker Compose (Alternative)
 
-### 1. Image Upload Storage
+สร้างไฟล์ `docker-compose.prod.yml`:
 
-ตอนนี้ใช้ `public/uploads/` ใน container ซึ่งจะหายเมื่อ restart
+```yaml
+version: '3.8'
 
-**แก้ไข: ใช้ AWS S3**
+services:
+  app:
+    build: .
+    container_name: thai-music-app
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.production
+    volumes:
+      - ./public/uploads:/app/public/uploads
+    depends_on:
+      - mongodb
+    restart: unless-stopped
+    networks:
+      - thai-music-network
 
-ต้องแก้ไขไฟล์:
-- `app/api/register-support/route.ts`
-- `app/api/register100/route.ts`
+  mongodb:
+    image: mongo:7
+    container_name: mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+    volumes:
+      - mongodb-data:/data/db
+    ports:
+      - "27017:27017"
+    restart: unless-stopped
+    networks:
+      - thai-music-network
 
-เปลี่ยนจาก local file storage เป็น S3
+volumes:
+  mongodb-data:
 
-### 2. Environment Variables
+networks:
+  thai-music-network:
+    driver: bridge
+```
 
-ต้องตั้งค่า:
-- `MONGODB_URI` - MongoDB connection string
-- `NEXT_PUBLIC_API_URL` - Public URL ของ application
-- `AWS_ACCESS_KEY_ID` - สำหรับ S3 (ถ้าใช้)
-- `AWS_SECRET_ACCESS_KEY` - สำหรับ S3 (ถ้าใช้)
-- `AWS_REGION` - เช่น ap-southeast-1
-- `S3_BUCKET_NAME` - ชื่อ S3 bucket
-
----
-
-## ค่าใช้จ่ายโดยประมาณ (Bangkok Region)
-
-### ECS Fargate
-- 0.5 vCPU, 1GB RAM: ~$15-20/เดือน
-- MongoDB Atlas Free Tier: $0
-- ALB: ~$20/เดือน
-- **รวม: ~$35-40/เดือน**
-
-### EC2
-- t3.small (2 vCPU, 2GB RAM): ~$15/เดือน
-- MongoDB Atlas Free Tier: $0
-- **รวม: ~$15/เดือน** (ถูกที่สุด)
-
-### App Runner
-- 1 vCPU, 2GB RAM: ~$25-30/เดือน
-- MongoDB Atlas Free Tier: $0
-- **รวม: ~$25-30/เดือน**
-
----
-
-## แนะนำสำหรับคุณ
-
-**เริ่มต้น: EC2 + Docker (วิธีที่ 2)**
-- ง่าย ถูก ควบคุมได้
-- เหมาะสำหรับ MVP และ testing
-
-**Production: ECS Fargate (วิธีที่ 1)**
-- Auto-scaling
-- Managed service
-- เหมาะสำหรับ production ที่มี traffic สูง
+Deploy:
+```bash
+docker-compose -f docker-compose.prod.yml up -d
+```
 
 ---
 
-## ต้องการความช่วยเหลือ?
+## การ Update Application
 
-บอกผมว่าคุณเลือกวิธีไหน แล้วผมจะช่วย:
-1. สร้าง scripts สำหรับ deploy
-2. แก้ไข code ให้รองรับ S3
-3. สร้าง CI/CD pipeline
+### 1. Pull Latest Code
+```bash
+cd /home/ubuntu/thai-music-platform
+git pull origin master
+```
+
+### 2. Rebuild และ Restart
+```bash
+# Stop container
+docker stop thai-music-app
+docker rm thai-music-app
+
+# Rebuild image
+docker build -t thai-music-platform:latest .
+
+# Run new container
+docker run -d \
+  --name thai-music-app \
+  --network thai-music-network \
+  -p 3000:3000 \
+  --env-file .env.production \
+  -v /home/ubuntu/thai-music-platform/public/uploads:/app/public/uploads \
+  --restart unless-stopped \
+  thai-music-platform:latest
+```
+
+### 3. Zero-Downtime Deployment (Advanced)
+```bash
+# สร้าง script deploy.sh
+nano deploy.sh
+```
+
+```bash
+#!/bin/bash
+set -e
+
+echo "Pulling latest code..."
+git pull origin master
+
+echo "Building new image..."
+docker build -t thai-music-platform:new .
+
+echo "Starting new container..."
+docker run -d \
+  --name thai-music-app-new \
+  --network thai-music-network \
+  -p 3001:3000 \
+  --env-file .env.production \
+  -v /home/ubuntu/thai-music-platform/public/uploads:/app/public/uploads \
+  thai-music-platform:new
+
+echo "Waiting for new container to be ready..."
+sleep 10
+
+echo "Switching traffic..."
+# Update Nginx upstream
+sudo sed -i 's/localhost:3000/localhost:3001/' /etc/nginx/sites-available/thai-music
+sudo nginx -s reload
+
+echo "Stopping old container..."
+docker stop thai-music-app
+docker rm thai-music-app
+
+echo "Renaming new container..."
+docker rename thai-music-app-new thai-music-app
+
+echo "Updating port..."
+docker stop thai-music-app
+docker rm thai-music-app
+docker run -d \
+  --name thai-music-app \
+  --network thai-music-network \
+  -p 3000:3000 \
+  --env-file .env.production \
+  -v /home/ubuntu/thai-music-platform/public/uploads:/app/public/uploads \
+  --restart unless-stopped \
+  thai-music-platform:new
+
+sudo sed -i 's/localhost:3001/localhost:3000/' /etc/nginx/sites-available/thai-music
+sudo nginx -s reload
+
+echo "Deployment complete!"
+```
+
+```bash
+chmod +x deploy.sh
+./deploy.sh
+```
+
+---
+
+## การ Backup
+
+### 1. Backup MongoDB
+```bash
+# สร้าง backup script
+nano backup-mongodb.sh
+```
+
+```bash
+#!/bin/bash
+BACKUP_DIR="/home/ubuntu/backups/mongodb"
+DATE=$(date +%Y%m%d_%H%M%S)
+
+mkdir -p $BACKUP_DIR
+
+docker exec mongodb mongodump \
+  --username admin \
+  --password <PASSWORD> \
+  --authenticationDatabase admin \
+  --out /tmp/backup
+
+docker cp mongodb:/tmp/backup $BACKUP_DIR/backup_$DATE
+
+# Compress
+tar -czf $BACKUP_DIR/backup_$DATE.tar.gz $BACKUP_DIR/backup_$DATE
+rm -rf $BACKUP_DIR/backup_$DATE
+
+# Keep only last 7 days
+find $BACKUP_DIR -name "backup_*.tar.gz" -mtime +7 -delete
+
+echo "Backup completed: backup_$DATE.tar.gz"
+```
+
+```bash
+chmod +x backup-mongodb.sh
+
+# เพิ่มใน crontab (backup ทุกวันเวลา 2:00 AM)
+crontab -e
+```
+
+เพิ่ม:
+```
+0 2 * * * /home/ubuntu/backup-mongodb.sh >> /home/ubuntu/backup.log 2>&1
+```
+
+### 2. Backup Uploads
+```bash
+# Sync ไป S3
+aws s3 sync /home/ubuntu/thai-music-platform/public/uploads s3://your-bucket/uploads/
+```
+
+---
+
+## การ Monitor
+
+### 1. ติดตั้ง Monitoring Tools
+```bash
+# htop
+sudo apt install htop -y
+
+# Docker stats
+docker stats
+```
+
+### 2. Application Logs
+```bash
+# Real-time logs
+docker logs -f thai-music-app
+
+# Last 100 lines
+docker logs --tail 100 thai-music-app
+
+# Logs with timestamp
+docker logs -t thai-music-app
+```
+
+### 3. Nginx Logs
+```bash
+# Access logs
+sudo tail -f /var/log/nginx/access.log
+
+# Error logs
+sudo tail -f /var/log/nginx/error.log
+```
+
+### 4. System Resources
+```bash
+# Disk usage
+df -h
+
+# Memory usage
+free -h
+
+# CPU usage
+top
+```
+
+---
+
+## Troubleshooting
+
+### Container ไม่ start
+```bash
+# ดู logs
+docker logs thai-music-app
+
+# ตรวจสอบ port conflict
+sudo netstat -tulpn | grep 3000
+
+# ตรวจสอบ environment variables
+docker exec thai-music-app env
+```
+
+### Database Connection Error
+```bash
+# ทดสอบ MongoDB connection
+docker exec -it mongodb mongosh -u admin -p <PASSWORD>
+
+# ตรวจสอบ network
+docker network inspect thai-music-network
+
+# Ping MongoDB จาก app container
+docker exec thai-music-app ping mongodb
+```
+
+### Out of Memory
+```bash
+# เพิ่ม swap
+sudo fallocate -l 4G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+
+# ทำให้ permanent
+echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+```
+
+### Disk Full
+```bash
+# ลบ unused Docker images
+docker image prune -a
+
+# ลบ unused volumes
+docker volume prune
+
+# ลบ logs เก่า
+sudo find /var/log -name "*.log" -mtime +30 -delete
+```
+
+### SSL Certificate Issues
+```bash
+# Renew manually
+sudo certbot renew
+
+# ตรวจสอบ certificate
+sudo certbot certificates
+
+# Test SSL
+curl -vI https://yourdomain.com
+```
+
+---
+
+## Security Best Practices
+
+### 1. Firewall
+```bash
+# ติดตั้ง UFW
+sudo apt install ufw -y
+
+# Default policies
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+
+# Allow SSH
+sudo ufw allow 22/tcp
+
+# Allow HTTP/HTTPS
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+
+# Enable firewall
+sudo ufw enable
+```
+
+### 2. Fail2ban
+```bash
+# ติดตั้ง
+sudo apt install fail2ban -y
+
+# Configure
+sudo nano /etc/fail2ban/jail.local
+```
+
+```ini
+[sshd]
+enabled = true
+port = 22
+maxretry = 3
+bantime = 3600
+```
+
+```bash
+sudo systemctl enable fail2ban
+sudo systemctl start fail2ban
+```
+
+### 3. Regular Updates
+```bash
+# Auto security updates
+sudo apt install unattended-upgrades -y
+sudo dpkg-reconfigure -plow unattended-upgrades
+```
+
+### 4. MongoDB Security
+- ใช้ strong password
+- Enable authentication
+- จำกัด network access
+- Regular backups
+- Update เป็นประจำ
+
+---
+
+## Performance Optimization
+
+### 1. Enable Gzip ใน Nginx
+```nginx
+# เพิ่มใน /etc/nginx/nginx.conf
+gzip on;
+gzip_vary on;
+gzip_min_length 1024;
+gzip_types text/plain text/css text/xml text/javascript application/x-javascript application/xml+rss application/json;
+```
+
+### 2. Cache Static Assets
+```nginx
+location ~* \.(jpg|jpeg|png|gif|ico|css|js|svg|woff|woff2)$ {
+    expires 1y;
+    add_header Cache-Control "public, immutable";
+}
+```
+
+### 3. MongoDB Indexes
+```javascript
+// สร้าง indexes สำหรับ queries ที่ใช้บ่อย
+db.register100.createIndex({ schoolId: 1 })
+db.register100.createIndex({ createdAt: -1 })
+db.registerSupport.createIndex({ schoolId: 1 })
+db.users.createIndex({ email: 1 }, { unique: true })
+```
+
+---
+
+## Cost Optimization
+
+### 1. EC2 Instance
+- ใช้ Reserved Instances สำหรับ production (ประหยัดได้ถึง 72%)
+- ใช้ Spot Instances สำหรับ development/testing
+- Right-size instance ตาม usage
+
+### 2. Storage
+- ใช้ S3 Intelligent-Tiering สำหรับ uploads
+- Enable S3 Lifecycle policies
+- ใช้ CloudFront CDN
+
+### 3. Database
+- MongoDB Atlas Free Tier (512 MB) สำหรับ development
+- Shared Cluster สำหรับ production ขนาดเล็ก
+
+---
+
+## Checklist ก่อน Go Live
+
+- [ ] SSL Certificate ติดตั้งและทำงานถูกต้อง
+- [ ] Database backup automated
+- [ ] Monitoring setup
+- [ ] Error logging configured
+- [ ] Environment variables ตั้งค่าถูกต้อง
+- [ ] Admin user สร้างแล้ว
+- [ ] Security groups configured properly
+- [ ] Firewall rules set
+- [ ] Domain DNS configured
+- [ ] Email service working (ถ้ามี)
+- [ ] File upload working
+- [ ] Performance tested
+- [ ] Load tested (ถ้าคาดว่ามี traffic สูง)
+
+---
+
+## ติดต่อและ Support
+
+- GitHub: https://github.com/9golfy/thai-music-platform
+- Issues: https://github.com/9golfy/thai-music-platform/issues
+
+---
+
+**หมายเหตุ**: คู่มือนี้เป็นแนวทางทั่วไป อาจต้องปรับแต่งตามความต้องการเฉพาะของโปรเจค
