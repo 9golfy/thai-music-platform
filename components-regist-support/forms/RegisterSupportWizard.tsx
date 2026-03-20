@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useRef, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
@@ -19,8 +19,12 @@ import Step5 from './steps/Step5';
 import Step6 from './steps/Step6';
 import Step7 from './steps/Step7';
 import Step8 from './steps/Step8';
+import Step9 from './steps/Step9';
 
 const STEPS = STEP_TITLES;
+
+const toThaiNumerals = (value: number | string) =>
+  String(value).replace(/\d/g, (d) => '๐๑๒๓๔๕๖๗๘๙'[Number(d)]);
 
 export default function RegisterSupportWizard() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -78,7 +82,8 @@ export default function RegisterSupportWizard() {
       regsup_DCP_PR_Channel_YOUTUBE: false,
       regsup_DCP_PR_Channel_Tiktok: false,
       regsup_heardFromOther: false,
-      regsup_certifiedINFOByAdminName: false,
+      regsup_certifiedByAdmin: false,
+      regsup_affiliationDetail: '',
       regsup_teacher_training_score: 0,
       regsup_teacher_qualification_score: 0,
       regsup_support_from_org_score: 0,
@@ -400,7 +405,7 @@ export default function RegisterSupportWizard() {
   }, []);
 
   const goToStep = (targetStep: number) => {
-    const clampedStep = Math.max(1, Math.min(8, targetStep));
+    const clampedStep = Math.max(1, Math.min(9, targetStep));
     setCurrentStep(clampedStep);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -412,7 +417,7 @@ export default function RegisterSupportWizard() {
       return;
     }
 
-    if (currentStep === 8) {
+    if (currentStep === 9) {
       // Don't call form.handleSubmit here - let the form's onSubmit handle it
       return;
     }
@@ -515,9 +520,9 @@ export default function RegisterSupportWizard() {
     console.log('🚀 Submitting form:', data);
     
     // Check certification checkbox first
-    if (!data.regsup_certifiedINFOByAdminName) {
+    if (!data.regsup_certifiedByAdmin) {
       const missing: string[] = [];
-      missing.push('การรับรองข้อมูล - กรุณาติ๊กถูกเพื่อรับรองว่าข้อมูลเป็นความจริง (Step 8)');
+      missing.push('การรับรองข้อมูล - กรุณาติ๊กถูกเพื่อรับรองว่าข้อมูลเป็นความจริง (Step 9)');
       setMissingFields(missing);
       setShowMissingFieldsModal(true);
       return;
@@ -641,8 +646,14 @@ export default function RegisterSupportWizard() {
       if (result.success) {
         console.log('✅ Form submitted successfully! ID:', result.id);
         
+        // Reset submission state first
         setIsSubmitting(false);
-        setShowTeacherInfoModal(false); // Close teacher info modal
+        
+        // Small delay to ensure state update
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // Close teacher info modal
+        setShowTeacherInfoModal(false);
         
         // Show success modal
         console.log('📊 Showing success modal');
@@ -671,13 +682,9 @@ export default function RegisterSupportWizard() {
   };
 
   const calculateAllScores = (data: RegisterSupportFormData) => {
-    // Teacher training score (5 points per checkbox, max 20)
-    let trainingScore = 0;
-    if (data.regsup_isCompulsorySubject) trainingScore += 5;
-    if (data.regsup_hasAfterSchoolTeaching) trainingScore += 5;
-    if (data.regsup_hasElectiveSubject) trainingScore += 5;
-    if (data.regsup_hasLocalCurriculum) trainingScore += 5;
-    data.regsup_teacher_training_score = trainingScore;
+    // Teacher training score - For register-support, give full 20 points since there are no checkboxes
+    // (register-support focuses on supporting schools, not detailed curriculum structure)
+    data.regsup_teacher_training_score = 20;
 
     // Teacher qualification score (5 points per unique qualification type, max 20)
     const uniqueQualifications = new Set<string>();
@@ -790,6 +797,8 @@ export default function RegisterSupportWizard() {
         return <Step7 form={form} />;
       case 8:
         return <Step8 form={form} />;
+      case 9:
+        return <Step9 form={form} />;
       default:
         return null;
     }
@@ -822,7 +831,7 @@ export default function RegisterSupportWizard() {
                 ความคืบหน้า (PROGRESS)
               </p>
               <p className="text-2xl font-bold text-[#00B050]">
-                {currentStep} / 8
+                {toThaiNumerals(currentStep)} / {toThaiNumerals(9)}
               </p>
             </div>
           </div>
@@ -856,7 +865,7 @@ export default function RegisterSupportWizard() {
                         : 'bg-gray-200 text-gray-500'
                     }`}
                   >
-                    {step.number}
+                    {toThaiNumerals(step.number)}
                   </div>
                   <span className="text-xs mt-1 hidden md:block">{step.title}</span>
                 </button>
@@ -918,7 +927,7 @@ export default function RegisterSupportWizard() {
                 getFormData={getCompleteFormData}
               />
               
-              {currentStep < 8 ? (
+              {currentStep < 9 ? (
                 <button
                   type="button"
                   onClick={handleNext}

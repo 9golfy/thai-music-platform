@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 export default async function CreateCertificatePage() {
   const session = await getSession();
 
-  if (!session || !['root', 'admin'].includes(session.role)) {
+  if (!session || !['root', 'admin', 'super_admin'].includes(session.role)) {
     redirect('/dcp-admin/dashboard');
   }
 

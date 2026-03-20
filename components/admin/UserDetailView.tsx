@@ -36,6 +36,9 @@ export default function UserDetailView({ id, session }: { id: string; session: S
   const [generatedPassword, setGeneratedPassword] = useState('');
   const [isResettingPassword, setIsResettingPassword] = useState(false);
   const [passwordCopied, setPasswordCopied] = useState(false);
+  const [showImageUploadModal, setShowImageUploadModal] = useState(false);
+  const [newProfileImage, setNewProfileImage] = useState<string | null>(null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
 
   useEffect(() => {
     fetchUser();
@@ -134,6 +137,67 @@ export default function UserDetailView({ id, session }: { id: string; session: S
     setPasswordCopied(false);
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('กรุณาเลือกไฟล์รูปภาพเท่านั้น');
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('ขนาดไฟล์ต้องไม่เกิน 5MB');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setNewProfileImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleUploadImage = async () => {
+    if (!newProfileImage) return;
+
+    setIsUploadingImage(true);
+    try {
+      const response = await fetch(`/api/users/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          profileImage: newProfileImage,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Update local state
+        setUser({ ...user!, profileImage: newProfileImage });
+        setShowImageUploadModal(false);
+        setNewProfileImage(null);
+        alert('อัปเดตรูปโปรไฟล์สำเร็จ');
+      } else {
+        alert('เกิดข้อผิดพลาด: ' + data.message);
+      }
+    } catch (error) {
+      alert('เกิดข้อผิดพลาดในการอัปเดตรูปโปรไฟล์');
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
+
+  const handleCancelImageUpload = () => {
+    setShowImageUploadModal(false);
+    setNewProfileImage(null);
+  };
+
   const handleSave = async () => {
     if (!editedData) return;
     
@@ -145,12 +209,21 @@ export default function UserDetailView({ id, session }: { id: string; session: S
     
     setIsSaving(true);
     try {
+      // Prepare data to send - filter out role if user is not root
+      let dataToSend;
+      if (session.role !== 'root') {
+        const { role, ...dataWithoutRole } = editedData;
+        dataToSend = dataWithoutRole;
+      } else {
+        dataToSend = editedData;
+      }
+      
       const response = await fetch(`/api/users/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(editedData),
+        body: JSON.stringify(dataToSend),
       });
       const data = await response.json();
       if (data.success) {
@@ -255,13 +328,46 @@ export default function UserDetailView({ id, session }: { id: string; session: S
             </div>
             
             {/* Profile Image */}
-            {user.profileImage && (
-              <div className="flex-shrink-0">
-                <img 
-                  src={user.profileImage.startsWith('http') ? user.profileImage : `/api${user.profileImage}`}
-                  alt={`${user.firstName} ${user.lastName}`}
-                  className="w-24 h-24 rounded-full object-cover border-4 border-gray-200"
-                />
+            {displayData?.profileImage && (
+              <div className="flex-shrink-0 relative group">
+                <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-200 bg-gray-100">
+                  <img 
+                    src={displayData.profileImage}
+                    alt={`${displayData.firstName} ${displayData.lastName}`}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                {/* Camera Icon Overlay */}
+                <button
+                  onClick={() => setShowImageUploadModal(true)}
+                  className="absolute bottom-0 right-0 w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white hover:bg-blue-600 transition-all shadow-lg border-2 border-white"
+                  title="เปลี่ยนรูปโปรไฟล์"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </button>
+              </div>
+            )}
+            {!displayData?.profileImage && (
+              <div className="flex-shrink-0 relative group">
+                <div className="w-32 h-32 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center border-4 border-gray-200">
+                  <span className="text-white text-4xl font-bold">
+                    {displayData?.firstName?.charAt(0)}{displayData?.lastName?.charAt(0)}
+                  </span>
+                </div>
+                {/* Camera Icon Overlay */}
+                <button
+                  onClick={() => setShowImageUploadModal(true)}
+                  className="absolute bottom-0 right-0 w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white hover:bg-blue-600 transition-all shadow-lg border-2 border-white"
+                  title="เพิ่มรูปโปรไฟล์"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </button>
               </div>
             )}
           </div>
@@ -271,16 +377,26 @@ export default function UserDetailView({ id, session }: { id: string; session: S
         <div className="flex gap-3 mb-6 justify-end">
           {!isEditMode ? (
             <>
-              <button
-                onClick={handleEdit}
-                className="px-6 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg hover:from-blue-600 hover:to-cyan-600 transition-all flex items-center gap-2 shadow-md"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
-                EDIT
-              </button>
-              {session.role === 'root' && user.role !== 'root' && (
+              {/* Only allow editing if user is root, or if user is admin and target is not root */}
+              {(session.role === 'root' || (session.role === 'admin' && user.role !== 'root')) ? (
+                <button
+                  onClick={handleEdit}
+                  className="px-6 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg hover:from-blue-600 hover:to-cyan-600 transition-all flex items-center gap-2 shadow-md"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  EDIT
+                </button>
+              ) : (
+                <div className="px-6 py-2 bg-gray-300 text-gray-600 rounded-lg flex items-center gap-2">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                  ไม่มีสิทธิ์แก้ไข
+                </div>
+              )}
+              {((session.role === 'root' && user.role !== 'root') || (session.role === 'admin' && user.role === 'teacher')) && (
                 <button
                   onClick={() => setShowDeleteModal(true)}
                   className="px-6 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg hover:from-red-600 hover:to-pink-600 transition-all flex items-center gap-2 shadow-md"
@@ -589,6 +705,106 @@ export default function UserDetailView({ id, session }: { id: string; session: S
               >
                 ปิด
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Image Upload Modal */}
+      {showImageUploadModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-semibold text-gray-900">เปลี่ยนรูปโปรไฟล์</h3>
+              <button
+                onClick={handleCancelImageUpload}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {/* Current Image */}
+              <div className="text-center">
+                <p className="text-sm text-gray-600 mb-3">รูปปัจจุบัน</p>
+                <div className="flex justify-center">
+                  {displayData?.profileImage ? (
+                    <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-200">
+                      <img 
+                        src={displayData.profileImage}
+                        alt="Current profile"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-32 h-32 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center border-4 border-gray-200">
+                      <span className="text-white text-4xl font-bold">
+                        {displayData?.firstName?.charAt(0)}{displayData?.lastName?.charAt(0)}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* New Image Preview */}
+              {newProfileImage && (
+                <div className="text-center">
+                  <p className="text-sm text-gray-600 mb-3">รูปใหม่</p>
+                  <div className="flex justify-center">
+                    <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-blue-500">
+                      <img 
+                        src={newProfileImage}
+                        alt="New profile preview"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Upload Button */}
+              <div>
+                <label
+                  htmlFor="profileImageUpload"
+                  className="w-full px-4 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg hover:from-blue-600 hover:to-cyan-600 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  {newProfileImage ? 'เลือกรูปใหม่' : 'เลือกรูปภาพ'}
+                </label>
+                <input
+                  id="profileImageUpload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
+                <p className="text-xs text-gray-500 text-center mt-2">
+                  รองรับไฟล์: JPG, PNG, GIF (ขนาดไม่เกิน 5MB)
+                </p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={handleCancelImageUpload}
+                  disabled={isUploadingImage}
+                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all disabled:opacity-50"
+                >
+                  ยกเลิก
+                </button>
+                <button
+                  onClick={handleUploadImage}
+                  disabled={!newProfileImage || isUploadingImage}
+                  className="flex-1 px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isUploadingImage ? 'กำลังอัปเดต...' : 'บันทึก'}
+                </button>
+              </div>
             </div>
           </div>
         </div>

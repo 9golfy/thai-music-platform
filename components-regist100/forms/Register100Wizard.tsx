@@ -20,8 +20,15 @@ import Step5 from './steps/Step5';
 import Step6 from './steps/Step6';
 import Step7 from './steps/Step7';
 import Step8 from './steps/Step8';
+import Step9 from './steps/Step9';
 
 const STEPS = STEP_TITLES;
+
+// Convert Arabic numerals to Thai numerals
+const toThaiNumeral = (num: number): string => {
+  const thaiNumerals = ['๐', '๑', '๒', '๓', '๔', '๕', '๖', '๗', '๘', '๙'];
+  return num.toString().split('').map(digit => thaiNumerals[parseInt(digit)]).join('');
+};
 
 export default function Register100Wizard() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -38,6 +45,25 @@ export default function Register100Wizard() {
   const [mgtImageFile, setMgtImageFile] = useState<File | null>(null);
   const [teacherImageFiles, setTeacherImageFiles] = useState<{ [key: number]: File }>({});
 
+  // Expose state setters globally for testing
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as any).setMgtImageFile = setMgtImageFile;
+      (window as any).setTeacherImageFiles = setTeacherImageFiles;
+      (window as any).getMgtImageFile = () => mgtImageFile;
+      (window as any).getTeacherImageFiles = () => teacherImageFiles;
+    }
+    
+    return () => {
+      if (typeof window !== 'undefined') {
+        delete (window as any).setMgtImageFile;
+        delete (window as any).setTeacherImageFiles;
+        delete (window as any).getMgtImageFile;
+        delete (window as any).getTeacherImageFiles;
+      }
+    };
+  }, [mgtImageFile, teacherImageFiles]);
+
   const form = useForm<Register100FormData>({
     resolver: zodResolver(register100Schema),
     mode: 'onBlur',
@@ -45,8 +71,10 @@ export default function Register100Wizard() {
       reg100_thaiMusicTeachers: [],
       reg100_currentMusicTypes: [],
       reg100_readinessItems: [],
-      reg100_inClassInstructionDurations: [],
-      reg100_outOfClassInstructionDurations: [],
+      reg100_compulsoryCurriculum: [],
+      reg100_electiveCurriculum: [],
+      reg100_localCurriculum: [],
+      reg100_afterSchoolSchedule: [],
       reg100_supportFactors: [],
       reg100_supportFromOrg: [],
       reg100_supportFromExternal: [],
@@ -65,7 +93,8 @@ export default function Register100Wizard() {
       reg100_DCP_PR_Channel_YOUTUBE: false,
       reg100_DCP_PR_Channel_Tiktok: false,
       reg100_heardFromOther: false,
-      reg100_certifiedINFOByAdminName: false,
+      reg100_certifiedByAdmin: false,
+      reg100_affiliationDetail: '',
       reg100_teacher_training_score: 0,
       reg100_teacher_qualification_score: 0,
       reg100_support_from_org_score: 0,
@@ -297,13 +326,13 @@ export default function Register100Wizard() {
   }, []);
 
   const goToStep = (targetStep: number) => {
-    const clampedStep = Math.max(1, Math.min(8, targetStep));
+    const clampedStep = Math.max(1, Math.min(9, targetStep));
     setCurrentStep(clampedStep);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleNext = async () => {
-    if (currentStep === 8) {
+    if (currentStep === 9) {
       form.handleSubmit(onSubmit)();
       return;
     }
@@ -342,7 +371,10 @@ export default function Register100Wizard() {
         setShowValidationErrorModal(true);
         return;
       }
-    } else if (currentStep === 5) {
+    } else if (currentStep === 6) {
+      // Step 6: No specific validation required - all fields are optional
+      // Just proceed to next step
+    } else if (currentStep === 7) {
       // Check if at least 1 award exists with awardLevel selected
       const awards = form.getValues('reg100_awards') || [];
       if (awards.length === 0 || !awards[0]?.awardLevel) {
@@ -388,18 +420,10 @@ export default function Register100Wizard() {
 
   const onSubmit = async (data: Register100FormData) => {
     console.log('🚀 Submitting form:', data);
-    console.log('📋 Certification checkbox value:', data.reg100_certifiedINFOByAdminName);
+    console.log('📋 Certification checkbox value:', data.reg100_certifiedByAdmin);
     
     // Validate all required fields before submission
     const missingFields: string[] = [];
-    
-    // Step 8 validation - Certification checkbox
-    if (!data.reg100_certifiedINFOByAdminName) {
-      console.log('❌ Certification checkbox is NOT checked');
-      missingFields.push('การรับรองข้อมูล - กรุณาติ๊กถูกเพื่อรับรองว่าข้อมูลเป็นความจริง (Step 8)');
-    } else {
-      console.log('✅ Certification checkbox IS checked');
-    }
     
     // Step 1 validation
     if (!data.reg100_schoolName) missingFields.push('ชื่อสถานศึกษา (Step 1)');
@@ -438,14 +462,14 @@ export default function Register100Wizard() {
       missingFields.push('คุณลักษณะครูผู้สอน (Step 4)');
     }
     
-    // Step 5 validation - At least 1 award is required
+    // Step 6 validation - At least 1 award is required
     if (!data.reg100_awards || data.reg100_awards.length === 0 || !data.reg100_awards[0]?.awardLevel) {
-      missingFields.push('รางวัล - กรุณาเพิ่มอย่างน้อย 1 รายการและเลือกระดับรางวัล (Step 5)');
+      missingFields.push('รางวัล - กรุณาเพิ่มอย่างน้อย 1 รายการและเลือกระดับรางวัล (Step 6)');
     } else {
       // Award level is required if awards exist
       data.reg100_awards.forEach((award, index) => {
         if (award.awardName && !award.awardLevel) {
-          missingFields.push(`ระดับรางวัล - รางวัลที่ ${index + 1} (Step 5)`);
+          missingFields.push(`ระดับรางวัล - รางวัลที่ ${index + 1} (Step 6)`);
         }
       });
     }
@@ -497,12 +521,27 @@ export default function Register100Wizard() {
       });
       
       // Append files from state
+      console.log('📁 Checking files to upload...');
+      console.log('📁 mgtImageFile:', mgtImageFile ? `${mgtImageFile.name} (${mgtImageFile.size} bytes)` : 'null');
+      console.log('📁 teacherImageFiles:', Object.keys(teacherImageFiles).length, 'files');
+      Object.entries(teacherImageFiles).forEach(([index, file]) => {
+        console.log(`📁 teacherImageFiles[${index}]:`, file ? `${file.name} (${file.size} bytes)` : 'null');
+      });
+      
       if (mgtImageFile) {
         formData.append('mgtImage', mgtImageFile);
+        console.log('✅ Appended mgtImage to FormData');
+      } else {
+        console.log('⚠️ No mgtImageFile to append');
       }
       
       Object.entries(teacherImageFiles).forEach(([index, file]) => {
-        formData.append(`teacherImage_${index}`, file);
+        if (file) {
+          formData.append(`teacherImage_${index}`, file);
+          console.log(`✅ Appended teacherImage_${index} to FormData`);
+        } else {
+          console.log(`⚠️ No file for teacherImage_${index}`);
+        }
       });
 
       const response = await fetch('/api/register100', {
@@ -666,6 +705,8 @@ export default function Register100Wizard() {
         return <Step7 form={form} />;
       case 8:
         return <Step8 form={form} />;
+      case 9:
+        return <Step9 form={form} />;
       default:
         return null;
     }
@@ -698,7 +739,7 @@ export default function Register100Wizard() {
                 ความคืบหน้า (PROGRESS)
               </p>
               <p className="text-2xl font-bold text-[#00B050]">
-                {currentStep} / 8
+                {toThaiNumeral(currentStep)} / {toThaiNumeral(9)}
               </p>
             </div>
           </div>
@@ -732,13 +773,13 @@ export default function Register100Wizard() {
                         : 'bg-gray-200 text-gray-500'
                     }`}
                   >
-                    {step.number}
+                    {toThaiNumeral(step.number)}
                   </div>
-                  <span className="text-xs mt-1 hidden md:block">{step.title}</span>
+                  <span className="text-xs mt-1 text-center leading-tight hidden md:block">{step.title}</span>
                 </button>
                 {index < STEPS.length - 1 && (
                   <div
-                    className={`flex-1 h-1 mx-2 ${
+                    className={`flex-1 h-1 mx-1.5 ${
                       currentStep > step.number ? 'bg-[#00B050]/70' : 'bg-gray-200'
                     }`}
                   />
@@ -794,7 +835,7 @@ export default function Register100Wizard() {
                 getFormData={() => form.getValues()}
               />
               
-              {currentStep < 8 ? (
+              {currentStep < 9 ? (
                 <button
                   type="button"
                   onClick={handleNext}
@@ -805,8 +846,7 @@ export default function Register100Wizard() {
                 </button>
               ) : (
                 <button
-                  type="button"
-                  onClick={() => form.handleSubmit(onSubmit)()}
+                  type="submit"
                   disabled={isSubmitting}
                   data-testid="btn-submit"
                   className="px-6 py-2 bg-[#00B050] text-white rounded-lg hover:bg-[#009040] disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium cursor-pointer"

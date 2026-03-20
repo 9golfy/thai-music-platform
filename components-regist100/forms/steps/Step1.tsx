@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { Register100FormData } from '@/lib/validators/register100.schema';
 import { calculateSchoolSize, getSchoolSizeDisplayText } from '@/lib/utils/schoolSize';
+import { devLog } from '@/lib/utils/devLogger';
 
 interface Step1Props {
   form: UseFormReturn<Register100FormData>;
@@ -80,44 +81,28 @@ export default function Step1({ form }: Step1Props) {
         typeof (window as any).jQuery !== 'undefined' &&
         typeof (window as any).jQuery.Thailand === 'function'
       ) {
-        console.log('✅ Initializing jquery.Thailand.js...');
+        devLog.log('✅ Initializing jquery.Thailand.js...');
         
         const $ = (window as any).jQuery;
         
-        // Debug: Check actual IDs in DOM
         const districtEl = document.getElementById('th-district');
         const amphoeEl = document.getElementById('th-amphoe');
         const provinceEl = document.getElementById('th-province');
         const zipcodeEl = document.getElementById('th-zipcode');
         
-        console.log('🔍 Checking elements by ID:');
-        console.log('  document.getElementById("th-district"):', districtEl);
-        console.log('  document.getElementById("th-amphoe"):', amphoeEl);
-        console.log('  document.getElementById("th-province"):', provinceEl);
-        console.log('  document.getElementById("th-zipcode"):', zipcodeEl);
-        
-        console.log('🔍 Checking elements with jQuery:');
-        console.log('  $("#th-district").length:', $('#th-district').length);
-        console.log('  $("#th-amphoe").length:', $('#th-amphoe').length);
-        console.log('  $("#th-province").length:', $('#th-province').length);
-        console.log('  $("#th-zipcode").length:', $('#th-zipcode').length);
-        
         // Only initialize if all elements are found
         if (!districtEl || !amphoeEl || !provinceEl || !zipcodeEl) {
-          console.warn('⚠️ Not all elements found yet, will retry...');
           return;
         }
         
         try {
-          console.log('🚀 Calling $.Thailand()...');
-          const result = $.Thailand({
-            database: 'https://earthchie.github.io/jquery.Thailand.js/jquery.Thailand.js/database/db.json',
+          $.Thailand({
+            database: '/data/thailand-db.json',
             $district: $(districtEl),
             $amphoe: $(amphoeEl),
             $province: $(provinceEl),
             $zipcode: $(zipcodeEl),
             onDataFill: function (data: any) {
-              console.log('📍 Address auto-filled:', data);
               setValue('reg100_subDistrict', data.district, {
                 shouldValidate: true,
                 shouldDirty: true,
@@ -136,11 +121,8 @@ export default function Step1({ form }: Step1Props) {
               });
             },
             onLoad: function() {
-              console.log('✅ jquery.Thailand.js database loaded and ready!');
-              
-              // Force black text color using MutationObserver
+              // Force black text color for autocomplete elements
               const forceBlackText = () => {
-                // Find all autocomplete elements
                 const elements = document.querySelectorAll(
                   '.tt-menu, .tt-menu *, .tt-dataset, .tt-dataset *, .tt-suggestion, .tt-suggestion *, .tt-highlight, .twitter-typeahead span, .twitter-typeahead pre'
                 );
@@ -154,40 +136,41 @@ export default function Step1({ form }: Step1Props) {
                 });
               };
               
-              // Run immediately
               setTimeout(forceBlackText, 100);
               
-              // Watch for DOM changes and apply styles
-              const observer = new MutationObserver((mutations) => {
-                let shouldUpdate = false;
-                mutations.forEach((mutation) => {
-                  if (mutation.addedNodes.length > 0) {
-                    mutation.addedNodes.forEach((node) => {
-                      if (node instanceof HTMLElement) {
-                        if (node.classList.contains('tt-menu') || 
-                            node.classList.contains('tt-suggestion') ||
-                            node.classList.contains('tt-dataset') ||
-                            node.closest('.tt-menu')) {
-                          shouldUpdate = true;
+              // Watch for autocomplete container changes only (not entire document.body)
+              const autocompleteContainer = document.querySelector('.twitter-typeahead')?.parentElement;
+              if (autocompleteContainer) {
+                const observer = new MutationObserver((mutations) => {
+                  let shouldUpdate = false;
+                  mutations.forEach((mutation) => {
+                    if (mutation.addedNodes.length > 0) {
+                      mutation.addedNodes.forEach((node) => {
+                        if (node instanceof HTMLElement) {
+                          if (node.classList.contains('tt-menu') || 
+                              node.classList.contains('tt-suggestion') ||
+                              node.classList.contains('tt-dataset') ||
+                              node.closest('.tt-menu')) {
+                            shouldUpdate = true;
+                          }
                         }
-                      }
-                    });
+                      });
+                    }
+                  });
+                  
+                  if (shouldUpdate) {
+                    forceBlackText();
                   }
                 });
                 
-                if (shouldUpdate) {
-                  forceBlackText();
-                }
-              });
+                // Observe only the autocomplete container, not document.body
+                observer.observe(autocompleteContainer, {
+                  childList: true,
+                  subtree: true,
+                });
+              }
               
-              observer.observe(document.body, {
-                childList: true,
-                subtree: true,
-                attributes: true,
-                attributeFilter: ['class', 'style']
-              });
-              
-              // Also listen to input events
+              // Listen to input events
               const inputs = document.querySelectorAll('#th-district, #th-amphoe, #th-province, #th-zipcode');
               inputs.forEach((input) => {
                 input.addEventListener('input', () => {
@@ -201,16 +184,16 @@ export default function Step1({ form }: Step1Props) {
           });
 
           thailandInitialized.current = true;
-          console.log('✅ jquery.Thailand.js initialized successfully', result);
+          devLog.log('✅ jquery.Thailand.js initialized successfully');
         } catch (error) {
-          console.error('❌ Error initializing jquery.Thailand.js:', error);
+          devLog.error('Error initializing jquery.Thailand.js:', error);
         }
       }
     };
 
-    // Retry mechanism - check every 200ms for up to 10 seconds
+    // Retry mechanism
     let attempts = 0;
-    const maxAttempts = 50; // 50 * 200ms = 10 seconds
+    const maxAttempts = 50;
 
     const interval = setInterval(() => {
       attempts++;
@@ -224,11 +207,6 @@ export default function Step1({ form }: Step1Props) {
 
       if (attempts >= maxAttempts) {
         clearInterval(interval);
-        console.warn('⚠️ jquery.Thailand.js could not be initialized after 10 seconds');
-        console.warn('Check if scripts loaded:', {
-          jQuery: typeof (window as any).jQuery,
-          Thailand: typeof (window as any).jQuery?.Thailand
-        });
       }
     }, 200);
 
@@ -405,6 +383,18 @@ export default function Step1({ form }: Step1Props) {
                 {errors.reg100_affiliation.message as string}
               </p>
             )}
+
+            <div className="mt-3">
+              <label className="block text-sm font-medium text-gray-900 mb-2">
+                ระบุ
+              </label>
+              <input
+                type="text"
+                {...register('reg100_affiliationDetail')}
+                className="w-full px-4 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
+                placeholder="ระบุรายละเอียดสังกัด"
+              />
+            </div>
           </div>
 
           
@@ -461,7 +451,7 @@ export default function Step1({ form }: Step1Props) {
             {/* Dynamic text display */}
             <div className="text-gray-900">
               {schoolSize && studentCount && Number(studentCount) > 0 ? (
-                <span className="text-[#0FA968] font-medium">
+                <span className="text-base font-semibold text-[#0FA968]">
                   {getSchoolSizeDisplayText(schoolSize)}
                 </span>
               ) : (
@@ -605,10 +595,6 @@ export default function Step1({ form }: Step1Props) {
             </div>
           </div>
 
-          {/* Helper Text */}
-          <p className="text-sm text-[#0FA968] bg-[#f0f9f5] p-3 rounded-lg border border-[#c3e9d7]">
-            💡 พิมพ์ ตำบล/อำเภอ/จังหวัด เพื่อให้ระบบแนะนำอัตโนมัติ
-          </p>
 
           {/* โทรศัพท์ */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -617,7 +603,7 @@ export default function Step1({ form }: Step1Props) {
                 โทรศัพท์ <span className="text-red-500">*</span>
               </label>
               <input
-                type="number"
+                type="tel"
                 {...register('reg100_phone')}
                 className="w-full px-4 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="กรอกเบอร์โทรศัพท์"
@@ -627,7 +613,7 @@ export default function Step1({ form }: Step1Props) {
             <div>
               <label className="block text-sm font-medium text-gray-900 mb-2">โทรสาร</label>
               <input
-                type="number"
+                type="tel"
                 {...register('reg100_fax')}
                 className="w-full px-4 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="กรอกเบอร์โทรสาร"

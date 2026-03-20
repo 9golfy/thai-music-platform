@@ -1,19 +1,16 @@
 // Admin Login API
 import { NextResponse } from 'next/server';
-import { MongoClient } from 'mongodb';
+import { connectToDatabase } from '@/lib/mongodb';
 import { verifyPassword } from '@/lib/auth/password';
 import { setSessionCookie } from '@/lib/auth/session';
 import { User } from '@/lib/types/user.types';
 
-const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017';
-const dbName = 'thai_music_school';
-
 export async function POST(request: Request) {
-  const client = new MongoClient(uri);
-
   try {
     const body = await request.json();
     const { email, password } = body;
+
+    console.log('🔐 Admin login attempt:', { email });
 
     if (!email || !password) {
       return NextResponse.json(
@@ -22,18 +19,21 @@ export async function POST(request: Request) {
       );
     }
 
-    await client.connect();
-    const database = client.db(dbName);
-    const usersCollection = database.collection<User>('users');
+    // Connect to database
+    const { db } = await connectToDatabase();
+    const usersCollection = db.collection<User>('users');
 
-    // Find user by email and role (admin or root only)
+    // Find user by email and role (admin, root, or super_admin only)
     const user = await usersCollection.findOne({
       email: email.toLowerCase(),
-      role: { $in: ['admin', 'root'] },
-      isActive: true,
+      role: { $in: ['admin', 'root', 'super_admin'] },
+      isActive: { $ne: false }, // Allow undefined or true
     });
 
+    console.log('👤 User found:', user ? { email: user.email, role: user.role } : 'Not found');
+
     if (!user) {
+      console.log('❌ User not found or not active');
       return NextResponse.json(
         { success: false, message: 'Email หรือ Password ไม่ถูกต้อง' },
         { status: 401 }
@@ -42,8 +42,10 @@ export async function POST(request: Request) {
 
     // Verify password
     const isValidPassword = await verifyPassword(password, user.password);
+    console.log('🔑 Password valid:', isValidPassword);
 
     if (!isValidPassword) {
+      console.log('❌ Invalid password');
       return NextResponse.json(
         { success: false, message: 'Email หรือ Password ไม่ถูกต้อง' },
         { status: 401 }
@@ -65,6 +67,8 @@ export async function POST(request: Request) {
       lastName: user.lastName,
     });
 
+    console.log('✅ Login successful');
+
     return NextResponse.json({
       success: true,
       message: 'เข้าสู่ระบบสำเร็จ',
@@ -76,7 +80,7 @@ export async function POST(request: Request) {
       },
     });
   } catch (error) {
-    console.error('Admin login error:', error);
+    console.error('❌ Admin login error:', error);
     return NextResponse.json(
       {
         success: false,
@@ -85,7 +89,5 @@ export async function POST(request: Request) {
       },
       { status: 500 }
     );
-  } finally {
-    await client.close();
   }
 }

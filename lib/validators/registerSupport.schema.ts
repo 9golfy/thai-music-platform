@@ -14,7 +14,19 @@ const thaiMusicTeacherSchema = z.object({
   teacherEducation: z.string().optional(),
   teacherPhone: z.string().optional(),
   teacherEmail: z.string().email('กรุณากรอก email ให้ถูกต้อง').optional().or(z.literal('')),
+  teacherAbility: z.string().optional(),
   teacherImage: z.any().optional(),
+  isFromMusicInstitute: z.string().optional(),
+  musicInstituteEducation: z.array(z.object({
+    graduationYear: z.string().optional(),
+    major: z.string().optional(),
+    completionYear: z.string().optional(),
+  })).optional(),
+  otherEducation: z.array(z.object({
+    graduationYear: z.string().optional(),
+    major: z.string().optional(),
+    completionYear: z.string().optional(),
+  })).optional(),
 });
 
 // Support factor schema (for Step 5)
@@ -97,6 +109,7 @@ export const registerSupportSchema = z.object({
   regsup_province: z.string().optional(),
   regsup_schoolLevel: schoolLevelEnum,
   regsup_affiliation: z.string().optional(),
+  regsup_affiliationDetail: z.string().optional(),
   regsup_schoolSize: schoolSizeEnum.optional(),
   regsup_staffCount: z.coerce.number().optional(),
   regsup_studentCount: z.coerce.number().optional(),
@@ -167,6 +180,11 @@ export const registerSupportSchema = z.object({
   regsup_supportFromExternal: z.array(supportFromExternalSchema).default([]),
   regsup_support_from_external_score: z.number().default(0), // 5/10/15 คะแนน
   
+  // สถานศึกษามีเครื่องดนตรีไทยเพียงพอต่อการจัดการเรียนการสอน
+  regsup_hasEnoughInstruments: z.string().optional(), // "เพียงพอ" or "ไม่เพียงพอ"
+  regsup_enoughInstrumentsReason: z.string().optional(),
+  regsup_notEnoughInstrumentsReason: z.string().optional(),
+  
   // กรอบการเรียนการสอน
   regsup_curriculumFramework: z.string().optional(),
   regsup_learningOutcomes: z.string().optional(),
@@ -215,7 +233,7 @@ export const registerSupportSchema = z.object({
   regsup_suggestions: z.string().optional(),
 
   // การรับรองข้อมูล - Use custom validation in onSubmit instead of zod
-  regsup_certifiedINFOByAdminName: z.boolean().optional(),
+  regsup_certifiedByAdmin: z.boolean().optional(),
   
   // Total score
   regsup_total_score: z.number().default(0),

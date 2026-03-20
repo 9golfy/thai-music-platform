@@ -20,8 +20,10 @@ export default async function UsersPage() {
         <div>
           <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
           <p className="text-gray-600 mt-1">จัดการผู้ใช้งานในระบบ</p>
+          {/* Debug: Show current role */}
+          <p className="text-xs text-gray-400 mt-1">Current role: {session.role}</p>
         </div>
-        {session.role === 'root' && (
+        {(session.role === 'root' || session.role === 'super_admin') && (
           <Link href="/dcp-admin/dashboard/users/create">
             <button className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all shadow-md flex items-center gap-2 cursor-pointer">
               <UserPlus className="w-4 h-4" />

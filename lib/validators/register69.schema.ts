@@ -92,6 +92,7 @@ export const register69Schema = z.object({
   province: z.string().optional(),
   schoolLevel: schoolLevelEnum,
   affiliation: z.string().optional(),
+  affiliationDetail: z.string().optional(),
   schoolSize: schoolSizeEnum.optional(),
   staffCount: z.coerce.number().optional(),
   studentCount: z.coerce.number().optional(),

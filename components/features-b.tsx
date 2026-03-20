@@ -22,7 +22,7 @@ type Card = {
 
 const CARDS: Card[] = [
   {
-    image: "/images/student-pi.png",
+    image: "/images/klui-boy-500.png",
     title: "ข้อมูลโครงการฯ",
     subtitle:
       "เรียนรู้รายละเอียดโครงการคัดเลือกสถานศึกษา เรียนรู้รายละเอียดโครงการคัดเลือกสถานศึกษา",
@@ -33,7 +33,7 @@ const CARDS: Card[] = [
     imgOffsetY: -68,
   },
   {
-    image: "/images/student-ranat.png",
+    image: "/images/ranad-boy-500.png",
     title: "ประกาศนียบัตร e-Certificate",
     subtitle:
       "ตรวจสอบและดาวน์โหลดประกาศนียบัตรออนไลน์ ตรวจสอบและดาวน์โหลดประกาศนียบัตรออนไลน์",
@@ -44,7 +44,7 @@ const CARDS: Card[] = [
     imgOffsetY: -65,
   },
   {
-    image: "/images/student-saw.png",
+    image: "/images/saw-girl-500.png",
     title: "ดาวน์โหลดเอกสาร",
     subtitle:
       "รับเอกสารและสื่อประชาสัมพันธ์โครงการ รับเอกสารและสื่อประชาสัมพันธ์โครงการ",

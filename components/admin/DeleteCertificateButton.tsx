@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -40,10 +39,10 @@ export default function DeleteCertificateButton({
       if (data.success) {
         router.refresh();
       } else {
-        alert('เกิดข้อผิดพลาด: ' + data.message);
+        alert(`เกิดข้อผิดพลาด: ${data.message}`);
       }
-    } catch (error) {
-      alert('เกิดข้อผิดพลาดในการลบใบประกาศ');
+    } catch (_error) {
+      alert('เกิดข้อผิดพลาดในการยกเลิกใบประกาศ');
     } finally {
       setLoading(false);
     }
@@ -54,27 +53,27 @@ export default function DeleteCertificateButton({
       <AlertDialogTrigger asChild>
         <button className="px-3 py-1.5 bg-gradient-to-r from-red-500 to-pink-500 text-white text-sm rounded-lg hover:from-red-600 hover:to-pink-600 transition-all shadow-md flex items-center gap-1">
           <Trash2 className="w-4 h-4" />
-          Delete
+          ยกเลิก
         </button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>ยืนยันการลบใบประกาศ</AlertDialogTitle>
+          <AlertDialogTitle>ยืนยันการยกเลิก</AlertDialogTitle>
           <AlertDialogDescription>
-            คุณต้องการลบใบประกาศของ <strong>{schoolName}</strong> ใช่หรือไม่?
+            คุณต้องการยกเลิกใบประกาศของ <strong>{schoolName}</strong> ใช่หรือไม่?
             <br />
             <br />
             การดำเนินการนี้ไม่สามารถย้อนกลับได้
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={loading}>ยกเลิก</AlertDialogCancel>
+          <AlertDialogCancel disabled={loading}>ปิด</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDelete}
             disabled={loading}
             className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600"
           >
-            {loading ? 'กำลังลบ...' : 'ลบใบประกาศ'}
+            {loading ? 'กำลังยกเลิก...' : 'ยกเลิก'}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

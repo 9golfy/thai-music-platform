@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clear Local Storage - Thai Music School</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .info-box {
+            background: #f0f9ff;
+            border-left: 4px solid #3b82f6;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        
+        .info-box h3 {
+            color: #1e40af;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .info-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .info-box li {
+            color: #374151;
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .info-box li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-clear {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .btn-clear:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3);
+        }
+        
+        .btn-check {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .btn-check:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+        
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+        }
+        
+        .status.success {
+            background: #d1fae5;
+            border: 2px solid #10b981;
+            color: #065f46;
+            display: block;
+        }
+        
+        .status.info {
+            background: #dbeafe;
+            border: 2px solid #3b82f6;
+            color: #1e40af;
+            display: block;
+        }
+        
+        .storage-info {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .storage-info pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .warning {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            color: #92400e;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗑️ Clear Local Storage</h1>
+        <p class="subtitle">Thai Music School Registration System</p>
+        
+        <div class="info-box">
+            <h3>📋 What will be cleared:</h3>
+            <ul>
+                <li>Draft registration data (regist100, regist-support)</li>
+                <li>Form progress and temporary saves</li>
+                <li>Session tokens and cache</li>
+                <li>All localStorage items</li>
+            </ul>
+        </div>
+        
+        <div class="warning">
+            <strong>⚠️ Warning:</strong> This action cannot be undone. Make sure you have saved any important data before proceeding.
+        </div>
+        
+        <div class="button-group">
+            <button class="btn-check" onclick="checkStorage()">
+                📊 Check Storage
+            </button>
+            <button class="btn-clear" onclick="clearStorage()">
+                🗑️ Clear All Data
+            </button>
+        </div>
+        
+        <div id="status" class="status"></div>
+        <div id="storageInfo" class="storage-info" style="display: none;"></div>
+    </div>
+
+    <script>
+        function checkStorage() {
+            const statusDiv = document.getElementById('status');
+            const storageInfoDiv = document.getElementById('storageInfo');
+            
+            const itemCount = localStorage.length;
+            const items = {};
+            
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key) {
+                    const value = localStorage.getItem(key);
+                    items[key] = value ? value.substring(0, 100) + (value.length > 100 ? '...' : '') : null;
+                }
+            }
+            
+            statusDiv.className = 'status info';
+            statusDiv.innerHTML = `
+                <strong>📊 Storage Status:</strong><br>
+                Found ${itemCount} item(s) in localStorage
+            `;
+            
+            if (itemCount > 0) {
+                storageInfoDiv.style.display = 'block';
+                storageInfoDiv.innerHTML = `
+                    <strong>Stored Items:</strong>
+                    <pre>${JSON.stringify(items, null, 2)}</pre>
+                `;
+            } else {
+                storageInfoDiv.style.display = 'block';
+                storageInfoDiv.innerHTML = '<strong>✅ localStorage is empty</strong>';
+            }
+        }
+        
+        function clearStorage() {
+            if (!confirm('Are you sure you want to clear all localStorage data? This cannot be undone.')) {
+                return;
+            }
+            
+            const itemCount = localStorage.length;
+            localStorage.clear();
+            
+            const statusDiv = document.getElementById('status');
+            const storageInfoDiv = document.getElementById('storageInfo');
+            
+            statusDiv.className = 'status success';
+            statusDiv.innerHTML = `
+                <strong>✅ Success!</strong><br>
+                Cleared ${itemCount} item(s) from localStorage<br>
+                <small>You can now refresh the page or navigate to the registration form.</small>
+            `;
+            
+            storageInfoDiv.style.display = 'none';
+            
+            // Auto-hide success message after 5 seconds
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Check storage on page load
+        window.addEventListener('load', checkStorage);
+    </script>
+</body>
+</html>

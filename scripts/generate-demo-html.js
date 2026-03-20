@@ -1,0 +1,208 @@
+const { chromium } = require('playwright');
+const fs = require('fs');
+const path = require('path');
+
+async function generateDemoHTML() {
+  console.log('🚀 Starting demo HTML generation...');
+  
+  const browser = await chromium.launch({ headless: false });
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  
+  try {
+    // Navigate to homepage
+    console.log('\n📝 Loading homepage...');
+    await page.goto('http://localhost:3000/', { waitUntil: 'networkidle' });
+    await page.waitForTimeout(3000); // Wait for animations
+    
+    // Get the full HTML
+    const htmlContent = await page.content();
+    
+    // Create demo folder
+    const demoDir = path.join(__dirname, '../demo');
+    if (!fs.existsSync(demoDir)) {
+      fs.mkdirSync(demoDir, { recursive: true });
+    }
+    
+    // Version 1: Static Image Background
+    console.log('\n📸 Creating Version 1 (Static Image)...');
+    const version1HTML = htmlContent
+      .replace(
+        /<video[^>]*>[\s\S]*?<\/video>/gi,
+        `<div style="position: absolute; inset: 0; background-image: url('/images/hero_bg_3d_pixar.jpg'); background-size: cover; background-position: center;"></div>`
+      )
+      .replace(/http:\/\/localhost:3000/g, '.');
+    
+    fs.writeFileSync(
+      path.join(demoDir, 'hero-version1-image.html'),
+      version1HTML,
+      'utf8'
+    );
+    console.log('✅ Saved: demo/hero-version1-image.html');
+    
+    // Version 2: Video Background (keep as is)
+    console.log('\n🎬 Creating Version 2 (Video)...');
+    const version2HTML = htmlContent
+      .replace(/http:\/\/localhost:3000/g, '.');
+    
+    fs.writeFileSync(
+      path.join(demoDir, 'hero-version2-video.html'),
+      version2HTML,
+      'utf8'
+    );
+    console.log('✅ Saved: demo/hero-version2-video.html');
+    
+    // Create index page for easy comparison
+    const indexHTML = `<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hero Section Demo - เปรียบเทียบ 2 Versions</title>
+    <style>
+        body {
+            font-family: 'Sarabun', Arial, sans-serif;
+            margin: 0;
+            padding: 40px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 40px;
+        }
+        .versions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        .version-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .version-card h2 {
+            color: #10b981;
+            margin-bottom: 15px;
+        }
+        .version-card p {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #10b981;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+        .note {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+        .note h3 {
+            color: #92400e;
+            margin-top: 0;
+        }
+        .note ul {
+            color: #78350f;
+            line-height: 1.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎬 Hero Section Demo - เปรียบเทียบ 2 Versions</h1>
+        
+        <div class="versions">
+            <div class="version-card">
+                <h2>📸 Version 1: ภาพนิ่ง</h2>
+                <p>
+                    ใช้ภาพพื้นหลังแบบนิ่ง (Static Image)<br>
+                    <code>hero_bg_3d_pixar.jpg</code>
+                </p>
+                <p style="color: #059669; font-weight: 600;">
+                    ✓ โหลดเร็ว<br>
+                    ✓ ใช้ bandwidth น้อย<br>
+                    ✓ เหมาะสำหรับ mobile
+                </p>
+                <a href="hero-version1-image.html" class="btn" target="_blank">
+                    ดู Version 1
+                </a>
+            </div>
+            
+            <div class="version-card">
+                <h2>🎥 Version 2: วิดีโอ</h2>
+                <p>
+                    ใช้วิดีโอพื้นหลังแบบ loop<br>
+                    <code>hero-vdo.mp4</code>
+                </p>
+                <p style="color: #059669; font-weight: 600;">
+                    ✓ ดูสวยงาม มีชีวิตชีวา<br>
+                    ✓ ดึงดูดความสนใจ<br>
+                    ✓ ทันสมัย premium
+                </p>
+                <a href="hero-version2-video.html" class="btn" target="_blank">
+                    ดู Version 2
+                </a>
+            </div>
+        </div>
+        
+        <div class="note">
+            <h3>📌 หมายเหตุสำหรับการ Demo</h3>
+            <ul>
+                <li>ทั้ง 2 versions มี header และ hero section เหมือนกันทุกประการ</li>
+                <li>แตกต่างกันเฉพาะพื้นหลัง: ภาพนิ่ง vs วิดีโอ</li>
+                <li>ปุ่มและ layout เหมือนกันทั้งคู่</li>
+                <li>สามารถเปิดดูทั้ง 2 versions พร้อมกันเพื่อเปรียบเทียบ</li>
+                <li>ไฟล์ทั้งหมดอยู่ในโฟลเดอร์ <code>demo/</code></li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>`;
+    
+    fs.writeFileSync(
+      path.join(demoDir, 'index.html'),
+      indexHTML,
+      'utf8'
+    );
+    console.log('✅ Saved: demo/index.html');
+    
+    console.log('\n✅ Demo HTML generation completed!');
+    console.log('\n📂 Files created:');
+    console.log('   - demo/index.html (เปิดไฟล์นี้เพื่อเลือกดู)');
+    console.log('   - demo/hero-version1-image.html');
+    console.log('   - demo/hero-version2-video.html');
+    console.log('\n💡 Next steps:');
+    console.log('   1. เปิดไฟล์ demo/index.html ในเบราว์เซอร์');
+    console.log('   2. คลิกดู Version 1 และ Version 2');
+    console.log('   3. ส่งโฟลเดอร์ demo/ ให้ลูกค้าดู');
+    
+  } catch (error) {
+    console.error('❌ Error generating demo HTML:', error);
+  } finally {
+    await browser.close();
+  }
+}
+
+generateDemoHTML();

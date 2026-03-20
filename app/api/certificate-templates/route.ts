@@ -10,7 +10,7 @@ const dbName = 'thai_music_school';
 export async function GET() {
   const session = await getSession();
 
-  if (!session || !['root', 'admin'].includes(session.role)) {
+  if (!session || !['root', 'admin', 'super_admin'].includes(session.role)) {
     return NextResponse.json(
       { success: false, message: 'Unauthorized' },
       { status: 401 }
@@ -51,7 +51,7 @@ export async function GET() {
 export async function POST(request: Request) {
   const session = await getSession();
 
-  if (!session || !['root', 'admin'].includes(session.role)) {
+  if (!session || !['root', 'admin', 'super_admin'].includes(session.role)) {
     return NextResponse.json(
       { success: false, message: 'Unauthorized' },
       { status: 401 }

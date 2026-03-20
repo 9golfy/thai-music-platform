@@ -34,7 +34,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
-  ],
+, "scripts/delete-all-test-data.ts.disabled"  ],
   "exclude": [
     "node_modules",
     "regist"

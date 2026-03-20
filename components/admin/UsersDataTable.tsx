@@ -42,7 +42,7 @@ interface UsersDataTableProps {
 export default async function UsersDataTable({ session }: UsersDataTableProps) {
   const users = await getUsers();
 
-  const adminUsers = users.filter((u: any) => ['root', 'admin'].includes(u.role));
+  const adminUsers = users.filter((u: any) => ['root', 'admin', 'super_admin'].includes(u.role));
   const teacherUsers = users.filter((u: any) => u.role === 'teacher');
 
   return (
@@ -120,11 +120,18 @@ export default async function UsersDataTable({ session }: UsersDataTableProps) {
                           {user.phone || '-'}
                         </td>
                         <td className="py-3 px-4">
-                          <Badge
-                            variant={user.role === 'root' ? 'default' : 'secondary'}
-                          >
-                            {user.role}
-                          </Badge>
+                          <div className="flex flex-col gap-1">
+                            <Badge
+                              variant={user.role === 'root' || user.role === 'super_admin' ? 'default' : 'secondary'}
+                            >
+                              {user.role}
+                            </Badge>
+                            {(user.isSystemAdmin === true || user.email === 'root@thaimusic.com') && (
+                              <Badge variant="destructive" className="text-xs">
+                                System Admin
+                              </Badge>
+                            )}
+                          </div>
                         </td>
                         <td className="py-3 px-4">
                           <Badge variant={user.isActive ? 'default' : 'secondary'}>
@@ -139,7 +146,10 @@ export default async function UsersDataTable({ session }: UsersDataTableProps) {
                                 Edit
                               </button>
                             </Link>
-                            {session.role === 'root' && user.role !== 'root' && (
+                            {session.role === 'root' && 
+                             user.role !== 'root' && 
+                             user.isSystemAdmin !== true && 
+                             user.email !== 'root@thaimusic.com' && (
                               <DeleteUserButton 
                                 userId={user._id} 
                                 userName={`${user.firstName} ${user.lastName}`}
@@ -236,10 +246,14 @@ export default async function UsersDataTable({ session }: UsersDataTableProps) {
                                 Edit
                               </button>
                             </Link>
-                            <DeleteUserButton 
-                              userId={user._id} 
-                              userName={`${user.firstName} ${user.lastName}`}
-                            />
+                            {((session.role === 'root') || (session.role === 'admin')) && 
+                             user.isSystemAdmin !== true && 
+                             user.email !== 'root@thaimusic.com' && (
+                              <DeleteUserButton 
+                                userId={user._id} 
+                                userName={`${user.firstName} ${user.lastName}`}
+                              />
+                            )}
                           </div>
                         </td>
                       </tr>

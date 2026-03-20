@@ -1,703 +1,510 @@
 'use client';
 
-import { UseFormReturn, useFieldArray, Controller } from 'react-hook-form';
+import { UseFormReturn, useFieldArray } from 'react-hook-form';
 import { Register100FormData } from '@/lib/validators/register100.schema';
-import { useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 interface Step5Props {
   form: UseFormReturn<Register100FormData>;
 }
 
 export default function Step5({ form }: Step5Props) {
-  const { register, control, watch, setValue } = form;
-  const [otherSelectedIndices, setOtherSelectedIndices] = useState<Set<number>>(new Set());
-  
-  const hasSupportFromOrg = watch('reg100_hasSupportFromOrg');
-  const hasSupportFromExternal = watch('reg100_hasSupportFromExternal');
+  const { register, control } = form;
+  const isInitialized = useRef(false);
 
-  const { 
-    fields: supportFactorFields, 
-    append: appendSupportFactor, 
-    remove: removeSupportFactor 
-  } = useFieldArray({
+  // Field arrays for each section (max 5 items each)
+  const { fields: compulsoryFields, append: appendCompulsory, remove: removeCompulsory } = useFieldArray({
     control,
-    name: 'reg100_supportFactors',
+    name: 'reg100_compulsoryCurriculum',
   });
 
-  const { fields: orgFields, append: appendOrg, remove: removeOrg } = useFieldArray({
+  const { fields: electiveFields, append: appendElective, remove: removeElective } = useFieldArray({
     control,
-    name: 'reg100_supportFromOrg',
+    name: 'reg100_electiveCurriculum',
   });
 
-  const { fields: externalFields, append: appendExternal, remove: removeExternal } = useFieldArray({
+  const { fields: localFields, append: appendLocal, remove: removeLocal } = useFieldArray({
     control,
-    name: 'reg100_supportFromExternal',
+    name: 'reg100_localCurriculum',
   });
 
-  const { fields: awardFields, append: appendAward, remove: removeAward } = useFieldArray({
+  const { fields: afterSchoolFields, append: appendAfterSchool, remove: removeAfterSchool } = useFieldArray({
     control,
-    name: 'reg100_awards',
+    name: 'reg100_afterSchoolSchedule',
   });
 
-  // Handle organization type change
-  const handleOrgTypeChange = (index: number, value: string) => {
-    // Clear all three fields first
-    setValue(`reg100_supportFactors.${index}.sup_supportByAdmin`, '');
-    setValue(`reg100_supportFactors.${index}.sup_supportBySchoolBoard`, '');
-    setValue(`reg100_supportFactors.${index}.sup_supportByOthers`, '');
-    
-    // Set the selected one
-    if (value === 'ผู้บริหารสถานศึกษา') {
-      setValue(`reg100_supportFactors.${index}.sup_supportByAdmin`, value, { shouldDirty: true });
-      setOtherSelectedIndices(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(index);
-        return newSet;
-      });
-    } else if (value === 'กรรมการสถานศึกษา') {
-      setValue(`reg100_supportFactors.${index}.sup_supportBySchoolBoard`, value, { shouldDirty: true });
-      setOtherSelectedIndices(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(index);
-        return newSet;
-      });
-    } else if (value.startsWith('อื่นๆ')) {
-      // Mark this index as having "other" selected
-      setOtherSelectedIndices(prev => new Set(prev).add(index));
+  const MAX_ITEMS = 5;
+
+  // Initialize with first item for each section
+  useEffect(() => {
+    if (!isInitialized.current) {
+      if (compulsoryFields.length === 0) {
+        appendCompulsory({ gradeLevel: '', studentCount: undefined, hoursPerSemester: '', hoursPerYear: '' });
+      }
+      if (electiveFields.length === 0) {
+        appendElective({ gradeLevel: '', studentCount: undefined, hoursPerSemester: '', hoursPerYear: '' });
+      }
+      if (localFields.length === 0) {
+        appendLocal({ gradeLevel: '', studentCount: undefined, hoursPerSemester: '', hoursPerYear: '' });
+      }
+      if (afterSchoolFields.length === 0) {
+        appendAfterSchool({ day: '', timeFrom: '', timeTo: '', location: '' });
+      }
+      isInitialized.current = true;
     }
-  };
+  }, [compulsoryFields.length, electiveFields.length, localFields.length, afterSchoolFields.length, appendCompulsory, appendElective, appendLocal, appendAfterSchool]);
 
   return (
     <div className="space-y-6">
-      {/* ปัจจัยที่เกี่ยวข้องโดยตรง */}
+      {/* การเรียนการสอนดนตรีไทย */}
       <div className="bg-white rounded-lg shadow-sm border border-neutral-border overflow-hidden">
         <div className="bg-green-50 px-6 py-3 border-b border-neutral-border">
-          <h3 className="font-semibold text-gray-900">ปัจจัยที่เกี่ยวข้องโดยตรงต่อการเข้าร่วมกิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์</h3>
+          <h3 className="font-semibold text-gray-900">การเรียนการสอนดนตรีไทย</h3>
         </div>
-        <div className="p-6 space-y-4">
-          <p className="text-sm text-gray-900 mb-4">
-            ผู้ที่มีส่วนส่งเสริม สนับสนุนการจัดการเรียนการสอนดนตรีไทยในสถานศึกษา
-          </p>
+        <div className="p-6 space-y-6">
+          
+          {/* 1. เป็นวิชาบังคับในชั้นเรียน */}
+          <div>
+            <label className="flex items-start gap-3 cursor-pointer mb-4">
+              <input
+                {...register('reg100_isCompulsorySubject')}
+                type="checkbox"
+                className="mt-1 w-4 h-4 text-[#00B050] border-gray-300 rounded focus:ring-[#00B050]"
+              />
+              <div className="flex-1">
+                <span className="text-sm font-medium text-gray-900">เป็นวิชาบังคับในชั้นเรียน</span>
+                <p className="text-xs text-gray-600 mt-1">
+                  ระบุรายวิชาที่การเรียนดนตรีไทยเป็นวิชาบังคับในระดับชั้นเรียน (ระบุช่วงระยะเวลาสำหรับการเรียนการสอนดนตรีไทยของแต่ละระดับชั้นว่าในแต่ละภาคการศึกษา/ปีการศึกษา มีกี่ชั่วโมงเรียน)
+                </p>
+              </div>
+            </label>
 
-          {supportFactorFields.length === 0 && (
-            <Controller
-              control={control}
-              name={`reg100_supportFactors.0.sup_supportByAdmin`}
-              render={({ field: adminField }) => {
-                const adminValue = adminField.value || '';
-                const schoolBoardValue = form.getValues(`reg100_supportFactors.0.sup_supportBySchoolBoard`) || '';
-                const othersValue = form.getValues(`reg100_supportFactors.0.sup_supportByOthers`) || '';
-                
-                const currentOrgType = adminValue || schoolBoardValue || othersValue;
-                const isOtherSelected = otherSelectedIndices.has(0);
-
-                return (
-                  <div className="border border-neutral-border rounded-lg p-4 space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-900 mb-1">
-                        องค์กร/หน่วยงาน/บุคคลที่ทำให้การส่งเสริม สนับสนุน
-                      </label>
-                      <select
-                        value={isOtherSelected ? 'อื่นๆ' : currentOrgType}
-                        onChange={(e) => handleOrgTypeChange(0, e.target.value)}
-                        className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
-                      >
-                        <option value="">เลือกองค์กร/หน่วยงาน</option>
-                        <option value="ผู้บริหารสถานศึกษา">ผู้บริหารสถานศึกษา</option>
-                        <option value="กรรมการสถานศึกษา">กรรมการสถานศึกษา</option>
-                        <option value="อื่นๆ">อื่นๆ โปรดระบุ (เช่น วัด สมาคม มูลนิธิ)</option>
-                      </select>
-                    </div>
-                    
-                    {isOtherSelected && (
-                      <div>
-                        <input
-                          {...register(`reg100_supportFactors.0.sup_supportByOthers`)}
-                          type="text"
-                          placeholder="ระบุชื่อองค์กร เช่น วัด สมาคม มูลนิธิ"
-                          className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
-                          onChange={(e) => {
-                            setValue(`reg100_supportFactors.0.sup_supportByOthers`, e.target.value, { shouldDirty: true });
-                          }}
-                        />
-                      </div>
-                    )}
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-900 mb-1">
-                        รายละเอียด
-                      </label>
-                      <input
-                        {...register(`reg100_supportFactors.0.sup_supportByDescription`)}
-                        type="text"
-                        placeholder="รายละเอียดการสนับสนุน"
-                        className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-900 mb-1">
-                        วันที่ (ที่ได้รับการสนับสนุน)
-                      </label>
-                      <input
-                        {...register(`reg100_supportFactors.0.sup_supportByDate`)}
-                        type="text"
-                        placeholder="กรอกวันที่ (เช่น 15/02/2026)"
-                        className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-900 mb-1">
-                        หลักฐาน/ภาพถ่าย/รางวัล
-                      </label>
-                      <p className="text-xs text-gray-600 mb-2">
-                        (Link ในแชร์ drive เพื่อแนบไฟล์ PDF และ JPG)
-                      </p>
-                      <input
-                        {...register(`reg100_supportFactors.0.sup_supportByDriveLink`)}
-                        type="text"
-                        placeholder="หรือใส่ลิงก์ Google Drive / Dropbox"
-                        className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
-                      />
-                    </div>
-                  </div>
-                );
-              }}
-            />
-          )}
-
-          {supportFactorFields.map((field, index) => (
-            <Controller
-              key={field.id}
-              control={control}
-              name={`reg100_supportFactors.${index}.sup_supportByAdmin`}
-              render={({ field: adminField }) => {
-                const adminValue = adminField.value || '';
-                const schoolBoardValue = form.getValues(`reg100_supportFactors.${index}.sup_supportBySchoolBoard`) || '';
-                const othersValue = form.getValues(`reg100_supportFactors.${index}.sup_supportByOthers`) || '';
-                
-                const currentOrgType = adminValue || schoolBoardValue || othersValue;
-                const isOtherSelected = otherSelectedIndices.has(index);
-
-                return (
-                  <div className="border border-neutral-border rounded-lg p-4 space-y-4">
+            <div className="ml-7 space-y-4">
+              {compulsoryFields.map((field, idx) => (
+                <div key={field.id} className={idx === 0 ? "space-y-3" : "border border-neutral-border rounded-lg p-4 space-y-3"}>
+                  {idx > 0 && (
                     <div className="flex justify-end">
                       <button
                         type="button"
-                        onClick={() => removeSupportFactor(index)}
-                        className="text-red-500 hover:text-red-700 text-sm font-medium cursor-pointer"
+                        onClick={() => removeCompulsory(idx)}
+                        className="text-red-500 hover:text-red-700 text-sm font-medium cursor-pointer flex items-center gap-1"
                       >
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
                         ลบ
                       </button>
                     </div>
+                  )}
 
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-900 mb-1">
-                        องค์กร/หน่วยงาน/บุคคลที่ทำให้การส่งเสริม สนับสนุน
-                      </label>
-                      <select
-                        value={isOtherSelected ? 'อื่นๆ' : currentOrgType}
-                        onChange={(e) => handleOrgTypeChange(index, e.target.value)}
-                        className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
-                      >
-                        <option value="">เลือกองค์กร/หน่วยงาน</option>
-                        <option value="ผู้บริหารสถานศึกษา">ผู้บริหารสถานศึกษา</option>
-                        <option value="กรรมการสถานศึกษา">กรรมการสถานศึกษา</option>
-                        <option value="อื่นๆ">อื่นๆ โปรดระบุ (เช่น วัด สมาคม มูลนิธิ)</option>
-                      </select>
-                    </div>
-                    
-                    {isOtherSelected && (
-                      <div>
-                        <input
-                          {...register(`reg100_supportFactors.${index}.sup_supportByOthers`)}
-                          type="text"
-                          placeholder="ระบุชื่อองค์กร เช่น วัด สมาคม มูลนิธิ"
-                          className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
-                          onChange={(e) => {
-                            setValue(`reg100_supportFactors.${index}.sup_supportByOthers`, e.target.value, { shouldDirty: true });
-                          }}
-                        />
-                      </div>
-                    )}
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-900 mb-1">
-                        รายละเอียด
+                        ระดับชั้น
                       </label>
                       <input
-                        {...register(`reg100_supportFactors.${index}.sup_supportByDescription`)}
+                        {...register(`reg100_compulsoryCurriculum.${idx}.gradeLevel`)}
                         type="text"
-                        placeholder="รายละเอียดการสนับสนุน"
                         className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
                       />
                     </div>
 
                     <div>
                       <label className="block text-sm font-medium text-gray-900 mb-1">
-                        วันที่ (ที่ได้รับการสนับสนุน)
+                        เรียนดนตรีไทยจำนวน (คน)
                       </label>
                       <input
-                        {...register(`reg100_supportFactors.${index}.sup_supportByDate`)}
+                        {...register(`reg100_compulsoryCurriculum.${idx}.studentCount`)}
+                        type="number"
+                        min="0"
+                        placeholder="จำนวนนักเรียน (คน)"
+                        className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-900 mb-1">
+                        ชั่วโมง/ภาคการศึกษา
+                      </label>
+                      <input
+                        {...register(`reg100_compulsoryCurriculum.${idx}.hoursPerSemester`)}
                         type="text"
-                        placeholder="กรอกวันที่ (เช่น 15/02/2026)"
+                        placeholder="จำนวน (ชั่วโมง/ภาคการศึกษา)"
                         className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
                       />
                     </div>
 
                     <div>
                       <label className="block text-sm font-medium text-gray-900 mb-1">
-                        หลักฐาน/ภาพถ่าย/รางวัล
+                        ชั่วโมง/ปีการศึกษา
                       </label>
-                      <p className="text-xs text-gray-600 mb-2">
-                        (Link ในแชร์ drive เพื่อแนบไฟล์ PDF และ JPG)
-                      </p>
                       <input
-                        {...register(`reg100_supportFactors.${index}.sup_supportByDriveLink`)}
+                        {...register(`reg100_compulsoryCurriculum.${idx}.hoursPerYear`)}
                         type="text"
-                        placeholder="หรือใส่ลิงก์ Google Drive / Dropbox"
+                        placeholder="จำนวน (ชั่วโมง/ปีการศึกษา)"
                         className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
                       />
                     </div>
-                  </div>
-                );
-              }}
-            />
-          ))}
-
-          <button
-            type="button"
-            onClick={() => appendSupportFactor({
-              sup_supportByAdmin: '',
-              sup_supportBySchoolBoard: '',
-              sup_supportByOthers: '',
-              sup_supportByDescription: '',
-              sup_supportByDate: '',
-              sup_supportByDriveLink: '',
-            })}
-            className="w-full py-2 px-4 border-2 border-dashed border-primary text-primary rounded-lg hover:bg-green-50 cursor-pointer font-medium transition-colors"
-          >
-            + เพิ่มข้อมูล
-          </button>
-        </div>
-      </div>
-
-      {/* การสนับสนุน */}
-      <div className="bg-white rounded-lg shadow-sm border border-neutral-border overflow-hidden">
-        <div className="bg-green-50 px-6 py-3 border-b border-neutral-border">
-          <h3 className="font-semibold text-gray-900">ปัจจัยที่เกี่ยวข้องโดยตรงต่อการเข้าร่วมกิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์</h3>
-          <p className="text-sm text-gray-600 mt-1">การสนับสนุนวัสดุ อุปกรณ์ หรืองบประมาณ จากทั้งภายในและภายนอกสถานศึกษา</p>
-        </div>
-        <div className="p-6 space-y-6">
-          {/* Support from Organization */}
-          <div className="space-y-4">
-            <label className="flex items-start gap-3 cursor-pointer">
-              <input
-                {...register('reg100_hasSupportFromOrg')}
-                type="checkbox"
-                className="mt-1 w-4 h-4 text-[#00B050] border-gray-300 rounded focus:ring-[#00B050]"
-              />
-              <div>
-                <span className="text-sm font-medium text-gray-900">ได้รับการสนับสนุนจากต้นสังกัด (บุคคล/หน่วยงานภายใน)</span>
-                <p className="text-xs text-gray-600 mt-1">ถ้าติ๊กจะได้ 5 คะแนน</p>
-              </div>
-            </label>
-
-            <div className="ml-7 space-y-4">
-              {orgFields.length === 0 && (
-                <div className="border border-neutral-border rounded-lg p-4 space-y-3">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-1">
-                      บุคคล/หน่วยงาน
-                    </label>
-                    <input
-                      {...register(`reg100_supportFromOrg.0.organization`)}
-                      type="text"
-                      placeholder="ชื่อบุคคล/หน่วยงาน"
-                      className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-1">
-                      รายละเอียด
-                    </label>
-                    <textarea
-                      {...register(`reg100_supportFromOrg.0.details`)}
-                      rows={2}
-                      placeholder="รายละเอียดการสนับสนุน"
-                      className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-1">
-                      หลักฐาน/ภาพถ่าย (Link/URL สำหรับ Share Drive)
-                    </label>
-                    <input
-                      {...register(`reg100_supportFromOrg.0.evidenceLink`)}
-                      type="url"
-                      placeholder="https://drive.google.com/..."
-                      className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
-                    />
                   </div>
                 </div>
-              )}
+              ))}
 
-              {orgFields.map((field, index) => (
-                    <div key={field.id} className="border border-neutral-border rounded-lg p-4 space-y-3">
-                      <div className="flex justify-between items-center">
-                        <h4 className="font-medium text-gray-900 text-sm">รายการที่ {index + 1}</h4>
-                        <button
-                          type="button"
-                          onClick={() => removeOrg(index)}
-                          className="text-red-500 hover:text-red-700 text-sm font-medium cursor-pointer"
-                        >
-                          ลบ
-                        </button>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-900 mb-1">
-                          บุคคล/หน่วยงาน
-                        </label>
-                        <input
-                          {...register(`reg100_supportFromOrg.${index}.organization`)}
-                          type="text"
-                          className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-900 mb-1">
-                          รายละเอียด
-                        </label>
-                        <textarea
-                          {...register(`reg100_supportFromOrg.${index}.details`)}
-                          rows={2}
-                          className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-900 mb-1">
-                          หลักฐาน/ภาพถ่าย (Link/URL สำหรับ Share Drive)
-                        </label>
-                        <input
-                          {...register(`reg100_supportFromOrg.${index}.evidenceLink`)}
-                          type="url"
-                          className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
-                        />
-                      </div>
-                    </div>
-                  ))}
-
+              {compulsoryFields.length < MAX_ITEMS && (
                 <button
                   type="button"
-                  onClick={() => appendOrg({ organization: '', details: '', evidenceLink: '' })}
+                  onClick={() => appendCompulsory({ gradeLevel: '', studentCount: undefined, hoursPerSemester: '', hoursPerYear: '' })}
                   className="w-full py-2 px-4 border-2 border-dashed border-primary text-primary rounded-lg hover:bg-green-50 cursor-pointer font-medium transition-colors"
                 >
-                  + เพิ่มข้อมูล
+                  + เพิ่มข้อมูล ({compulsoryFields.length}/{MAX_ITEMS})
                 </button>
-              </div>
+              )}
+              {compulsoryFields.length >= MAX_ITEMS && (
+                <p className="text-sm text-gray-600 text-center py-2">
+                  เพิ่มข้อมูลได้สูงสุด 5 รายการ
+                </p>
+              )}
+            </div>
           </div>
 
-          {/* Support from External */}
-          <div className="space-y-4">
-            <label className="flex items-start gap-3 cursor-pointer">
+
+          {/* 2. มีวิชาเลือก/วิชาเรียนเพิ่มเติม/ชุมนุม */}
+          <div>
+            <label className="flex items-start gap-3 cursor-pointer mb-4">
               <input
-                {...register('reg100_hasSupportFromExternal')}
+                {...register('reg100_hasElectiveSubject')}
                 type="checkbox"
                 className="mt-1 w-4 h-4 text-[#00B050] border-gray-300 rounded focus:ring-[#00B050]"
               />
-              <div>
-                <span className="text-sm font-medium text-gray-900">ได้รับการสนับสนุนจากบุคคล/หน่วยงานภายนอก</span>
-                <p className="text-xs text-gray-600 mt-1">1 คน = 5 คะแนน, 2 คน = 10 คะแนน, 3+ คน = 15 คะแนน (สูงสุด)</p>
+              <div className="flex-1">
+                <span className="text-sm font-medium text-gray-900">มีวิชาเลือก/วิชาเรียนเพิ่มเติม/ชุมนุม</span>
+                <p className="text-xs text-gray-600 mt-1">
+                  ระบุรายวิชาที่การเรียนดนตรีไทยเป็นวิชาเลือกในระดับชั้นเรียน (ระบุช่วงระยะเวลาสำหรับการเรียนการสอนดนตรีไทยของแต่ละระดับชั้นว่าในแต่ละภาคการศึกษา/ปีการศึกษา มีกี่ชั่วโมงเรียน)
+                </p>
               </div>
             </label>
 
             <div className="ml-7 space-y-4">
-              {externalFields.length === 0 && (
-                  <div className="border border-neutral-border rounded-lg p-4 space-y-3">
+              {electiveFields.map((field, idx) => (
+                <div key={field.id} className={idx === 0 ? "space-y-3" : "border border-neutral-border rounded-lg p-4 space-y-3"}>
+                  {idx > 0 && (
+                    <div className="flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => removeElective(idx)}
+                        className="text-red-500 hover:text-red-700 text-sm font-medium cursor-pointer flex items-center gap-1"
+                      >
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                        ลบ
+                      </button>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-900 mb-1">
-                        บุคคล/หน่วยงาน
+                        ระดับชั้น
                       </label>
                       <input
-                        {...register(`reg100_supportFromExternal.0.organization`)}
+                        {...register(`reg100_electiveCurriculum.${idx}.gradeLevel`)}
                         type="text"
-                        placeholder="ชื่อบุคคล/หน่วยงาน"
                         className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
                       />
                     </div>
 
                     <div>
                       <label className="block text-sm font-medium text-gray-900 mb-1">
-                        รายละเอียด
-                      </label>
-                      <textarea
-                        {...register(`reg100_supportFromExternal.0.details`)}
-                        rows={2}
-                        placeholder="รายละเอียดการสนับสนุน"
-                        className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-900 mb-1">
-                        หลักฐาน/ภาพถ่าย (Link/URL สำหรับ Share Drive)
+                        เรียนดนตรีไทยจำนวน (คน)
                       </label>
                       <input
-                        {...register(`reg100_supportFromExternal.0.evidenceLink`)}
-                        type="url"
-                        placeholder="https://drive.google.com/..."
+                        {...register(`reg100_electiveCurriculum.${idx}.studentCount`)}
+                        type="number"
+                        min="0"
+                        placeholder="จำนวนนักเรียน (คน)"
                         className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
                       />
                     </div>
                   </div>
-                )}
 
-                {externalFields.map((field, index) => (
-                    <div key={field.id} className="border border-neutral-border rounded-lg p-4 space-y-3">
-                      <div className="flex justify-between items-center">
-                        <h4 className="font-medium text-gray-900 text-sm">รายการที่ {index + 1}</h4>
-                        <button
-                          type="button"
-                          onClick={() => removeExternal(index)}
-                          className="text-red-500 hover:text-red-700 text-sm font-medium cursor-pointer"
-                        >
-                          ลบ
-                        </button>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-900 mb-1">
-                          บุคคล/หน่วยงาน
-                        </label>
-                        <input
-                          {...register(`reg100_supportFromExternal.${index}.organization`)}
-                          type="text"
-                          className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-900 mb-1">
-                          รายละเอียด
-                        </label>
-                        <textarea
-                          {...register(`reg100_supportFromExternal.${index}.details`)}
-                          rows={2}
-                          className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-900 mb-1">
-                          หลักฐาน/ภาพถ่าย (Link/URL สำหรับ Share Drive)
-                        </label>
-                        <input
-                          {...register(`reg100_supportFromExternal.${index}.evidenceLink`)}
-                          type="url"
-                          className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
-                        />
-                      </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-900 mb-1">
+                        ชั่วโมง/ภาคการศึกษา
+                      </label>
+                      <input
+                        {...register(`reg100_electiveCurriculum.${idx}.hoursPerSemester`)}
+                        type="text"
+                        placeholder="จำนวน (ชั่วโมง/ภาคการศึกษา)"
+                        className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      />
                     </div>
-                  ))}
 
+                    <div>
+                      <label className="block text-sm font-medium text-gray-900 mb-1">
+                        ชั่วโมง/ปีการศึกษา
+                      </label>
+                      <input
+                        {...register(`reg100_electiveCurriculum.${idx}.hoursPerYear`)}
+                        type="text"
+                        placeholder="จำนวน (ชั่วโมง/ปีการศึกษา)"
+                        className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {electiveFields.length < MAX_ITEMS && (
                 <button
                   type="button"
-                  onClick={() => appendExternal({ organization: '', details: '', evidenceLink: '' })}
+                  onClick={() => appendElective({ gradeLevel: '', studentCount: undefined, hoursPerSemester: '', hoursPerYear: '' })}
                   className="w-full py-2 px-4 border-2 border-dashed border-primary text-primary rounded-lg hover:bg-green-50 cursor-pointer font-medium transition-colors"
                 >
-                  + เพิ่มข้อมูล
+                  + เพิ่มข้อมูล ({electiveFields.length}/{MAX_ITEMS})
                 </button>
-              </div>
-          </div>
-        </div>
-      </div>
-
-      {/* กรอบการเรียนการสอน */}
-      <div className="bg-white rounded-lg shadow-sm border border-neutral-border overflow-hidden">
-        <div className="bg-green-50 px-6 py-3 border-b border-neutral-border">
-          <h3 className="font-semibold text-gray-900">สถานศึกษามีกรอบการเรียนการสอนดนตรีไทย หรือสาระวิชาที่มุ่งให้นักเรียนสามารถปฏิบัติได้</h3>
-        </div>
-        <div className="p-6">
-          <textarea
-            {...register('reg100_curriculumFramework')}
-            rows={4}
-            className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
-            placeholder="กรอกรายละเอียด"
-          />
-        </div>
-      </div>
-
-      <div className="bg-white rounded-lg shadow-sm border border-neutral-border overflow-hidden">
-        <div className="bg-green-50 px-6 py-3 border-b border-neutral-border">
-          <h3 className="font-semibold text-gray-900">ผลสัมฤทธิ์ในการเรียนการสอนด้านดนตรีไทย</h3>
-        </div>
-        <div className="p-6">
-          <textarea
-            {...register('reg100_learningOutcomes')}
-            rows={4}
-            className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
-            placeholder="กรอกรายละเอียด"
-          />
-        </div>
-      </div>
-
-      <div className="bg-white rounded-lg shadow-sm border border-neutral-border overflow-hidden">
-        <div className="bg-green-50 px-6 py-3 border-b border-neutral-border">
-          <h3 className="font-semibold text-gray-900">การบริหารจัดการสอนดนตรีไทยของสถานศึกษา</h3>
-        </div>
-        <div className="p-6">
-          <textarea
-            {...register('reg100_managementContext')}
-            rows={4}
-            className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
-            placeholder="กรอกรายละเอียด"
-          />
-        </div>
-      </div>
-
-      {/* รางวัล */}
-      <div className="bg-white rounded-lg shadow-sm border border-neutral-border overflow-hidden">
-        <div className="bg-green-50 px-6 py-3 border-b border-neutral-border">
-          <h3 className="font-semibold text-gray-900">รางวัลและเกียรติคุณที่ได้รับในระยะเวลา ๑ ปี ย้อนหลัง</h3>
-          <p className="text-sm text-gray-600 mt-1">(ตั้งแต่พฤษภาคม ๒๕๖๗ – พฤษภาคม ๒๕๖๘)</p>
-          <p className="text-sm text-gray-600 mt-1">คะแนนเต็ม 20 คะแนน - เลือกระดับและคะแนนสูงสุดเพียงค่าเดียว</p>
-          <p className="text-xs text-gray-600 mt-1">อำเภอ = 5, จังหวัด = 10, ภาค = 15, ประเทศ = 20</p>
-        </div>
-        <div className="p-6 space-y-4">
-          {awardFields.length === 0 && (
-            <div className="border border-neutral-border rounded-lg p-4 space-y-3">
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-1">
-                  ระดับรางวัล <span className="text-red-500">*</span>
-                </label>
-                <select
-                  {...register(`reg100_awards.0.awardLevel`)}
-                  className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
-                >
-                  <option value="">เลือกระดับ</option>
-                  <option value="อำเภอ">ระดับอำเภอ (5 คะแนน)</option>
-                  <option value="จังหวัด">ระดับจังหวัด (10 คะแนน)</option>
-                  <option value="ภาค">ระดับภาค (15 คะแนน)</option>
-                  <option value="ประเทศ">ระดับประเทศ (20 คะแนน)</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-1">
-                  ชื่อรางวัล
-                </label>
-                <input
-                  {...register(`reg100_awards.0.awardName`)}
-                  type="text"
-                  placeholder="ชื่อรางวัล"
-                  className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-1">
-                  วันที่ได้รับรางวัล
-                </label>
-                <input
-                  {...register(`reg100_awards.0.awardDate`)}
-                  type="text"
-                  placeholder="เช่น 15/05/2568"
-                  className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-1">
-                  หลักฐาน (Link/URL)
-                </label>
-                <input
-                  {...register(`reg100_awards.0.awardEvidenceLink`)}
-                  type="url"
-                  placeholder="https://drive.google.com/..."
-                  className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
-                />
-              </div>
+              )}
+              {electiveFields.length >= MAX_ITEMS && (
+                <p className="text-sm text-gray-600 text-center py-2">
+                  เพิ่มข้อมูลได้สูงสุด 5 รายการ
+                </p>
+              )}
             </div>
-          )}
+          </div>
 
-          {awardFields.map((field, index) => (
-            <div key={field.id} className="border border-neutral-border rounded-lg p-4 space-y-3">
-              <div className="flex justify-between items-center">
-                <h4 className="font-medium text-gray-900 text-sm">รางวัลที่ {index + 1}</h4>
+          {/* 3. มีหลักสูตรวิชาของท้องถิ่น */}
+          <div>
+            <label className="flex items-start gap-3 cursor-pointer mb-4">
+              <input
+                {...register('reg100_hasLocalCurriculum')}
+                type="checkbox"
+                className="mt-1 w-4 h-4 text-[#00B050] border-gray-300 rounded focus:ring-[#00B050]"
+              />
+              <div className="flex-1">
+                <span className="text-sm font-medium text-gray-900">มีหลักสูตรวิชาของท้องถิ่น</span>
+                <p className="text-xs text-gray-600 mt-1">
+                  ระบุรายวิชาที่การเรียนดนตรีไทยเป็นหลักสูตรวิชาของท้องถิ่น (ระบุช่วงระยะเวลาสำหรับการเรียนการสอนดนตรีไทยของแต่ละระดับชั้นว่าในแต่ละภาคการศึกษา/ปีการศึกษา มีกี่ชั่วโมงเรียน)
+                </p>
+              </div>
+            </label>
+
+            <div className="ml-7 space-y-4">
+              {localFields.map((field, idx) => (
+                <div key={field.id} className={idx === 0 ? "space-y-3" : "border border-neutral-border rounded-lg p-4 space-y-3"}>
+                  {idx > 0 && (
+                    <div className="flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => removeLocal(idx)}
+                        className="text-red-500 hover:text-red-700 text-sm font-medium cursor-pointer flex items-center gap-1"
+                      >
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                        ลบ
+                      </button>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-900 mb-1">
+                        ระดับชั้น
+                      </label>
+                      <input
+                        {...register(`reg100_localCurriculum.${idx}.gradeLevel`)}
+                        type="text"
+                        className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-900 mb-1">
+                        เรียนดนตรีไทยจำนวน (คน)
+                      </label>
+                      <input
+                        {...register(`reg100_localCurriculum.${idx}.studentCount`)}
+                        type="number"
+                        min="0"
+                        placeholder="จำนวนนักเรียน (คน)"
+                        className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-900 mb-1">
+                        ชั่วโมง/ภาคการศึกษา
+                      </label>
+                      <input
+                        {...register(`reg100_localCurriculum.${idx}.hoursPerSemester`)}
+                        type="text"
+                        placeholder="จำนวน (ชั่วโมง/ภาคการศึกษา)"
+                        className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-900 mb-1">
+                        ชั่วโมง/ปีการศึกษา
+                      </label>
+                      <input
+                        {...register(`reg100_localCurriculum.${idx}.hoursPerYear`)}
+                        type="text"
+                        placeholder="จำนวน (ชั่วโมง/ปีการศึกษา)"
+                        className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {localFields.length < MAX_ITEMS && (
                 <button
                   type="button"
-                  onClick={() => removeAward(index)}
-                  className="text-red-500 hover:text-red-700 text-sm font-medium cursor-pointer"
+                  onClick={() => appendLocal({ gradeLevel: '', studentCount: undefined, hoursPerSemester: '', hoursPerYear: '' })}
+                  className="w-full py-2 px-4 border-2 border-dashed border-primary text-primary rounded-lg hover:bg-green-50 cursor-pointer font-medium transition-colors"
                 >
-                  ลบ
+                  + เพิ่มข้อมูล ({localFields.length}/{MAX_ITEMS})
                 </button>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-1">
-                  ระดับรางวัล
-                </label>
-                <select
-                  {...register(`reg100_awards.${index}.awardLevel`)}
-                  className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
-                >
-                  <option value="">เลือกระดับ</option>
-                  <option value="อำเภอ">ระดับอำเภอ (5 คะแนน)</option>
-                  <option value="จังหวัด">ระดับจังหวัด (10 คะแนน)</option>
-                  <option value="ภาค">ระดับภาค (15 คะแนน)</option>
-                  <option value="ประเทศ">ระดับประเทศ (20 คะแนน)</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-1">
-                  ชื่อรางวัล
-                </label>
-                <input
-                  {...register(`reg100_awards.${index}.awardName`)}
-                  type="text"
-                  className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-1">
-                  วันที่ได้รับรางวัล
-                </label>
-                <input
-                  {...register(`reg100_awards.${index}.awardDate`)}
-                  type="text"
-                  placeholder="เช่น 15/05/2568"
-                  className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-1">
-                  หลักฐาน (Link/URL)
-                </label>
-                <input
-                  {...register(`reg100_awards.${index}.awardEvidenceLink`)}
-                  type="url"
-                  className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
-                />
-              </div>
+              )}
+              {localFields.length >= MAX_ITEMS && (
+                <p className="text-sm text-gray-600 text-center py-2">
+                  เพิ่มข้อมูลได้สูงสุด 5 รายการ
+                </p>
+              )}
             </div>
-          ))}
+          </div>
 
-          <button
-            type="button"
-            onClick={() => appendAward({ awardLevel: '', awardName: '', awardDate: '', awardEvidenceLink: '' })}
-            className="w-full py-2 px-4 border-2 border-dashed border-primary text-primary rounded-lg hover:bg-green-50 cursor-pointer font-medium transition-colors"
-          >
-            + เพิ่มข้อมูล
-          </button>
+          {/* 4. นอกเวลาราชการ */}
+          <div>
+            <label className="flex items-start gap-3 cursor-pointer mb-4">
+              <input
+                {...register('reg100_hasAfterSchoolTeaching')}
+                type="checkbox"
+                className="mt-1 w-4 h-4 text-[#00B050] border-gray-300 rounded focus:ring-[#00B050]"
+              />
+              <span className="text-sm font-medium text-gray-900">นอกเวลาราชการ</span>
+            </label>
+
+            <div className="ml-7 space-y-4">
+              {afterSchoolFields.map((field, idx) => (
+                <div key={field.id} className={idx === 0 ? "space-y-3" : "border border-neutral-border rounded-lg p-4 space-y-3"}>
+                  {idx > 0 && (
+                    <div className="flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => removeAfterSchool(idx)}
+                        className="text-red-500 hover:text-red-700 text-sm font-medium cursor-pointer flex items-center gap-1"
+                      >
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                        ลบ
+                      </button>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-900 mb-1">
+                        วัน
+                      </label>
+                      <select
+                        {...register(`reg100_afterSchoolSchedule.${idx}.day`)}
+                        className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      >
+                        <option value="">เลือกวัน</option>
+                        <option value="จันทร์">จันทร์</option>
+                        <option value="อังคาร">อังคาร</option>
+                        <option value="พุธ">พุธ</option>
+                        <option value="พฤหัสบดี">พฤหัสบดี</option>
+                        <option value="ศุกร์">ศุกร์</option>
+                        <option value="เสาร์">เสาร์</option>
+                        <option value="อาทิตย์">อาทิตย์</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-900 mb-1">
+                        เวลา
+                      </label>
+                      <input
+                        {...register(`reg100_afterSchoolSchedule.${idx}.timeFrom`)}
+                        type="text"
+                        placeholder="เช่น 08:00"
+                        className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-900 mb-1">
+                        ถึง
+                      </label>
+                      <input
+                        {...register(`reg100_afterSchoolSchedule.${idx}.timeTo`)}
+                        type="text"
+                        placeholder="เช่น 16:00"
+                        className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-900 mb-1">
+                        สถานที่
+                      </label>
+                      <input
+                        {...register(`reg100_afterSchoolSchedule.${idx}.location`)}
+                        type="text"
+                        className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {afterSchoolFields.length < MAX_ITEMS && (
+                <button
+                  type="button"
+                  onClick={() => appendAfterSchool({ day: '', timeFrom: '', timeTo: '', location: '' })}
+                  className="w-full py-2 px-4 border-2 border-dashed border-primary text-primary rounded-lg hover:bg-green-50 cursor-pointer font-medium transition-colors"
+                >
+                  + เพิ่มข้อมูล ({afterSchoolFields.length}/{MAX_ITEMS})
+                </button>
+              )}
+              {afterSchoolFields.length >= MAX_ITEMS && (
+                <p className="text-sm text-gray-600 text-center py-2">
+                  เพิ่มข้อมูลได้สูงสุด 5 รายการ
+                </p>
+              )}
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      {/* สถานที่ทำการเรียนการสอนในภาพรวมของสถานศึกษา - Outside checkbox group */}
+      <div className="bg-white rounded-lg shadow-sm border border-neutral-border overflow-hidden">
+        <div className="bg-green-50 px-6 py-3 border-b border-neutral-border">
+          <h3 className="font-semibold text-gray-900">สถานที่ทำการเรียนการสอนในภาพรวมของสถานศึกษา</h3>
+        </div>
+        <div className="p-6">
+          <div>
+            <label className="block text-sm text-gray-700 mb-2">
+              (ระบุ เช่น ห้องเรียนรวม ห้องประชุม ห้องดนตรีไทย หรือในแต่ละห้องเรียนตามรายวิชา เป็นต้น)
+            </label>
+            <textarea
+              {...register('reg100_teachingLocation')}
+              rows={4}
+              className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
+              placeholder="กรอกรายละเอียด"
+            />
+          </div>
         </div>
       </div>
     </div>

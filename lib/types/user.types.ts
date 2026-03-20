@@ -1,6 +1,6 @@
 // User Types and Interfaces
 
-export type UserRole = 'root' | 'admin' | 'teacher';
+export type UserRole = 'root' | 'admin' | 'super_admin' | 'teacher';
 
 export interface User {
   _id?: string;

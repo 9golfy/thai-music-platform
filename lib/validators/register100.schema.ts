@@ -14,14 +14,24 @@ const thaiMusicTeacherSchema = z.object({
   teacherEducation: z.string().optional(),
   teacherPhone: z.string().optional(),
   teacherEmail: z.string().email('กรุณากรอก email ให้ถูกต้อง').optional().or(z.literal('')),
+  teacherAbility: z.string().optional(),
   teacherImage: z.any().optional(),
+  isFromMusicInstitute: z.string().optional(),
+  musicInstituteEducation: z.array(z.object({
+    graduationYear: z.string().optional(),
+    major: z.string().optional(),
+    completionYear: z.string().optional(),
+  })).optional(),
+  otherEducation: z.array(z.object({
+    graduationYear: z.string().optional(),
+    major: z.string().optional(),
+    completionYear: z.string().optional(),
+  })).optional(),
 });
 
-// Support factor schema (for Step 5)
+// Support factor schema (for Step 6)
 const supportFactorSchema = z.object({
   sup_supportByAdmin: z.string().optional(),
-  sup_supportBySchoolBoard: z.string().optional(),
-  sup_supportByOthers: z.string().optional(),
   sup_supportByDescription: z.string().optional(),
   sup_supportByDate: z.string().optional(),
   sup_supportByDriveLink: z.string().optional(),
@@ -86,6 +96,7 @@ export const register100Schema = z.object({
   reg100_province: z.string().optional(),
   reg100_schoolLevel: schoolLevelEnum,
   reg100_affiliation: z.string().optional(),
+  reg100_affiliationDetail: z.string().optional(),
   reg100_schoolSize: schoolSizeEnum.optional(),
   reg100_staffCount: z.coerce.number().optional(),
   reg100_studentCount: z.coerce.number().optional(),
@@ -124,14 +135,6 @@ export const register100Schema = z.object({
   // Step 4: ผู้สอนดนตรีไทย
   reg100_thaiMusicTeachers: z.array(thaiMusicTeacherSchema).default([]),
   
-  // Teacher training checkboxes (คะแนน)
-  reg100_isCompulsorySubject: z.boolean().default(false),
-  reg100_hasAfterSchoolTeaching: z.boolean().default(false),
-  reg100_hasElectiveSubject: z.boolean().default(false),
-  reg100_hasLocalCurriculum: z.boolean().default(false),
-  reg100_teacher_training_score: z.number().default(0),
-  reg100_teacher_qualification_score: z.number().default(0), // New: 5 points per unique qualification type
-  
   // ระยะเวลาการสอน
   reg100_inClassInstructionDurations: z.array(z.object({
     inClassGradeLevel: z.string().optional(),
@@ -145,9 +148,47 @@ export const register100Schema = z.object({
     outTimeTo: z.string().optional(),
     outLocation: z.string().optional(),
   })).default([]),
+  
+  // Teacher training checkboxes (คะแนน)
+  reg100_teacher_training_score: z.number().default(0),
+  reg100_teacher_qualification_score: z.number().default(0), // New: 5 points per unique qualification type
+  
   reg100_teachingLocation: z.string().optional(),
 
-  // Step 5: เครื่องดนตรี
+  // Step 5: หลักสูตร
+  reg100_isCompulsorySubject: z.boolean().default(false),
+  reg100_compulsoryCurriculum: z.array(z.object({
+    gradeLevel: z.string().optional(),
+    studentCount: z.coerce.number().optional(),
+    hoursPerSemester: z.string().optional(),
+    hoursPerYear: z.string().optional(),
+  })).default([]),
+  
+  reg100_hasElectiveSubject: z.boolean().default(false),
+  reg100_electiveCurriculum: z.array(z.object({
+    gradeLevel: z.string().optional(),
+    studentCount: z.coerce.number().optional(),
+    hoursPerSemester: z.string().optional(),
+    hoursPerYear: z.string().optional(),
+  })).default([]),
+  
+  reg100_hasLocalCurriculum: z.boolean().default(false),
+  reg100_localCurriculum: z.array(z.object({
+    gradeLevel: z.string().optional(),
+    studentCount: z.coerce.number().optional(),
+    hoursPerSemester: z.string().optional(),
+    hoursPerYear: z.string().optional(),
+  })).default([]),
+  
+  reg100_hasAfterSchoolTeaching: z.boolean().default(false),
+  reg100_afterSchoolSchedule: z.array(z.object({
+    day: z.string().optional(),
+    timeFrom: z.string().optional(),
+    timeTo: z.string().optional(),
+    location: z.string().optional(),
+  })).default([]),
+
+  // Step 6: เครื่องดนตรี
   // ปัจจัยที่เกี่ยวข้อง
   reg100_supportFactors: z.array(supportFactorSchema).default([]),
   
@@ -159,6 +200,11 @@ export const register100Schema = z.object({
   reg100_hasSupportFromExternal: z.boolean().default(false),
   reg100_supportFromExternal: z.array(supportFromExternalSchema).default([]),
   reg100_support_from_external_score: z.number().default(0), // 5/10/15 คะแนน
+  
+  // สถานศึกษามีเครื่องดนตรีไทยเพียงพอต่อการจัดการเรียนการสอน
+  reg100_hasEnoughInstruments: z.string().optional(), // "เพียงพอ" or "ไม่เพียงพอ"
+  reg100_enoughInstrumentsReason: z.string().optional(),
+  reg100_notEnoughInstrumentsReason: z.string().optional(),
   
   // กรอบการเรียนการสอน
   reg100_curriculumFramework: z.string().optional(),
@@ -207,8 +253,10 @@ export const register100Schema = z.object({
   reg100_obstacles: z.string().optional(),
   reg100_suggestions: z.string().optional(),
 
-  // การรับรองข้อมูล (validated in onSubmit, not by zod)
-  reg100_certifiedINFOByAdminName: z.boolean().optional(),
+  // การรับรองข้อมูล (required for submission)
+  reg100_certifiedByAdmin: z.boolean().refine(val => val === true, {
+    message: "กรุณาติ๊กถูกเพื่อรับรองว่าข้อมูลเป็นความจริง"
+  }),
   
   // Total score
   reg100_total_score: z.number().default(0),

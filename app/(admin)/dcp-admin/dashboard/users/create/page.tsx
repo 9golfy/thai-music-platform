@@ -8,8 +8,8 @@ import { Button } from '@/components/ui/button';
 export default async function CreateUserPage() {
   const session = await getSession();
 
-  // Only root can create users
-  if (!session || session.role !== 'root') {
+  // Only root and super_admin can create users
+  if (!session || (session.role !== 'root' && session.role !== 'super_admin')) {
     redirect('/dcp-admin/dashboard/users');
   }
 

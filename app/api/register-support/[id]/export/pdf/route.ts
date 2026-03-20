@@ -28,6 +28,36 @@ export async function GET(
       return submission[`regsup_${fieldName}`] ?? submission[fieldName] ?? '';
     };
 
+    const getSupportTypeName = () => {
+      const supportType = getFieldValue('supportType');
+      const supportTypeNameFieldMap: Record<string, string> = {
+        'สถานศึกษา': 'supportTypeSchoolName',
+        'ชุมนุม': 'supportTypeClubName',
+        'ชมรม': 'supportTypeAssociationName',
+        'กลุ่ม': 'supportTypeGroupName',
+        'วงดนตรีไทย': 'supportTypeBandName',
+      };
+
+      const selectedField = supportTypeNameFieldMap[supportType];
+      return (
+        (selectedField ? getFieldValue(selectedField) : '') ||
+        getFieldValue('supportTypeSchoolName') ||
+        getFieldValue('supportTypeClubName') ||
+        getFieldValue('supportTypeAssociationName') ||
+        getFieldValue('supportTypeGroupName') ||
+        getFieldValue('supportTypeBandName') ||
+        getFieldValue('supportTypeName') ||
+        getFieldValue('supportTypeOrgName') ||
+        getFieldValue('supportTypeFoundationName') ||
+        getFieldValue('supportTypeTemplateName') ||
+        getFieldValue('supportTypeOtherName')
+      );
+    };
+
+    const getSupportTypeMemberCount = () => {
+      return getFieldValue('supportTypeMemberCount') || getFieldValue('memberCount');
+    };
+
     const schoolName = getFieldValue('schoolName') || 'N/A';
     const totalScore = submission.total_score || 0;
 
@@ -37,6 +67,7 @@ export async function GET(
       
       return teachers.map((teacher, index) => `
         <tr><th colspan="2" style="background-color: #e9ecef; text-align: center;">ครูคนที่ ${index + 1}</th></tr>
+        ${teacher.teacherImage ? `<tr><th>รูปภาพ</th><td><img src="${teacher.teacherImage}" alt="ครูคนที่ ${index + 1}" style="max-width: 200px; max-height: 200px; object-fit: cover; border-radius: 8px;" /></td></tr>` : ''}
         <tr><th>คุณลักษณะ</th><td>${teacher.teacherQualification || '-'}</td></tr>
         <tr><th>ชื่อ-นามสกุล</th><td>${teacher.teacherFullName || '-'}</td></tr>
         <tr><th>ตำแหน่ง</th><td>${teacher.teacherPosition || '-'}</td></tr>
@@ -56,6 +87,17 @@ export async function GET(
           <td>${instrument.instrumentName || '-'}</td>
           <td>${instrument.quantity || '-'}</td>
           <td>${instrument.note || '-'}</td>
+        </tr>
+      `).join('');
+    };
+
+    const renderCurrentMusicTypes = (items: any[]) => {
+      if (!items || items.length === 0) return '<tr><td colspan="2">ไม่มีข้อมูลสภาวการณ์การเรียนการสอน</td></tr>';
+
+      return items.map((item) => `
+        <tr>
+          <th>${item.grade || '-'}</th>
+          <td>${item.details || '-'}</td>
         </tr>
       `).join('');
     };
@@ -225,15 +267,16 @@ export async function GET(
 
     <!-- Step 1: ข้อมูลพื้นฐาน -->
     <div class="section">
-        <h2>Step 1: ข้อมูลพื้นฐาน</h2>
+        <h2>1. ข้อมูลพื้นฐาน</h2>
         <table class="info-table">
             <tr><th>ประเภทการสนับสนุน</th><td>${getFieldValue('supportType')}</td></tr>
-            <tr><th>ชื่อกลุ่ม/องค์กร</th><td>${getFieldValue('supportTypeGroupName') || getFieldValue('supportTypeOrgName') || getFieldValue('supportTypeFoundationName') || getFieldValue('supportTypeTemplateName') || getFieldValue('supportTypeOtherName')}</td></tr>
-            <tr><th>จำนวนสมาชิก</th><td>${getFieldValue('memberCount')}</td></tr>
+            <tr><th>ชื่อกลุ่ม/องค์กร</th><td>${getSupportTypeName()}</td></tr>
+            <tr><th>จำนวนสมาชิก</th><td>${getSupportTypeMemberCount()}</td></tr>
             <tr><th>ชื่อสถานศึกษา</th><td>${getFieldValue('schoolName')}</td></tr>
             <tr><th>จังหวัด</th><td>${getFieldValue('schoolProvince')}</td></tr>
             <tr><th>ระดับการศึกษา</th><td>${getFieldValue('schoolLevel')}</td></tr>
             <tr><th>สังกัด</th><td>${getFieldValue('affiliation')}</td></tr>
+            <tr><th>ระบุ</th><td>${getFieldValue('affiliationDetail')}</td></tr>
             <tr><th>จำนวนบุคลากร</th><td>${getFieldValue('staffCount')}</td></tr>
             <tr><th>จำนวนนักเรียน</th><td>${getFieldValue('studentCount')}</td></tr>
             <tr><th>จำนวนนักเรียนแต่ละชั้น</th><td>${getFieldValue('studentCountByGrade')}</td></tr>
@@ -243,10 +286,11 @@ export async function GET(
         </table>
     </div>
 
-    <!-- Step 2: ผู้บริหารสถานศึกษา -->
+    <!-- Step 2: ผู้บริหาร -->
     <div class="section">
-        <h2>Step 2: ผู้บริหารสถานศึกษา</h2>
+        <h2>2. ผู้บริหาร</h2>
         <table class="info-table">
+            ${getFieldValue('mgtImage') ? `<tr><th>รูปภาพ</th><td><img src="${getFieldValue('mgtImage')}" alt="ผู้บริหาร" style="max-width: 200px; max-height: 200px; object-fit: cover; border-radius: 8px;" /></td></tr>` : ''}
             <tr><th>ชื่อ-นามสกุล</th><td>${getFieldValue('mgtFullName')}</td></tr>
             <tr><th>ตำแหน่ง</th><td>${getFieldValue('mgtPosition')}</td></tr>
             <tr><th>ที่อยู่</th><td>${getFieldValue('mgtAddress')}</td></tr>
@@ -255,9 +299,15 @@ export async function GET(
         </table>
     </div>
 
-    <!-- Step 3: ความพร้อมด้านวัสดุอุปกรณ์ -->
+    <!-- Step 3: สภาวการณ์ -->
     <div class="section">
-        <h2>Step 3: ความพร้อมด้านวัสดุอุปกรณ์</h2>
+        <h2>3. สภาวการณ์</h2>
+        <h3>สภาวการณ์การเรียนการสอน</h3>
+        <table class="info-table">
+            ${renderCurrentMusicTypes(submission.regsup_currentMusicTypes || submission.currentMusicTypes)}
+        </table>
+
+        <h3>ความพร้อมเครื่องดนตรี</h3>
         <table class="info-table">
             <tr><th>ชื่อเครื่องดนตรี</th><th>จำนวน</th><th>หมายเหตุ</th></tr>
             ${renderInstruments(submission.regsup_readinessItems || submission.readinessItems)}
@@ -266,7 +316,7 @@ export async function GET(
 
     <!-- Step 4: ผู้สอนดนตรีไทย -->
     <div class="section">
-        <h2>Step 4: ผู้สอนดนตรีไทย</h2>
+        <h2>4. ผู้สอนดนตรีไทย</h2>
         
         <h3>การเรียนการสอน</h3>
         <div class="checkbox-list">
@@ -285,9 +335,23 @@ export async function GET(
         </table>
     </div>
 
-    <!-- Step 5: การสนับสนุนและรางวัล -->
+    <!-- Step 5: หลักสูตร -->
     <div class="section">
-        <h2>Step 5: การสนับสนุนและรางวัล</h2>
+        <h2>5. หลักสูตร</h2>
+        
+        <h3>กรอบการเรียนการสอน</h3>
+        <p>${getFieldValue('curriculumFramework')}</p>
+
+        <h3>ผลสัมฤทธิ์ในการเรียนการสอน</h3>
+        <p>${getFieldValue('learningOutcomes')}</p>
+
+        <h3>การบริหารจัดการ</h3>
+        <p>${getFieldValue('managementContext')}</p>
+    </div>
+
+    <!-- Step 6: การสนับสนุน -->
+    <div class="section">
+        <h2>6. การสนับสนุน</h2>
         
         <h3>ปัจจัยที่เกี่ยวข้องโดยตรง</h3>
         <table class="info-table">
@@ -298,35 +362,27 @@ export async function GET(
         ${renderSupportOrgs(submission.regsup_supportFromOrg || submission.supportFromOrg, 'การสนับสนุนจากต้นสังกัด')}
         
         ${renderSupportOrgs(submission.regsup_supportFromExternal || submission.supportFromExternal, 'การสนับสนุนจากภายนอก')}
+    </div>
 
-        <h3>กรอบการเรียนการสอน</h3>
-        <p>${getFieldValue('curriculumFramework')}</p>
-
-        <h3>ผลสัมฤทธิ์ในการเรียนการสอน</h3>
-        <p>${getFieldValue('learningOutcomes')}</p>
-
-        <h3>การบริหารจัดการ</h3>
-        <p>${getFieldValue('managementContext')}</p>
+    <!-- Step 7: ผลงาน -->
+    <div class="section">
+        <h2>7. ผลงาน</h2>
 
         <h3>รางวัลและเกียรติคุณ</h3>
         <table class="info-table">
             <tr><th>ระดับ</th><th>ชื่อรางวัล</th><th>วันที่ได้รับ</th><th>หลักฐาน</th></tr>
             ${renderAwards(submission.regsup_awards || submission.awards)}
         </table>
-    </div>
 
-    <!-- Step 6: สื่อและวิดีโอ -->
-    <div class="section">
-        <h2>Step 6: สื่อและวิดีโอ</h2>
         <table class="info-table">
             <tr><th>ลิงก์แกลเลอรี่รูปภาพ</th><td>${getFieldValue('photoGalleryLink')}</td></tr>
             <tr><th>ลิงก์วิดีโอ</th><td>${getFieldValue('videoLink')}</td></tr>
         </table>
     </div>
 
-    <!-- Step 7: กิจกรรมและการเผยแพร่ -->
+    <!-- Step 8: การเผยแพร่ -->
     <div class="section">
-        <h2>Step 7: กิจกรรมและการเผยแพร่</h2>
+        <h2>8. การเผยแพร่</h2>
         
         ${renderActivities(submission.regsup_activitiesWithinProvinceInternal || submission.activitiesWithinProvinceInternal, 'กิจกรรมภายในจังหวัด (ภายใน)')}
         
@@ -335,11 +391,18 @@ export async function GET(
         ${renderActivities(submission.regsup_activitiesOutsideProvince || submission.activitiesOutsideProvince, 'กิจกรรมนอกจังหวัด')}
     </div>
 
-    <!-- Step 8: ประชาสัมพันธ์และแหล่งข้อมูล -->
+    <!-- Step 9: การประชาสัมพันธ์ -->
     <div class="section">
-        <h2>Step 8: ประชาสัมพันธ์และแหล่งข้อมูล</h2>
+        <h2>9. การประชาสัมพันธ์</h2>
         
         ${renderActivities(submission.regsup_prActivities || submission.prActivities, 'กิจกรรมประชาสัมพันธ์')}
+
+        <h3>ช่องทางการประชาสัมพันธ์</h3>
+        <div class="checkbox-list">
+            <div class="checkbox-item">☑ Facebook: ${getFieldValue('DCP_PR_Channel_FACEBOOK') ? 'ใช้' : 'ไม่ใช้'}</div>
+            <div class="checkbox-item">☑ YouTube: ${getFieldValue('DCP_PR_Channel_YOUTUBE') ? 'ใช้' : 'ไม่ใช้'}</div>
+            <div class="checkbox-item">☑ TikTok: ${getFieldValue('DCP_PR_Channel_Tiktok') ? 'ใช้' : 'ไม่ใช้'}</div>
+        </div>
 
         <h3>แหล่งที่มาของข้อมูล</h3>
         <table class="info-table">
@@ -350,10 +413,13 @@ export async function GET(
         </table>
 
         <h3>ปัญหาอุปสรรค</h3>
-        <p>${getFieldValue('obstacles')}</p>
+        <p>${getFieldValue('obstacles') || '-'}</p>
 
         <h3>ข้อเสนอแนะ</h3>
-        <p>${getFieldValue('suggestions')}</p>
+        <p>${getFieldValue('suggestions') || '-'}</p>
+
+        <h3>ข้าพเจ้าขอรับรองว่าข้อมูลที่กรอกในแบบฟอร์มนี้เป็นความจริงทุกประการ</h3>
+        <p>${(getFieldValue('certifiedByAdmin') || getFieldValue('regsup_certifiedByAdmin')) ? '☑ ยอมรับ' : '☐ ไม่ยอมรับ'}</p>
     </div>
     
     <div class="footer">

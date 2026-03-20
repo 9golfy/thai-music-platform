@@ -6,6 +6,8 @@ import { generateSchoolId, getNextSchoolIdSequence } from '@/lib/utils/schoolId'
 import { hashPassword, generateTeacherPassword } from '@/lib/auth/password';
 import { sendTeacherLoginInfoEmail } from '@/lib/email/mailer';
 import { sendEmailWithRateLimit } from '@/lib/email/rateLimiter';
+import { validateUploadedImage } from '@/lib/utils/fileValidation';
+import { devLog } from '@/lib/utils/devLogger';
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/thai_music_school';
 
@@ -45,7 +47,7 @@ export async function POST(request: NextRequest) {
       'DCP_PR_Channel_YOUTUBE', 'regsup_DCP_PR_Channel_YOUTUBE',
       'DCP_PR_Channel_Tiktok', 'regsup_DCP_PR_Channel_Tiktok',
       'heardFromOther', 'regsup_heardFromOther',
-      'certifiedINFOByAdminName', 'regsup_certifiedINFOByAdminName',
+      'certifiedByAdmin', 'regsup_certifiedByAdmin',
     ];
 
     booleanFields.forEach((field) => {
@@ -83,22 +85,35 @@ export async function POST(request: NextRequest) {
     try {
       await mkdir(uploadDir, { recursive: true });
     } catch (error) {
-      console.log('Upload directory already exists or error creating:', error);
+      devLog.log('Upload directory already exists or error creating:', error);
     }
 
     // Save management image
     if (files.mgtImage) {
       const file = files.mgtImage;
+      
+      // Validate file type using magic bytes (security check)
+      const bytes = await file.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+      
+      const validation = await validateUploadedImage(buffer, 1); // 1MB max
+      if (!validation.valid) {
+        return NextResponse.json(
+          { error: `Management image validation failed: ${validation.error}` },
+          { status: 400 }
+        );
+      }
+      
+      devLog.log('Management image validated:', validation.detectedType);
+      
       const timestamp = Date.now();
       const filename = `mgt_support_${timestamp}_${file.name}`;
       const filepath = path.join(uploadDir, filename);
       
-      const bytes = await file.arrayBuffer();
-      const buffer = Buffer.from(bytes);
       await writeFile(filepath, buffer);
       
       data.mgtImage = `/uploads/${filename}`;
-      console.log('✅ Saved mgtImage:', filename);
+      devLog.log('Saved mgtImage:', filename);
     }
 
     // Save teacher images
@@ -107,16 +122,29 @@ export async function POST(request: NextRequest) {
         const fileKey = `teacherImage_${i}`;
         if (files[fileKey]) {
           const file = files[fileKey];
+          
+          // Validate file type using magic bytes (security check)
+          const bytes = await file.arrayBuffer();
+          const buffer = Buffer.from(bytes);
+          
+          const validation = await validateUploadedImage(buffer, 1); // 1MB max
+          if (!validation.valid) {
+            return NextResponse.json(
+              { error: `Teacher image ${i} validation failed: ${validation.error}` },
+              { status: 400 }
+            );
+          }
+          
+          devLog.log(`Teacher image ${i} validated:`, validation.detectedType);
+          
           const timestamp = Date.now();
           const filename = `teacher_support_${i}_${timestamp}_${file.name}`;
           const filepath = path.join(uploadDir, filename);
           
-          const bytes = await file.arrayBuffer();
-          const buffer = Buffer.from(bytes);
           await writeFile(filepath, buffer);
           
           data.regsup_thaiMusicTeachers[i].teacherImage = `/uploads/${filename}`;
-          console.log(`✅ Saved teacherImage_${i}:`, filename);
+          devLog.log(`Saved teacherImage_${i}:`, filename);
         }
       }
     }
@@ -219,14 +247,6 @@ export async function POST(request: NextRequest) {
         return submissionData[`regsup_${fieldName}`] ?? submissionData[fieldName];
       };
 
-      // Step 4: Teacher Training Score (4 checkboxes × 5 points each = 20 max)
-      let trainingScore = 0;
-      if (getFieldValue('isCompulsorySubject')) trainingScore += 5;
-      if (getFieldValue('hasAfterSchoolTeaching')) trainingScore += 5;
-      if (getFieldValue('hasElectiveSubject')) trainingScore += 5;
-      if (getFieldValue('hasLocalCurriculum')) trainingScore += 5;
-      scores.teacher_training_score = trainingScore;
-
       // Step 4: Teacher Qualification Score (unique qualifications × 5 points each = 20 max)
       const teachers = getFieldValue('thaiMusicTeachers') || [];
       const uniqueQualifications = new Set();
@@ -276,9 +296,8 @@ export async function POST(request: NextRequest) {
       const prActivities = getFieldValue('prActivities') || [];
       scores.pr_activity_score = (Array.isArray(prActivities) && prActivities.length >= 3) ? 5 : 0;
 
-      // Calculate total score
-      scores.total_score = scores.teacher_training_score + 
-                          scores.teacher_qualification_score + 
+      // Calculate total score (max 80 points for register-support)
+      scores.total_score = scores.teacher_qualification_score + 
                           scores.support_from_org_score + 
                           scores.support_from_external_score + 
                           scores.award_score + 
@@ -316,7 +335,11 @@ export async function POST(request: NextRequest) {
     const teacherEmail = data.teacherEmail;
     const teacherPhone = data.teacherPhone;
 
+    console.log('🔍 Debug teacher info:', { teacherEmail, teacherPhone });
+    console.log('🔍 All data keys:', Object.keys(data));
+
     if (!teacherEmail || !teacherPhone) {
+      console.error('❌ Missing teacher info:', { teacherEmail, teacherPhone });
       return NextResponse.json(
         {
           success: false,

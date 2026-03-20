@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { MongoClient, ObjectId } from 'mongodb';
+import { getSchoolSizeDisplayText } from '@/lib/utils/schoolSize';
 
 const uri = process.env.MONGODB_URI || 'mongodb://root:rootpass@localhost:27017/thai_music_school?authSource=admin';
 const dbName = process.env.MONGO_DB || 'thai_music_school';
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -26,6 +27,14 @@ export async function GET(
     // Helper function to get field value with fallback
     const getFieldValue = (fieldName: string) => {
       return submission[`reg100_${fieldName}`] ?? submission[fieldName] ?? '';
+    };
+
+    const getDisplayValue = (fieldName: string) => {
+      const value = getFieldValue(fieldName);
+      if (fieldName === 'schoolSize') {
+        return getSchoolSizeDisplayText(value) || value;
+      }
+      return value;
     };
 
     const schoolName = getFieldValue('schoolName') || 'ไม่ระบุ';
@@ -62,6 +71,16 @@ export async function GET(
         ]);
       });
       return instrumentRows;
+    };
+
+    const formatCurrentMusicTypesData = (items: any[]) => {
+      if (!items || items.length === 0) return [['ไม่มีข้อมูลสภาวการณ์การเรียนการสอน']];
+
+      const rows: any[][] = [['ระดับชั้น', 'รายละเอียด']];
+      items.forEach((item) => {
+        rows.push([item.grade || '-', item.details || '-']);
+      });
+      return rows;
     };
 
     // Helper function to format activities data for CSV
@@ -116,13 +135,14 @@ export async function GET(
       ['ชื่อสถานศึกษา:', getFieldValue('schoolName')],
       [''],
       
-      // Step 1: ข้อมูลพื้นฐาน
-      ['=== STEP 1: ข้อมูลพื้นฐาน ==='],
+      // 1. ข้อมูลพื้นฐาน
+      ['=== 1. ข้อมูลพื้นฐาน ==='],
       ['ชื่อสถานศึกษา', getFieldValue('schoolName')],
       ['จังหวัด', getFieldValue('schoolProvince')],
       ['ระดับการศึกษา', getFieldValue('schoolLevel')],
       ['สังกัด', getFieldValue('affiliation')],
-      ['ขนาดโรงเรียน', getFieldValue('schoolSize')],
+      ['ระบุ', getFieldValue('affiliationDetail')],
+      ['ขนาดโรงเรียน', getDisplayValue('schoolSize')],
       ['จำนวนบุคลากร', getFieldValue('staffCount')],
       ['จำนวนนักเรียน', getFieldValue('studentCount')],
       ['จำนวนนักเรียนแต่ละชั้น', getFieldValue('studentCountByGrade')],
@@ -131,8 +151,8 @@ export async function GET(
       ['โทรสาร', getFieldValue('mgtFax')],
       [''],
       
-      // Step 2: ผู้บริหารสถานศึกษา
-      ['=== STEP 2: ผู้บริหารสถานศึกษา ==='],
+      // 2. ผู้บริหาร
+      ['=== 2. ผู้บริหาร ==='],
       ['ชื่อ-นามสกุล', getFieldValue('mgtFullName')],
       ['ตำแหน่ง', getFieldValue('mgtPosition')],
       ['ที่อยู่', getFieldValue('mgtAddress')],
@@ -140,17 +160,13 @@ export async function GET(
       ['อีเมล', getFieldValue('mgtEmail')],
       [''],
       
-      // Step 3: แผนการสอนดนตรีไทย
-      ['=== STEP 3: แผนการสอนดนตรีไทย ==='],
-      ['สภาวการณ์การเรียนการสอน ม.1-3', getFieldValue('teachingSituation_M1_M3')],
-      ['สภาวการณ์การเรียนการสอน ม.4-6', getFieldValue('teachingSituation_M4_M6')],
-      [''],
-      ['ความพร้อมเครื่องดนตรี'],
-      ...formatInstrumentsData(submission.reg100_readinessItems || submission.readinessItems),
+      // 3. สภาวการณ์
+      ['=== 3. สภาวการณ์ ==='],
+      ...formatCurrentMusicTypesData(submission.reg100_currentMusicTypes || submission.currentMusicTypes),
       [''],
       
-      // Step 4: ผู้สอนดนตรีไทย
-      ['=== STEP 4: ผู้สอนดนตรีไทย ==='],
+      // 4. ผู้สอนดนตรีไทย
+      ['=== 4. ผู้สอนดนตรีไทย ==='],
       ['การเรียนการสอน'],
       ['วิชาบังคับ', getFieldValue('isCompulsorySubject') ? 'มี' : 'ไม่มี'],
       ['สอนหลังเลิกเรียน', getFieldValue('hasAfterSchoolTeaching') ? 'มี' : 'ไม่มี'],
@@ -163,28 +179,31 @@ export async function GET(
       ...formatTeachersData(submission.reg100_thaiMusicTeachers || submission.thaiMusicTeachers),
       [''],
       
-      // Step 5: การสนับสนุนและรางวัล
-      ['=== STEP 5: การสนับสนุนและรางวัล ==='],
-      ...formatSupportOrgsData(submission.reg100_supportFromOrg || submission.supportFromOrg, 'การสนับสนุนจากต้นสังกัด'),
-      [''],
-      ...formatSupportOrgsData(submission.reg100_supportFromExternal || submission.supportFromExternal, 'การสนับสนุนจากภายนอก'),
-      [''],
+      // 5. หลักสูตร
+      ['=== 5. หลักสูตร ==='],
       ['กรอบหลักสูตร', getFieldValue('curriculumFramework')],
       ['ผลการเรียนรู้', getFieldValue('learningOutcomes')],
       ['บริบทการจัดการ', getFieldValue('managementContext')],
       [''],
+      
+      // 6. การสนับสนุน
+      ['=== 6. การสนับสนุน ==='],
+      ...formatSupportOrgsData(submission.reg100_supportFromOrg || submission.supportFromOrg, 'การสนับสนุนจากต้นสังกัด'),
+      [''],
+      ...formatSupportOrgsData(submission.reg100_supportFromExternal || submission.supportFromExternal, 'การสนับสนุนจากภายนอก'),
+      [''],
+      
+      // 7. ผลงาน
+      ['=== 7. ผลงาน ==='],
       ['รางวัลและเกียรติคุณ'],
       ...formatAwardsData(submission.reg100_awards || submission.awards),
       [''],
-      
-      // Step 6: สื่อและวิดีโอ
-      ['=== STEP 6: สื่อและวิดีโอ ==='],
       ['ลิงก์แกลเลอรี่รูปภาพ', getFieldValue('photoGalleryLink')],
       ['ลิงก์วิดีโอ', getFieldValue('videoLink')],
       [''],
       
-      // Step 7: กิจกรรมและการเผยแพร่
-      ['=== STEP 7: กิจกรรมและการเผยแพร่ ==='],
+      // 8. การเผยแพร่
+      ['=== 8. การเผยแพร่ ==='],
       ...formatActivitiesData(submission.reg100_activitiesWithinProvinceInternal || submission.activitiesWithinProvinceInternal, 'กิจกรรมภายในจังหวัด (ภายใน)'),
       [''],
       ...formatActivitiesData(submission.reg100_activitiesWithinProvinceExternal || submission.activitiesWithinProvinceExternal, 'กิจกรรมภายในจังหวัด (ภายนอก)'),
@@ -192,8 +211,9 @@ export async function GET(
       ...formatActivitiesData(submission.reg100_activitiesOutsideProvince || submission.activitiesOutsideProvince, 'กิจกรรมนอกจังหวัด'),
       [''],
       
-      // Step 8: ประชาสัมพันธ์และแหล่งข้อมูล
-      ['=== STEP 8: ประชาสัมพันธ์และแหล่งข้อมูล ==='],
+      // 9. การประชาสัมพันธ์
+      ['=== 9. การประชาสัมพันธ์ ==='],
+      ['ประชาสัมพันธ์'],
       ...formatActivitiesData(submission.reg100_prActivities || submission.prActivities, 'กิจกรรมประชาสัมพันธ์'),
       [''],
       ['แหล่งที่มาของข้อมูล'],
@@ -204,6 +224,7 @@ export async function GET(
       [''],
       ['ปัญหาอุปสรรค', getFieldValue('obstacles')],
       ['ข้อเสนอแนะ', getFieldValue('suggestions')],
+      ['ข้าพเจ้าขอรับรองว่าข้อมูลที่กรอกในแบบฟอร์มนี้เป็นความจริงทุกประการ', (getFieldValue('certifiedByAdmin') || getFieldValue('reg100_certifiedByAdmin')) ? 'ยอมรับ' : 'ไม่ยอมรับ'],
       [''],
       
       // Score Summary

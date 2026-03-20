@@ -15,7 +15,7 @@ export async function GET(
   const session = await getSession();
   const { id } = await params;
 
-  if (!session || !['root', 'admin'].includes(session.role)) {
+  if (!session || !['root', 'admin', 'super_admin'].includes(session.role)) {
     return NextResponse.json(
       { success: false, message: 'Unauthorized' },
       { status: 401 }
@@ -67,7 +67,7 @@ export async function PUT(
   const session = await getSession();
   const { id } = await params;
 
-  if (!session || !['root', 'admin'].includes(session.role)) {
+  if (!session || !['root', 'admin', 'super_admin'].includes(session.role)) {
     return NextResponse.json(
       { success: false, message: 'Unauthorized' },
       { status: 401 }
@@ -94,8 +94,8 @@ export async function PUT(
       );
     }
 
-    // Only root can change role or update root users
-    if (session.role !== 'root' && (role || user.role === 'root')) {
+    // Only root and super_admin can change role or update root users
+    if (!['root', 'super_admin'].includes(session.role) && (role || user.role === 'root')) {
       return NextResponse.json(
         { success: false, message: 'ไม่มีสิทธิ์แก้ไขข้อมูลนี้' },
         { status: 403 }
@@ -111,7 +111,7 @@ export async function PUT(
     if (lastName) updateData.lastName = lastName;
     if (phone) updateData.phone = phone;
     if (email) updateData.email = email.toLowerCase();
-    if (role && session.role === 'root') updateData.role = role;
+    if (role && ['root', 'super_admin'].includes(session.role)) updateData.role = role;
     if (typeof isActive === 'boolean') updateData.isActive = isActive;
     if (profileImage) updateData.profileImage = profileImage;
     if (schoolId !== undefined) updateData.schoolId = schoolId; // Allow empty string to clear schoolId
@@ -151,10 +151,10 @@ export async function DELETE(
   const session = await getSession();
   const { id } = await params;
 
-  // Only root can delete users
-  if (!session || session.role !== 'root') {
+  // Only root, admin, or super_admin can delete users
+  if (!session || !['root', 'admin', 'super_admin'].includes(session.role)) {
     return NextResponse.json(
-      { success: false, message: 'Only root can delete users' },
+      { success: false, message: 'Only admin, super_admin, or root can delete users' },
       { status: 403 }
     );
   }
@@ -166,7 +166,7 @@ export async function DELETE(
     const database = client.db(dbName);
     const usersCollection = database.collection('users');
 
-    // Check if user is root
+    // Check if user exists and get user data
     const user = await usersCollection.findOne({ _id: new ObjectId(id) });
 
     if (!user) {
@@ -176,9 +176,26 @@ export async function DELETE(
       );
     }
 
+    // Prevent deletion of system admin
+    if (user.isSystemAdmin === true || user.email === 'root@thaimusic.com') {
+      return NextResponse.json(
+        { success: false, message: 'ไม่สามารถลบ System Administrator ได้' },
+        { status: 403 }
+      );
+    }
+
+    // Prevent deletion of root users
     if (user.role === 'root') {
       return NextResponse.json(
         { success: false, message: 'ไม่สามารถลบ Root user ได้' },
+        { status: 403 }
+      );
+    }
+
+    // Admin users can only delete teacher users
+    if (session.role === 'admin' && user.role !== 'teacher') {
+      return NextResponse.json(
+        { success: false, message: 'Admin สามารถลบได้เฉพาะ Teacher เท่านั้น' },
         { status: 403 }
       );
     }

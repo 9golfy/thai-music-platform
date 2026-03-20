@@ -12,6 +12,7 @@ export const STEP_FIELDS: Record<number, StepFieldKey[]> = {
     'province',
     'schoolLevel',
     'affiliation',
+    'affiliationDetail',
     'schoolSize',
     'staffCount',
     'studentCount',

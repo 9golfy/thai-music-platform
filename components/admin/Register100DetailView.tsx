@@ -11,7 +11,7 @@ interface Submission {
 
 export default function Register100DetailView({ id, hideScores = false, readOnly = false, hideDelete = false }: { id: string; hideScores?: boolean; readOnly?: boolean; hideDelete?: boolean }) {
   const router = useRouter();
-  
+
   const [submission, setSubmission] = useState<Submission | null>(null);
   const [loading, setLoading] = useState(true);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -23,11 +23,8 @@ export default function Register100DetailView({ id, hideScores = false, readOnly
 
   useEffect(() => {
     fetchSubmission();
-    
-    // Check if URL has ?mode=edit parameter
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('mode') === 'edit') {
-      // Will set edit mode after data is loaded
       setIsEditMode(true);
     }
   }, [id]);
@@ -38,7 +35,6 @@ export default function Register100DetailView({ id, hideScores = false, readOnly
       const data = await response.json();
       if (data.success) {
         setSubmission(data.submission);
-        // If edit mode is requested, set editedData
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('mode') === 'edit') {
           setEditedData(data.submission);
@@ -58,9 +54,7 @@ export default function Register100DetailView({ id, hideScores = false, readOnly
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(`/api/register100/${id}`, {
-        method: 'DELETE',
-      });
+      const response = await fetch(`/api/register100/${id}`, { method: 'DELETE' });
       const data = await response.json();
       if (data.success) {
         alert('ลบข้อมูลสำเร็จ');
@@ -75,10 +69,7 @@ export default function Register100DetailView({ id, hideScores = false, readOnly
 
   const handleEdit = () => {
     setIsEditMode(true);
-    // Create editedData with both prefixed and non-prefixed field names for compatibility
     const editData = { ...submission! };
-    
-    // Add non-prefixed versions of reg100_ fields for backward compatibility
     Object.keys(editData).forEach(key => {
       if (key.startsWith('reg100_')) {
         const unprefixedKey = key.replace('reg100_', '');
@@ -87,7 +78,6 @@ export default function Register100DetailView({ id, hideScores = false, readOnly
         }
       }
     });
-    
     setEditedData(editData);
   };
 
@@ -98,41 +88,35 @@ export default function Register100DetailView({ id, hideScores = false, readOnly
 
   const handleSave = async () => {
     if (!editedData) return;
-    
-    // Validate required dropdown fields
+
     const errors: string[] = [];
-    
-    // Validate teachers' qualifications
-    if (editedData.reg100_thaiMusicTeachers && editedData.reg100_thaiMusicTeachers.length > 0) {
+
+    if (editedData.reg100_thaiMusicTeachers?.length > 0) {
       editedData.reg100_thaiMusicTeachers.forEach((teacher: any, index: number) => {
         if (!teacher.teacherQualification || teacher.teacherQualification === '') {
           errors.push(`ครูคนที่ ${index + 1}: กรุณาเลือกคุณลักษณะ`);
         }
       });
     }
-    
-    // Validate awards' levels
-    if (editedData.reg100_awards && editedData.reg100_awards.length > 0) {
+
+    if (editedData.reg100_awards?.length > 0) {
       editedData.reg100_awards.forEach((award: any, index: number) => {
         if (!award.awardLevel || award.awardLevel === '') {
           errors.push(`รางวัลที่ ${index + 1}: กรุณาเลือกระดับรางวัล`);
         }
       });
     }
-    
-    // Show errors if any
+
     if (errors.length > 0) {
       alert('กรุณากรอกข้อมูลให้ครบถ้วน:\n\n' + errors.join('\n'));
       return;
     }
-    
+
     setIsSaving(true);
     try {
       const response = await fetch(`/api/register100/${id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editedData),
       });
       const data = await response.json();
@@ -154,17 +138,12 @@ export default function Register100DetailView({ id, hideScores = false, readOnly
   const handleFieldChange = (field: string, value: any) => {
     if (editedData) {
       const updatedData = { ...editedData, [field]: value };
-      
-      // If updating a reg100_ prefixed field, also update the non-prefixed version
       if (field.startsWith('reg100_')) {
         const unprefixedField = field.replace('reg100_', '');
         updatedData[unprefixedField] = value;
-      }
-      // If updating a non-prefixed field that has a reg100_ equivalent, update both
-      else if (editedData[`reg100_${field}`] !== undefined) {
+      } else if (editedData[`reg100_${field}`] !== undefined) {
         updatedData[`reg100_${field}`] = value;
       }
-      
       setEditedData(updatedData);
     }
   };
@@ -194,24 +173,15 @@ export default function Register100DetailView({ id, hideScores = false, readOnly
 
   const handleExportPDF = async () => {
     try {
-      const response = await fetch(`/api/register100/${id}/export/pdf`, {
-        method: 'GET',
-      });
-      
+      const response = await fetch(`/api/register100/${id}/export/pdf`);
       if (response.ok) {
         const htmlContent = await response.text();
-        
-        // Create a new window with the HTML content
         const printWindow = window.open('', '_blank');
         if (printWindow) {
           printWindow.document.write(htmlContent);
           printWindow.document.close();
-          
-          // Wait for content to load, then trigger print
           printWindow.onload = () => {
-            setTimeout(() => {
-              printWindow.print();
-            }, 500);
+            setTimeout(() => { printWindow.print(); }, 500);
           };
         }
       } else {
@@ -223,41 +193,37 @@ export default function Register100DetailView({ id, hideScores = false, readOnly
     }
   };
 
+  // FIX #3: use submission directly (displayData is defined later)
   const handleExportExcel = async () => {
-      try {
-        const timestamp = Date.now();
-        const response = await fetch(`/api/register100/${id}/export/excel?t=${timestamp}`, {
-          method: 'GET',
-        });
-
-        if (response.ok) {
-          const blob = await response.blob();
-          const url = window.URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          const fileTimestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
-          a.download = `register100-${displayData?.reg100_schoolName || id}-${fileTimestamp}.csv`;
-          document.body.appendChild(a);
-          a.click();
-          window.URL.revokeObjectURL(url);
-          document.body.removeChild(a);
-        } else {
-          alert('เกิดข้อผิดพลาดในการส่งออก Excel');
-        }
-      } catch (error) {
-        console.error('Error exporting Excel:', error);
+    try {
+      const timestamp = Date.now();
+      const response = await fetch(`/api/register100/${id}/export/excel?t=${timestamp}`);
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const fileTimestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+        // FIX: use submission?.reg100_schoolName instead of displayData (not yet defined here)
+        a.download = `register100-${submission?.reg100_schoolName || id}-${fileTimestamp}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      } else {
         alert('เกิดข้อผิดพลาดในการส่งออก Excel');
       }
-    };
+    } catch (error) {
+      console.error('Error exporting Excel:', error);
+      alert('เกิดข้อผิดพลาดในการส่งออก Excel');
+    }
+  };
 
-  // Helper function to create a proxy object that automatically handles field name mapping
   const createFieldProxy = (data: any) => {
     if (!data) return null;
-    
     return new Proxy(data, {
       get(target, prop) {
         if (typeof prop === 'string') {
-          // First try with reg100_ prefix, then without prefix
           return target[`reg100_${prop}`] ?? target[prop];
         }
         return target[prop];
@@ -266,7 +232,6 @@ export default function Register100DetailView({ id, hideScores = false, readOnly
   };
 
   const displayData = isEditMode ? createFieldProxy(editedData) : createFieldProxy(submission);
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -286,9 +251,9 @@ export default function Register100DetailView({ id, hideScores = false, readOnly
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4 max-w-7xl">
-        {/* Header Section */}
+
+        {/* Header */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          {/* Back Button + School Name */}
           <div className="mb-6">
             <button
               onClick={() => router.back()}
@@ -299,15 +264,8 @@ export default function Register100DetailView({ id, hideScores = false, readOnly
               </svg>
               กลับ
             </button>
-            
-            <h1 className="text-3xl font-bold text-gray-900">
-              {displayData?.schoolName}
-            </h1>
-            <p className="text-gray-600 mt-2">
-              {displayData?.schoolProvince} • {displayData?.schoolLevel}
-            </p>
-            
-            {/* School ID */}
+            <h1 className="text-3xl font-bold text-gray-900">{displayData?.schoolName}</h1>
+            <p className="text-gray-600 mt-2">{displayData?.schoolProvince} • {displayData?.schoolLevel}</p>
             <div className="mt-3">
               {submission.schoolId ? (
                 <span className="inline-block px-4 py-2 bg-blue-50 text-blue-700 font-mono text-sm font-semibold rounded-lg border border-blue-200">
@@ -319,21 +277,15 @@ export default function Register100DetailView({ id, hideScores = false, readOnly
                 </span>
               )}
             </div>
-
-            {/* Registrant Information */}
             {(submission.teacherEmail || submission.teacherPhone) && (
               <div className="mt-4">
                 <div className="text-sm font-medium text-gray-700 mb-2">ผู้ลงทะเบียน:</div>
                 <div className="space-y-1">
                   {submission.teacherEmail && (
-                    <div className="text-sm text-gray-600">
-                      <span className="font-medium">อีเมล:</span> {submission.teacherEmail}
-                    </div>
+                    <div className="text-sm text-gray-600"><span className="font-medium">อีเมล:</span> {submission.teacherEmail}</div>
                   )}
                   {submission.teacherPhone && (
-                    <div className="text-sm text-gray-600">
-                      <span className="font-medium">เบอร์โทรศัพท์:</span> {submission.teacherPhone}
-                    </div>
+                    <div className="text-sm text-gray-600"><span className="font-medium">เบอร์โทรศัพท์:</span> {submission.teacherPhone}</div>
                   )}
                 </div>
               </div>
@@ -341,348 +293,123 @@ export default function Register100DetailView({ id, hideScores = false, readOnly
           </div>
         </div>
 
-        {/* Score Summary Block - Separate */}
+        {/* Score Summary */}
         {!hideScores && (
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          {/* Total Score */}
-          <div className="bg-gradient-to-r from-green-50 to-green-100 p-6 rounded-lg border-2 border-green-200 mb-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-lg font-semibold text-gray-700">คะแนนรวมทั้งหมด</div>
-                <div className="text-sm text-gray-600 mt-1">Total Score</div>
-              </div>
-              <div className="text-right">
-                <div className="flex items-center justify-end gap-3">
-                  <span className={`text-3xl font-bold ${getGradeColor(calculateGrade(submission.total_score || 0))}`}>
-                    Grade {calculateGrade(submission.total_score || 0)}
-                  </span>
-                  <span className="text-gray-400">|</span>
-                  <span className="text-5xl font-bold text-green-600">{submission.total_score || 0}</span>
+          <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <div className="bg-gradient-to-r from-green-50 to-green-100 p-6 rounded-lg border-2 border-green-200 mb-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-lg font-semibold text-gray-700">คะแนนรวมทั้งหมด</div>
+                  <div className="text-sm text-gray-600 mt-1">Total Score</div>
                 </div>
-                <div className="text-lg text-gray-600 font-medium">/ 100 คะแนน</div>
+                <div className="text-right">
+                  <div className="flex items-center justify-end gap-3">
+                    <span className={`text-3xl font-bold ${getGradeColor(calculateGrade(submission.total_score || 0))}`}>
+                      Grade {calculateGrade(submission.total_score || 0)}
+                    </span>
+                    <span className="text-gray-400">|</span>
+                    <span className="text-5xl font-bold text-green-600">{submission.total_score || 0}</span>
+                  </div>
+                  <div className="text-lg text-gray-600 font-medium">/ 100 คะแนน</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <ScoreCard step="STEP 5" title="การเรียนการสอนดนตรีไทย" subtitle="วิชาบังคับ, หลังเลิกเรียน, วิชาเลือก, หลักสูตรท้องถิ่น" score={submission.teacher_training_score || 0} max={20} color="blue" note="5 คะแนน/ข้อ × 4 ข้อ" />
+              <ScoreCard step="STEP 4" title="คุณลักษณะครูผู้สอน" subtitle="ครูดนตรีไทย, ครูภูมิปัญญา, ผู้ทรงคุณวุฒิ, วิทยากร" score={submission.teacher_qualification_score || 0} max={20} color="purple" note="5 คะแนน/ประเภท (สูงสุด 4 ประเภท)" />
+              <ScoreCard step="STEP 7" title="การสนับสนุนจากต้นสังกัด" subtitle="บุคคล/หน่วยงานภายใน" score={submission.support_from_org_score || 0} max={5} color="teal" note="ติ๊กถูก = 5 คะแนน" />
+              <ScoreCard step="STEP 7" title="การสนับสนุนจากภายนอก" subtitle="บุคคล/หน่วยงานภายนอก" score={submission.support_from_external_score || 0} max={15} color="orange" note="1 คน=5, 2 คน=10, 3+ คน=15" />
+              <ScoreCard step="STEP 7" title="รางวัลและเกียรติคุณ" subtitle="อำเภอ, จังหวัด, ภาค, ประเทศ" score={submission.award_score || 0} max={20} color="amber" note="อำเภอ=5, จังหวัด=10, ภาค=15, ประเทศ=20" />
+              <ScoreCard step="STEP 8" title="กิจกรรมภายในสถานศึกษา" subtitle="ภายในจังหวัด - ภายในโรงเรียน" score={submission.activity_within_province_internal_score || 0} max={5} color="cyan" note="≥ 3 กิจกรรม = 5 คะแนน" />
+              <ScoreCard step="STEP 8" title="กิจกรรมภายนอกสถานศึกษา" subtitle="ภายในจังหวัด - นอกโรงเรียน" score={submission.activity_within_province_external_score || 0} max={5} color="indigo" note="≥ 3 กิจกรรม = 5 คะแนน" />
+              <ScoreCard step="STEP 8" title="กิจกรรมนอกจังหวัด" subtitle="ภายนอกจังหวัด" score={submission.activity_outside_province_score || 0} max={5} color="pink" note="≥ 3 กิจกรรม = 5 คะแนน" />
+              <ScoreCard step="STEP 9" title="การประชาสัมพันธ์" subtitle="Facebook, YouTube, TikTok, Website" score={submission.pr_activity_score || 0} max={5} color="rose" note="≥ 3 กิจกรรม = 5 คะแนน" />
+            </div>
+
+            <div className="mt-6 bg-gray-50 p-4 rounded-lg border border-gray-200">
+              <div className="text-sm font-semibold text-gray-700 mb-2">สรุปการคำนวณคะแนน:</div>
+              <div className="text-xs text-gray-600 space-y-1">
+                {[
+                  ['Step 5: การเรียนการสอน (4 ข้อ × 5)', submission.teacher_training_score || 0, 20],
+                  ['Step 4: คุณลักษณะครู (ประเภทที่ไม่ซ้ำ × 5)', submission.teacher_qualification_score || 0, 20],
+                  ['Step 7: สนับสนุนจากต้นสังกัด', submission.support_from_org_score || 0, 5],
+                  ['Step 7: สนับสนุนจากภายนอก', submission.support_from_external_score || 0, 15],
+                  ['Step 7: รางวัล (ระดับสูงสุด)', submission.award_score || 0, 20],
+                  ['Step 8: กิจกรรมภายในสถานศึกษา', submission.activity_within_province_internal_score || 0, 5],
+                  ['Step 8: กิจกรรมภายนอกสถานศึกษา', submission.activity_within_province_external_score || 0, 5],
+                  ['Step 8: กิจกรรมนอกจังหวัด', submission.activity_outside_province_score || 0, 5],
+                  ['Step 9: การประชาสัมพันธ์', submission.pr_activity_score || 0, 5],
+                ].map(([label, score, max]) => (
+                  <div key={label as string} className="flex justify-between">
+                    <span>{label}</span>
+                    <span className="font-medium">{score}/{max} คะแนน</span>
+                  </div>
+                ))}
+                <div className="flex justify-between pt-2 mt-2 border-t-2 border-gray-300 font-bold text-green-700">
+                  <span>รวมทั้งหมด</span>
+                  <span>{submission.total_score || 0} / 100 คะแนน</span>
+                </div>
               </div>
             </div>
           </div>
-
-          {/* Score Breakdown by Steps */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {/* Step 4: Teacher Training Score */}
-            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex-1">
-                  <div className="text-xs font-semibold text-blue-800 mb-1">STEP 4</div>
-                  <div className="text-sm font-medium text-gray-700">การเรียนการสอนดนตรีไทย</div>
-                  <div className="text-xs text-gray-600 mt-1">
-                    (วิชาบังคับ, หลังเลิกเรียน, วิชาเลือก, หลักสูตรท้องถิ่น)
-                  </div>
-                </div>
-                <div className="text-right ml-3">
-                  <div className="text-2xl font-bold text-blue-600">{submission.teacher_training_score || 0}</div>
-                  <div className="text-xs text-gray-500">/ 20</div>
-                </div>
-              </div>
-              <div className="text-xs text-blue-700 bg-blue-100 px-2 py-1 rounded mt-2">
-                5 คะแนน/ข้อ × 4 ข้อ
-              </div>
-            </div>
-
-            {/* Step 4: Teacher Qualification Score */}
-            <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex-1">
-                  <div className="text-xs font-semibold text-purple-800 mb-1">STEP 4</div>
-                  <div className="text-sm font-medium text-gray-700">คุณลักษณะครูผู้สอน</div>
-                  <div className="text-xs text-gray-600 mt-1">
-                    (ครูดนตรีไทย, ครูภูมิปัญญา, ผู้ทรงคุณวุฒิ, วิทยากร)
-                  </div>
-                </div>
-                <div className="text-right ml-3">
-                  <div className="text-2xl font-bold text-purple-600">{submission.teacher_qualification_score || 0}</div>
-                  <div className="text-xs text-gray-500">/ 20</div>
-                </div>
-              </div>
-              <div className="text-xs text-purple-700 bg-purple-100 px-2 py-1 rounded mt-2">
-                5 คะแนน/ประเภท (สูงสุด 4 ประเภท)
-              </div>
-            </div>
-
-            {/* Step 5: Support from Organization */}
-            <div className="bg-teal-50 p-4 rounded-lg border border-teal-200">
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex-1">
-                  <div className="text-xs font-semibold text-teal-800 mb-1">STEP 5</div>
-                  <div className="text-sm font-medium text-gray-700">การสนับสนุนจากต้นสังกัด</div>
-                  <div className="text-xs text-gray-600 mt-1">
-                    (บุคคล/หน่วยงานภายใน)
-                  </div>
-                </div>
-                <div className="text-right ml-3">
-                  <div className="text-2xl font-bold text-teal-600">{submission.support_from_org_score || 0}</div>
-                  <div className="text-xs text-gray-500">/ 5</div>
-                </div>
-              </div>
-              <div className="text-xs text-teal-700 bg-teal-100 px-2 py-1 rounded mt-2">
-                ติ๊กถูก = 5 คะแนน
-              </div>
-            </div>
-
-            {/* Step 5: Support from External */}
-            <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex-1">
-                  <div className="text-xs font-semibold text-orange-800 mb-1">STEP 5</div>
-                  <div className="text-sm font-medium text-gray-700">การสนับสนุนจากภายนอก</div>
-                  <div className="text-xs text-gray-600 mt-1">
-                    (บุคคล/หน่วยงานภายนอก)
-                  </div>
-                </div>
-                <div className="text-right ml-3">
-                  <div className="text-2xl font-bold text-orange-600">{submission.support_from_external_score || 0}</div>
-                  <div className="text-xs text-gray-500">/ 15</div>
-                </div>
-              </div>
-              <div className="text-xs text-orange-700 bg-orange-100 px-2 py-1 rounded mt-2">
-                1 คน=5, 2 คน=10, 3+ คน=15
-              </div>
-            </div>
-
-            {/* Step 5: Award Score */}
-            <div className="bg-amber-50 p-4 rounded-lg border border-amber-200">
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex-1">
-                  <div className="text-xs font-semibold text-amber-800 mb-1">STEP 5</div>
-                  <div className="text-sm font-medium text-gray-700">รางวัลและเกียรติคุณ</div>
-                  <div className="text-xs text-gray-600 mt-1">
-                    (อำเภอ, จังหวัด, ภาค, ประเทศ)
-                  </div>
-                </div>
-                <div className="text-right ml-3">
-                  <div className="text-2xl font-bold text-amber-600">{submission.award_score || 0}</div>
-                  <div className="text-xs text-gray-500">/ 20</div>
-                </div>
-              </div>
-              <div className="text-xs text-amber-700 bg-amber-100 px-2 py-1 rounded mt-2">
-                อำเภอ=5, จังหวัด=10, ภาค=15, ประเทศ=20
-              </div>
-            </div>
-
-            {/* Step 7: Internal Activities */}
-            <div className="bg-cyan-50 p-4 rounded-lg border border-cyan-200">
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex-1">
-                  <div className="text-xs font-semibold text-cyan-800 mb-1">STEP 7</div>
-                  <div className="text-sm font-medium text-gray-700">กิจกรรมภายในสถานศึกษา</div>
-                  <div className="text-xs text-gray-600 mt-1">
-                    (ภายในจังหวัด - ภายในโรงเรียน)
-                  </div>
-                </div>
-                <div className="text-right ml-3">
-                  <div className="text-2xl font-bold text-cyan-600">{submission.activity_within_province_internal_score || 0}</div>
-                  <div className="text-xs text-gray-500">/ 5</div>
-                </div>
-              </div>
-              <div className="text-xs text-cyan-700 bg-cyan-100 px-2 py-1 rounded mt-2">
-                ≥ 3 กิจกรรม = 5 คะแนน
-              </div>
-            </div>
-
-            {/* Step 7: External Activities */}
-            <div className="bg-indigo-50 p-4 rounded-lg border border-indigo-200">
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex-1">
-                  <div className="text-xs font-semibold text-indigo-800 mb-1">STEP 7</div>
-                  <div className="text-sm font-medium text-gray-700">กิจกรรมภายนอกสถานศึกษา</div>
-                  <div className="text-xs text-gray-600 mt-1">
-                    (ภายในจังหวัด - นอกโรงเรียน)
-                  </div>
-                </div>
-                <div className="text-right ml-3">
-                  <div className="text-2xl font-bold text-indigo-600">{submission.activity_within_province_external_score || 0}</div>
-                  <div className="text-xs text-gray-500">/ 5</div>
-                </div>
-              </div>
-              <div className="text-xs text-indigo-700 bg-indigo-100 px-2 py-1 rounded mt-2">
-                ≥ 3 กิจกรรม = 5 คะแนน
-              </div>
-            </div>
-
-            {/* Step 7: Outside Province Activities */}
-            <div className="bg-pink-50 p-4 rounded-lg border border-pink-200">
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex-1">
-                  <div className="text-xs font-semibold text-pink-800 mb-1">STEP 7</div>
-                  <div className="text-sm font-medium text-gray-700">กิจกรรมนอกจังหวัด</div>
-                  <div className="text-xs text-gray-600 mt-1">
-                    (ภายนอกจังหวัด)
-                  </div>
-                </div>
-                <div className="text-right ml-3">
-                  <div className="text-2xl font-bold text-pink-600">{submission.activity_outside_province_score || 0}</div>
-                  <div className="text-xs text-gray-500">/ 5</div>
-                </div>
-              </div>
-              <div className="text-xs text-pink-700 bg-pink-100 px-2 py-1 rounded mt-2">
-                ≥ 3 กิจกรรม = 5 คะแนน
-              </div>
-            </div>
-
-            {/* Step 8: PR Activities */}
-            <div className="bg-rose-50 p-4 rounded-lg border border-rose-200">
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex-1">
-                  <div className="text-xs font-semibold text-rose-800 mb-1">STEP 8</div>
-                  <div className="text-sm font-medium text-gray-700">การประชาสัมพันธ์</div>
-                  <div className="text-xs text-gray-600 mt-1">
-                    (Facebook, YouTube, TikTok, Website)
-                  </div>
-                </div>
-                <div className="text-right ml-3">
-                  <div className="text-2xl font-bold text-rose-600">{submission.pr_activity_score || 0}</div>
-                  <div className="text-xs text-gray-500">/ 5</div>
-                </div>
-              </div>
-              <div className="text-xs text-rose-700 bg-rose-100 px-2 py-1 rounded mt-2">
-                ≥ 3 กิจกรรม = 5 คะแนน
-              </div>
-            </div>
-          </div>
-
-          {/* Score Calculation Summary */}
-          <div className="mt-6 bg-gray-50 p-4 rounded-lg border border-gray-200">
-            <div className="text-sm font-semibold text-gray-700 mb-2">สรุปการคำนวณคะแนน:</div>
-            <div className="text-xs text-gray-600 space-y-1">
-              <div className="flex justify-between">
-                <span>Step 4: การเรียนการสอน (4 ข้อ × 5)</span>
-                <span className="font-medium">{submission.teacher_training_score || 0} คะแนน</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Step 4: คุณลักษณะครู (ประเภทที่ไม่ซ้ำ × 5)</span>
-                <span className="font-medium">{submission.teacher_qualification_score || 0} คะแนน</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Step 5: สนับสนุนจากต้นสังกัด</span>
-                <span className="font-medium">{submission.support_from_org_score || 0} คะแนน</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Step 5: สนับสนุนจากภายนอก</span>
-                <span className="font-medium">{submission.support_from_external_score || 0} คะแนน</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Step 5: รางวัล (ระดับสูงสุด)</span>
-                <span className="font-medium">{submission.award_score || 0} คะแนน</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Step 7: กิจกรรมภายในสถานศึกษา</span>
-                <span className="font-medium">{submission.activity_within_province_internal_score || 0} คะแนน</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Step 7: กิจกรรมภายนอกสถานศึกษา</span>
-                <span className="font-medium">{submission.activity_within_province_external_score || 0} คะแนน</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Step 7: กิจกรรมนอกจังหวัด</span>
-                <span className="font-medium">{submission.activity_outside_province_score || 0} คะแนน</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Step 8: การประชาสัมพันธ์</span>
-                <span className="font-medium">{submission.pr_activity_score || 0} คะแนน</span>
-              </div>
-              <div className="flex justify-between pt-2 mt-2 border-t-2 border-gray-300 font-bold text-green-700">
-                <span>รวมทั้งหมด</span>
-                <span>{submission.total_score || 0} / 100 คะแนน</span>
-              </div>
-            </div>
-          </div>
-        </div>
         )}
 
-        {/* Action Buttons - Above Step 1 */}
+        {/* Action Buttons */}
         {!readOnly && (
-        <div className="flex gap-3 mb-6 justify-end">
-          {!isEditMode ? (
-            <>
-              <button
-                onClick={() => handleExportPDF()}
-                className="px-6 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all flex items-center gap-2 shadow-md"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                Export PDF
-              </button>
-              <button
-                onClick={() => handleExportExcel()}
-                className="px-6 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all flex items-center gap-2 shadow-md"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                Export Excel
-              </button>
-              <button
-                onClick={handleEdit}
-                className="px-6 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg hover:from-blue-600 hover:to-cyan-600 transition-all flex items-center gap-2 shadow-md"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
-                EDIT
-              </button>
-              {!hideDelete && (
-                <button
-                  onClick={() => setShowDeleteModal(true)}
-                  className="px-6 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg hover:from-red-600 hover:to-pink-600 transition-all flex items-center gap-2 shadow-md"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                  DELETE
+          <div className="flex gap-3 mb-6 justify-end">
+            {!isEditMode && (
+              <>
+                <button onClick={handleExportPDF} className="px-6 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all flex items-center gap-2 shadow-md">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                  Export PDF
                 </button>
-              )}
-            </>
-          ) : null}
-        </div>
+                <button onClick={handleExportExcel} className="px-6 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all flex items-center gap-2 shadow-md">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                  Export Excel
+                </button>
+                <button onClick={handleEdit} className="px-6 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg hover:from-blue-600 hover:to-cyan-600 transition-all flex items-center gap-2 shadow-md">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                  EDIT
+                </button>
+                {!hideDelete && (
+                  <button onClick={() => setShowDeleteModal(true)} className="px-6 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg hover:from-red-600 hover:to-pink-600 transition-all flex items-center gap-2 shadow-md">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    DELETE
+                  </button>
+                )}
+              </>
+            )}
+          </div>
         )}
 
-        {/* Floating Save/Cancel Buttons - Only in Edit Mode */}
+        {/* Floating Save/Cancel in Edit Mode */}
         {isEditMode && !readOnly && (
           <div className="fixed bottom-8 right-8 z-40 flex gap-3">
-            <button
-              onClick={handleCancelEdit}
-              disabled={isSaving}
-              className="px-6 py-3 bg-gradient-to-r from-gray-400 to-gray-500 text-white rounded-lg hover:from-gray-500 hover:to-gray-600 transition-all flex items-center gap-2 shadow-lg disabled:opacity-50"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
+            <button onClick={handleCancelEdit} disabled={isSaving} className="px-6 py-3 bg-gradient-to-r from-gray-400 to-gray-500 text-white rounded-lg hover:from-gray-500 hover:to-gray-600 transition-all flex items-center gap-2 shadow-lg disabled:opacity-50">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
               CANCEL
             </button>
-            <button
-              onClick={handleSave}
-              disabled={isSaving}
-              className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all flex items-center gap-2 shadow-lg disabled:opacity-50"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
+            <button onClick={handleSave} disabled={isSaving} className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all flex items-center gap-2 shadow-lg disabled:opacity-50">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
               {isSaving ? 'SAVING...' : 'SAVE'}
             </button>
           </div>
         )}
 
-        {/* Step 1: ข้อมูลพื้นฐาน */}
-        <StepSection title="Step 1: ข้อมูลพื้นฐาน" stepNumber={1}>
+        {/* ── Step 1 ── */}
+        <StepSection title="ข้อมูลพื้นฐาน" stepNumber={1}>
           <div className="grid grid-cols-2 gap-6">
             <Field label="ชื่อสถานศึกษา" value={displayData?.schoolName} isEditMode={isEditMode} onChange={(val) => handleFieldChange('reg100_schoolName', val)} fieldName="reg100_schoolName" />
             <Field label="จังหวัด" value={displayData?.schoolProvince} isEditMode={isEditMode} onChange={(val) => handleFieldChange('reg100_schoolProvince', val)} fieldName="reg100_schoolProvince" />
             <Field label="ระดับการศึกษา" value={displayData?.schoolLevel} isEditMode={isEditMode} onChange={(val) => handleFieldChange('reg100_schoolLevel', val)} fieldName="reg100_schoolLevel" />
             <Field label="สังกัด" value={displayData?.affiliation} isEditMode={isEditMode} onChange={(val) => handleFieldChange('reg100_affiliation', val)} fieldName="reg100_affiliation" />
+            <Field label="ระบุ" value={displayData?.affiliationDetail ?? displayData?.reg100_affiliationDetail} isEditMode={isEditMode} onChange={(val) => handleFieldChange('reg100_affiliationDetail', val)} fieldName="reg100_affiliationDetail" />
             <Field label="ขนาดโรงเรียน" value={displayData?.schoolSize} isEditMode={isEditMode} onChange={(val) => handleFieldChange('reg100_schoolSize', val)} fieldName="reg100_schoolSize" />
             <Field label="จำนวนบุคลากร" value={displayData?.staffCount} isEditMode={isEditMode} onChange={(val) => handleFieldChange('reg100_staffCount', val)} fieldName="reg100_staffCount" />
             <Field label="จำนวนนักเรียน" value={displayData?.studentCount} isEditMode={isEditMode} onChange={(val) => handleFieldChange('reg100_studentCount', val)} fieldName="reg100_studentCount" />
             <Field label="จำนวนนักเรียนแต่ละชั้น" value={displayData?.studentCountByGrade} fullWidth isEditMode={isEditMode} onChange={(val) => handleFieldChange('reg100_studentCountByGrade', val)} fieldName="reg100_studentCountByGrade" />
           </div>
-          
           <div className="mt-6">
             <h4 className="font-semibold text-gray-900 mb-3">สถานที่ตั้ง</h4>
             <div className="grid grid-cols-2 gap-6">
@@ -699,8 +426,8 @@ export default function Register100DetailView({ id, hideScores = false, readOnly
           </div>
         </StepSection>
 
-        {/* Step 2: ผู้บริหาร */}
-        <StepSection title="Step 2: ผู้บริหารสถานศึกษา" stepNumber={2}>
+        {/* ── Step 2 ── */}
+        <StepSection title="ผู้บริหาร" stepNumber={2}>
           <div className="grid grid-cols-2 gap-6">
             <Field label="ชื่อ-นามสกุล" value={displayData?.reg100_mgtFullName} isEditMode={isEditMode} onChange={(val) => handleFieldChange('reg100_mgtFullName', val)} fieldName="reg100_mgtFullName" />
             <Field label="ตำแหน่ง" value={displayData?.reg100_mgtPosition} isEditMode={isEditMode} onChange={(val) => handleFieldChange('reg100_mgtPosition', val)} fieldName="reg100_mgtPosition" />
@@ -708,42 +435,15 @@ export default function Register100DetailView({ id, hideScores = false, readOnly
             <Field label="โทรศัพท์" value={submission.reg100_mgtPhone} />
             <Field label="อีเมล" value={submission.reg100_mgtEmail} />
           </div>
-          
-          {/* Manager Image Section */}
           <div className="mt-4">
             {isEditMode ? (
-              <Field 
-                label="ลิงก์รูปภาพผู้บริหาร (URL)" 
-                value={displayData?.reg100_mgtImage || displayData?.mgtImage} 
-                fullWidth
-                isEditMode={isEditMode}
-                onChange={(val) => handleFieldChange('reg100_mgtImage', val)}
-                fieldName="reg100_mgtImage"
-              />
+              <Field label="ลิงก์รูปภาพผู้บริหาร (URL)" value={displayData?.reg100_mgtImage || displayData?.mgtImage} fullWidth isEditMode={isEditMode} onChange={(val) => handleFieldChange('reg100_mgtImage', val)} fieldName="reg100_mgtImage" />
             ) : (
               (submission.reg100_mgtImage || submission.mgtImage) && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">รูปภาพผู้บริหาร</label>
-                  <div 
-                    onClick={() => handleImageClick(
-                      (submission.reg100_mgtImage || submission.mgtImage).startsWith('http') 
-                        ? (submission.reg100_mgtImage || submission.mgtImage)
-                        : (submission.reg100_mgtImage || submission.mgtImage).startsWith('/uploads/') 
-                          ? (submission.reg100_mgtImage || submission.mgtImage).replace('/uploads/', '/api/uploads/')
-                          : (submission.reg100_mgtImage || submission.mgtImage)
-                    )}
-                    className="cursor-pointer hover:opacity-80 transition-opacity inline-block"
-                  >
-                    <img 
-                      src={(submission.reg100_mgtImage || submission.mgtImage).startsWith('http') 
-                        ? (submission.reg100_mgtImage || submission.mgtImage) 
-                        : (submission.reg100_mgtImage || submission.mgtImage).startsWith('/uploads/') 
-                          ? (submission.reg100_mgtImage || submission.mgtImage).replace('/uploads/', '/api/uploads/')
-                          : (submission.reg100_mgtImage || submission.mgtImage)
-                      }
-                      alt="ผู้บริหาร" 
-                      className="rounded-lg border border-gray-300 w-[200px] h-[200px] object-cover"
-                    />
+                  <div onClick={() => handleImageClick(resolveImageUrl(submission.reg100_mgtImage || submission.mgtImage))} className="cursor-pointer hover:opacity-80 transition-opacity inline-block">
+                    <img src={resolveImageUrl(submission.reg100_mgtImage || submission.mgtImage)} alt="ผู้บริหาร" className="rounded-lg border border-gray-300 w-[200px] h-[200px] object-cover" />
                   </div>
                 </div>
               )
@@ -751,687 +451,449 @@ export default function Register100DetailView({ id, hideScores = false, readOnly
           </div>
         </StepSection>
 
-        {/* Step 3: แผนการสอน */}
-        <StepSection title="Step 3: แผนการสอนดนตรีไทย" stepNumber={3}>
+        {/* ── Step 3 ── */}
+        <StepSection title="สภาวการณ์" stepNumber={3}>
           <div className="space-y-6">
-            <div>
-              <h4 className="font-semibold text-gray-900 mb-3">สภาวการณ์การเรียนการสอน</h4>
-              {(isEditMode ? displayData?.reg100_currentMusicTypes : submission.reg100_currentMusicTypes) && (isEditMode ? displayData?.reg100_currentMusicTypes : submission.reg100_currentMusicTypes).length > 0 ? (
-                (isEditMode ? displayData?.reg100_currentMusicTypes : submission.reg100_currentMusicTypes).map((item: any, index: number) => (
-                  <div key={index} className="bg-gray-50 p-4 rounded-lg mb-3 relative">
-                    <div className="grid grid-cols-2 gap-4">
-                      <Field 
-                        label="ระดับชั้น" 
-                        value={item.grade} 
-                        isEditMode={isEditMode}
-                        onChange={(val) => handleArrayFieldChange('reg100_currentMusicTypes', index, 'grade', val)}
-                        fieldName="grade"
-                      />
-                      <Field 
-                        label="รายละเอียด" 
-                        value={item.details} 
-                        isEditMode={isEditMode}
-                        onChange={(val) => handleArrayFieldChange('reg100_currentMusicTypes', index, 'details', val)}
-                        fieldName="details"
-                      />
-                    </div>
-                    {isEditMode && (
-                      <button
-                        onClick={() => handleRemoveArrayItem('reg100_currentMusicTypes', index)}
-                        className="absolute top-2 right-2 text-red-500 hover:text-red-700"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    )}
-                  </div>
-                ))
-              ) : (
-                <p className="text-gray-500">ไม่มีข้อมูล</p>
+            <ArraySection
+              title="สภาวการณ์การเรียนการสอน"
+              items={isEditMode ? displayData?.reg100_currentMusicTypes : submission.reg100_currentMusicTypes}
+              isEditMode={isEditMode}
+              onAdd={() => handleAddArrayItem('reg100_currentMusicTypes', { grade: '', details: '' })}
+              onRemove={(i) => handleRemoveArrayItem('reg100_currentMusicTypes', i)}
+              renderItem={(item, i) => (
+                <div className="grid grid-cols-2 gap-4">
+                  <Field label="ระดับชั้น" value={item.grade} isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_currentMusicTypes', i, 'grade', val)} fieldName="grade" />
+                  <Field label="รายละเอียด" value={item.details} isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_currentMusicTypes', i, 'details', val)} fieldName="details" />
+                </div>
               )}
-              {isEditMode && (
-                <button
-                  onClick={() => handleAddArrayItem('reg100_currentMusicTypes', { grade: '', details: '' })}
-                  className="mt-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg hover:from-blue-600 hover:to-cyan-600 transition-all flex items-center gap-2"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                  เพิ่มรายการ
-                </button>
+            />
+            <ArraySection
+              title="ความพร้อมเครื่องดนตรี"
+              items={isEditMode ? displayData?.reg100_readinessItems : submission.reg100_readinessItems}
+              isEditMode={isEditMode}
+              onAdd={() => handleAddArrayItem('reg100_readinessItems', { instrumentName: '', quantity: '', note: '' })}
+              onRemove={(i) => handleRemoveArrayItem('reg100_readinessItems', i)}
+              renderItem={(item, i) => (
+                <div className="grid grid-cols-3 gap-4">
+                  <Field label="ชื่อเครื่องดนตรี" value={item.instrumentName} isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_readinessItems', i, 'instrumentName', val)} fieldName="instrumentName" />
+                  <Field label="จำนวน" value={item.quantity} isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_readinessItems', i, 'quantity', val)} fieldName="quantity" />
+                  <Field label="หมายเหตุ" value={item.note} isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_readinessItems', i, 'note', val)} fieldName="note" />
+                </div>
               )}
-            </div>
-
-            <div>
-              <h4 className="font-semibold text-gray-900 mb-3">ความพร้อมเครื่องดนตรี</h4>
-              {(isEditMode ? displayData?.reg100_readinessItems : submission.reg100_readinessItems) && (isEditMode ? displayData?.reg100_readinessItems : submission.reg100_readinessItems).length > 0 ? (
-                (isEditMode ? displayData?.reg100_readinessItems : submission.reg100_readinessItems).map((item: any, index: number) => (
-                  <div key={index} className="bg-gray-50 p-4 rounded-lg mb-3 relative">
-                    <div className="grid grid-cols-3 gap-4">
-                      <Field 
-                        label="ชื่อเครื่องดนตรี" 
-                        value={item.instrumentName} 
-                        isEditMode={isEditMode}
-                        onChange={(val) => handleArrayFieldChange('reg100_readinessItems', index, 'instrumentName', val)}
-                        fieldName="instrumentName"
-                      />
-                      <Field 
-                        label="จำนวน" 
-                        value={item.quantity} 
-                        isEditMode={isEditMode}
-                        onChange={(val) => handleArrayFieldChange('reg100_readinessItems', index, 'quantity', val)}
-                        fieldName="quantity"
-                      />
-                      <Field 
-                        label="หมายเหตุ" 
-                        value={item.note} 
-                        isEditMode={isEditMode}
-                        onChange={(val) => handleArrayFieldChange('reg100_readinessItems', index, 'note', val)}
-                        fieldName="note"
-                      />
-                    </div>
-                    {isEditMode && (
-                      <button
-                        onClick={() => handleRemoveArrayItem('reg100_readinessItems', index)}
-                        className="absolute top-2 right-2 text-red-500 hover:text-red-700"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    )}
-                  </div>
-                ))
-              ) : (
-                <p className="text-gray-500">ไม่มีข้อมูล</p>
-              )}
-              {isEditMode && (
-                <button
-                  onClick={() => handleAddArrayItem('reg100_readinessItems', { instrumentName: '', quantity: '', note: '' })}
-                  className="mt-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg hover:from-blue-600 hover:to-cyan-600 transition-all flex items-center gap-2"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                  เพิ่มรายการ
-                </button>
-              )}
-            </div>
+            />
           </div>
         </StepSection>
 
-        {/* Step 4: ผู้สอน */}
-        <StepSection title="Step 4: ผู้สอนดนตรีไทย" stepNumber={4}>
+        {/* ── Step 4 ── */}
+        <StepSection title="ผู้สอนดนตรีไทย" stepNumber={4}>
           <div className="space-y-6">
-            <div>
-              <h4 className="font-semibold text-gray-900 mb-3">รายชื่อครู</h4>
-              {(isEditMode ? displayData?.reg100_thaiMusicTeachers : submission.reg100_thaiMusicTeachers) && (isEditMode ? displayData?.reg100_thaiMusicTeachers : submission.reg100_thaiMusicTeachers).length > 0 ? (
-                (isEditMode ? displayData?.reg100_thaiMusicTeachers : submission.reg100_thaiMusicTeachers).map((teacher: any, index: number) => (
-                  <div key={index} className="bg-gray-50 p-4 rounded-lg mb-3 relative">
-                    <div className="grid grid-cols-2 gap-4">
-                      <SelectField 
-                        label="คุณลักษณะ" 
-                        value={teacher.teacherQualification}
-                        options={[
-                          'ครูผู้สอนดนตรีไทยในโรงเรียนที่สำเร็จการศึกษาดนตรีไทย',
-                          'ครูภูมิปัญญาในท้องถิ่น',
-                          'ผู้ทรงคุณวุฒิ ด้านการสอนดนตรีไทย',
-                          'วิทยากร/บุคคลภายนอก ที่มาร่วมสอนดนตรีไทยในโรงเรียน'
-                        ]}
-                        isEditMode={isEditMode}
-                        onChange={(val) => handleArrayFieldChange('reg100_thaiMusicTeachers', index, 'teacherQualification', val)}
-                        fieldName="teacherQualification"
-                        required={true}
-                      />
-                      <Field 
-                        label="ชื่อ-นามสกุล" 
-                        value={teacher.teacherFullName} 
-                        isEditMode={isEditMode}
-                        onChange={(val) => handleArrayFieldChange('reg100_thaiMusicTeachers', index, 'teacherFullName', val)}
-                        fieldName="teacherFullName"
-                      />
-                      <Field 
-                        label="ตำแหน่ง" 
-                        value={teacher.teacherPosition} 
-                        isEditMode={isEditMode}
-                        onChange={(val) => handleArrayFieldChange('reg100_thaiMusicTeachers', index, 'teacherPosition', val)}
-                        fieldName="teacherPosition"
-                      />
-                      <Field 
-                        label="วุฒิการศึกษา" 
-                        value={teacher.teacherEducation} 
-                        isEditMode={isEditMode}
-                        onChange={(val) => handleArrayFieldChange('reg100_thaiMusicTeachers', index, 'teacherEducation', val)}
-                        fieldName="teacherEducation"
-                      />
-                      <Field 
-                        label="โทรศัพท์" 
-                        value={teacher.teacherPhone} 
-                        isEditMode={isEditMode}
-                        onChange={(val) => handleArrayFieldChange('reg100_thaiMusicTeachers', index, 'teacherPhone', val)}
-                        fieldName="teacherPhone"
-                      />
-                      <Field 
-                        label="อีเมล" 
-                        value={teacher.teacherEmail} 
-                        isEditMode={isEditMode}
-                        onChange={(val) => handleArrayFieldChange('reg100_thaiMusicTeachers', index, 'teacherEmail', val)}
-                        fieldName="teacherEmail"
-                      />
-                    </div>
-                    
-                    {/* Image Section */}
-                    <div className="mt-4">
-                      {isEditMode ? (
-                        <Field 
-                          label="ลิงก์รูปภาพครู (URL)" 
-                          value={teacher.teacherImage} 
-                          fullWidth
-                          isEditMode={isEditMode}
-                          onChange={(val) => handleArrayFieldChange('reg100_thaiMusicTeachers', index, 'teacherImage', val)}
-                          fieldName="teacherImage"
-                        />
-                      ) : (
-                        teacher.teacherImage && (
+            <ArraySection
+              title="รายชื่อครู"
+              items={isEditMode ? displayData?.reg100_thaiMusicTeachers : submission.reg100_thaiMusicTeachers}
+              isEditMode={isEditMode}
+              addLabel="เพิ่มครู"
+              onAdd={() => handleAddArrayItem('reg100_thaiMusicTeachers', { teacherQualification: '', teacherFullName: '', teacherPosition: '', teacherPhone: '', teacherEmail: '', teacherImage: '' })}
+              onRemove={(i) => handleRemoveArrayItem('reg100_thaiMusicTeachers', i)}
+              renderItem={(teacher, i) => (
+                <>
+                  <div className="mb-2"><h5 className="text-lg font-semibold text-gray-800">ครูคนที่ {i + 1}</h5></div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <Field label="ชื่อ-นามสกุล" value={teacher.teacherFullName} isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'teacherFullName', val)} fieldName="teacherFullName" />
+                    <SelectField
+                      label="คุณลักษณะ"
+                      value={teacher.teacherQualification}
+                      options={['ครูผู้สอนดนตรีไทยในโรงเรียนที่สำเร็จการศึกษาดนตรีไทย', 'ครูภูมิปัญญาในท้องถิ่น', 'ผู้ทรงคุณวุฒิ ด้านการสอนดนตรีไทย', 'วิทยากร/บุคคลภายนอก ที่มาร่วมสอนดนตรีไทยในโรงเรียน']}
+                      isEditMode={isEditMode}
+                      onChange={(val) => handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'teacherQualification', val)}
+                      fieldName="teacherQualification"
+                      required
+                    />
+                    <Field label="โทรศัพท์" value={teacher.teacherPhone} isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'teacherPhone', val)} fieldName="teacherPhone" />
+                    <Field label="ตำแหน่ง" value={teacher.teacherPosition} isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'teacherPosition', val)} fieldName="teacherPosition" />
+                    <Field label="ทักษะ ความรู้ ความสามารถ ในการสอนภาคปฏิบัติดนตรีไทย" value={teacher.teacherAbility} isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'teacherAbility', val)} fieldName="reg100_obstacles" />
+                    <Field label="อีเมล" value={teacher.teacherEmail} isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'teacherEmail', val)} fieldName="teacherEmail" />
+                    <div className="col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">วุฒิการศึกษา</label>
+                      <div className="space-y-2">
+                        {teacher.musicInstituteEducation?.length > 0 && (
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">รูปภาพครู</label>
-                            <div 
-                              onClick={() => handleImageClick(
-                                teacher.teacherImage.startsWith('http') 
-                                  ? teacher.teacherImage 
-                                  : teacher.teacherImage.startsWith('/uploads/') 
-                                    ? teacher.teacherImage.replace('/uploads/', '/api/uploads/')
-                                    : teacher.teacherImage
-                              )}
-                              className="cursor-pointer hover:opacity-80 transition-opacity inline-block"
-                            >
-                              <img 
-                                src={teacher.teacherImage.startsWith('http') 
-                                  ? teacher.teacherImage 
-                                  : teacher.teacherImage.startsWith('/uploads/') 
-                                    ? teacher.teacherImage.replace('/uploads/', '/api/uploads/')
-                                    : teacher.teacherImage
-                                }
-                                alt={`ครู ${index + 1}`}
-                                className="rounded-lg border border-gray-300 w-[150px] h-[150px] object-cover"
-                              />
-                            </div>
+                            <h5 className="text-sm font-medium text-gray-800 mb-1">การศึกษาจากสถาบันดนตรี:</h5>
+                            {teacher.musicInstituteEducation.map((edu: any, ei: number) => (
+                              <div key={ei} className="text-sm text-gray-600 ml-2">• รุ่นจบ: {edu.graduationYear || '-'} | สาขา: {edu.major || '-'} | ปีที่สำเร็จ: {edu.completionYear || '-'}</div>
+                            ))}
                           </div>
-                        )
-                      )}
+                        )}
+                        {teacher.otherEducation?.length > 0 && (
+                          <div>
+                            <h5 className="text-sm font-medium text-gray-800 mb-1">การศึกษาจากแหล่งอื่น:</h5>
+                            {teacher.otherEducation.map((edu: any, ei: number) => (
+                              <div key={ei} className="text-sm text-gray-600 ml-2">• รุ่นจบ: {edu.graduationYear || '-'} | สาขา: {edu.major || '-'} | ปีที่สำเร็จ: {edu.completionYear || '-'}</div>
+                            ))}
+                          </div>
+                        )}
+                        {!teacher.musicInstituteEducation?.length && !teacher.otherEducation?.length && (
+                          <div className="text-sm text-gray-500">ไม่มีข้อมูลการศึกษา</div>
+                        )}
+                      </div>
                     </div>
-                    
-                    {isEditMode && (
-                      <button
-                        onClick={() => handleRemoveArrayItem('reg100_thaiMusicTeachers', index)}
-                        className="absolute top-2 right-2 text-red-500 hover:text-red-700"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
+                  </div>
+                  <div className="mt-4">
+                    {isEditMode ? (
+                      <Field label="ลิงก์รูปภาพครู (URL)" value={teacher.teacherImage} fullWidth isEditMode onChange={(val) => handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'teacherImage', val)} fieldName="teacherImage" />
+                    ) : (
+                      teacher.teacherImage && (
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">รูปภาพครู</label>
+                          <div onClick={() => handleImageClick(resolveImageUrl(teacher.teacherImage))} className="cursor-pointer hover:opacity-80 transition-opacity inline-block">
+                            <img src={resolveImageUrl(teacher.teacherImage)} alt={`ครู ${i + 1}`} className="rounded-lg border border-gray-300 w-[150px] h-[150px] object-cover" />
+                          </div>
+                        </div>
+                      )
                     )}
                   </div>
-                ))
-              ) : (
-                <p className="text-gray-500">ไม่มีข้อมูล</p>
+                </>
               )}
-              {isEditMode && (
-                <button
-                  onClick={() => handleAddArrayItem('reg100_thaiMusicTeachers', { 
-                    teacherQualification: '', 
-                    teacherFullName: '', 
-                    teacherPosition: '', 
-                    teacherEducation: '', 
-                    teacherPhone: '', 
-                    teacherEmail: '',
-                    teacherImage: ''
-                  })}
-                  className="mt-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg hover:from-blue-600 hover:to-cyan-600 transition-all flex items-center gap-2"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                  เพิ่มครู
-                </button>
-              )}
-            </div>
+            />
+          </div>
+        </StepSection>
 
-            <div>
-              <h4 className="font-semibold text-gray-900 mb-3">การเรียนการสอน</h4>
-              <div className="grid grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg">
-                <CheckboxField 
-                  label="วิชาบังคับ" 
-                  value={displayData?.reg100_isCompulsorySubject} 
-                  isEditMode={isEditMode}
-                  onChange={(val) => handleFieldChange('reg100_isCompulsorySubject', val)}
-                  fieldName="reg100_isCompulsorySubject"
-                />
-                <CheckboxField 
-                  label="สอนหลังเลิกเรียน" 
-                  value={displayData?.reg100_hasAfterSchoolTeaching} 
-                  isEditMode={isEditMode}
-                  onChange={(val) => handleFieldChange('reg100_hasAfterSchoolTeaching', val)}
-                  fieldName="reg100_hasAfterSchoolTeaching"
-                />
-                <CheckboxField 
-                  label="วิชาเลือก" 
-                  value={displayData?.reg100_hasElectiveSubject} 
-                  isEditMode={isEditMode}
-                  onChange={(val) => handleFieldChange('reg100_hasElectiveSubject', val)}
-                  fieldName="reg100_hasElectiveSubject"
-                />
-                <CheckboxField 
-                  label="หลักสูตรท้องถิ่น" 
-                  value={displayData?.reg100_hasLocalCurriculum} 
-                  isEditMode={isEditMode}
-                  onChange={(val) => handleFieldChange('reg100_hasLocalCurriculum', val)}
-                  fieldName="reg100_hasLocalCurriculum"
-                />
+        {/* ── Step 5 ── */}
+        <StepSection title="หลักสูตร" stepNumber={5}>
+          <div className="space-y-6">
+            {[
+              { checkField: 'reg100_isCompulsorySubject', label: 'เป็นวิชาบังคับในชั้นเรียน', dataField: 'reg100_compulsoryCurriculum', title: 'รายละเอียดวิชาบังคับ' },
+              { checkField: 'reg100_hasElectiveSubject', label: 'มีวิชาเลือก/วิชาเรียนเพิ่มเติม/ชุมนุม', dataField: 'reg100_electiveCurriculum', title: 'รายละเอียดวิชาเลือก' },
+              { checkField: 'reg100_hasLocalCurriculum', label: 'มีหลักสูตรวิชาของท้องถิ่น', dataField: 'reg100_localCurriculum', title: 'รายละเอียดหลักสูตรท้องถิ่น' },
+            ].map(({ checkField, label, dataField, title }) => (
+              <div key={checkField}>
+                <CheckboxField label={label} value={displayData?.[checkField]} isEditMode={isEditMode} onChange={(val) => handleFieldChange(checkField, val)} fieldName={checkField} />
+                {displayData?.[dataField]?.length > 0 && (
+                  <div className="ml-6 mt-2">
+                    <h5 className="font-medium text-gray-800 mb-2">{title}</h5>
+                    {displayData[dataField].map((c: any, i: number) => (
+                      <div key={i} className="bg-gray-50 p-3 rounded border mb-2 grid grid-cols-2 gap-3">
+                        <Field label="ระดับชั้น" value={c.gradeLevel} isEditMode={false} />
+                        <Field label="จำนวนนักเรียน (คน)" value={c.studentCount} isEditMode={false} />
+                        <Field label="ชั่วโมง/ภาคการศึกษา" value={c.hoursPerSemester} isEditMode={false} />
+                        <Field label="ชั่วโมง/ปีการศึกษา" value={c.hoursPerYear} isEditMode={false} />
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
+            ))}
+            <div>
+              <CheckboxField label="นอกเวลาราชการ" value={displayData?.reg100_hasAfterSchoolTeaching} isEditMode={isEditMode} onChange={(val) => handleFieldChange('reg100_hasAfterSchoolTeaching', val)} fieldName="reg100_hasAfterSchoolTeaching" />
+              {displayData?.reg100_afterSchoolSchedule?.length > 0 && (
+                <div className="ml-6 mt-2">
+                  <h5 className="font-medium text-gray-800 mb-2">ตารางเรียนนอกเวลา</h5>
+                  {displayData.reg100_afterSchoolSchedule.map((s: any, i: number) => (
+                    <div key={i} className="bg-gray-50 p-3 rounded border mb-2 grid grid-cols-2 gap-3">
+                      <Field label="วัน" value={s.day} isEditMode={false} />
+                      <Field label="สถานที่" value={s.location} isEditMode={false} />
+                      <Field label="เวลาเริ่ม" value={s.timeFrom} isEditMode={false} />
+                      <Field label="เวลาสิ้นสุด" value={s.timeTo} isEditMode={false} />
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-
+          </div>
             <Field label="สถานที่สอน" value={displayData?.reg100_teachingLocation} fullWidth isEditMode={isEditMode} onChange={(val) => handleFieldChange('reg100_teachingLocation', val)} fieldName="reg100_teachingLocation" />
-          </div>
         </StepSection>
 
-        {/* Step 5: การสนับสนุน */}
-        <StepSection title="Step 5: การสนับสนุนและรางวัล" stepNumber={5}>
-          <div className="space-y-6">
-            <div>
-              <h4 className="font-semibold text-gray-900 mb-3">การสนับสนุนจากองค์กร</h4>
-              <CheckboxField 
-                label="มีการสนับสนุนจากองค์กร" 
-                value={displayData?.reg100_hasSupportFromOrg} 
-                isEditMode={isEditMode}
-                onChange={(val) => handleFieldChange('reg100_hasSupportFromOrg', val)}
-                fieldName="reg100_hasSupportFromOrg"
-              />
-              {(isEditMode ? displayData?.reg100_supportFromOrg : submission.reg100_supportFromOrg) && (isEditMode ? displayData?.reg100_supportFromOrg : submission.reg100_supportFromOrg).length > 0 && (
-                <div className="mt-3 space-y-3">
-                  {(isEditMode ? displayData?.reg100_supportFromOrg : submission.reg100_supportFromOrg).map((item: any, index: number) => (
-                    <div key={index} className="bg-gray-50 p-4 rounded-lg relative">
-                      <Field 
-                        label="องค์กร" 
-                        value={item.organization} 
-                        isEditMode={isEditMode}
-                        onChange={(val) => handleArrayFieldChange('reg100_supportFromOrg', index, 'organization', val)}
-                        fieldName="organization"
-                      />
-                      <Field 
-                        label="รายละเอียด" 
-                        value={item.details} 
-                        isEditMode={isEditMode}
-                        onChange={(val) => handleArrayFieldChange('reg100_supportFromOrg', index, 'details', val)}
-                        fieldName="details"
-                      />
-                      <Field 
-                        label="ลิงก์หลักฐาน" 
-                        value={item.evidenceLink} 
-                        isEditMode={isEditMode}
-                        onChange={(val) => handleArrayFieldChange('reg100_supportFromOrg', index, 'evidenceLink', val)}
-                        fieldName="evidenceLink"
-                      />
-                      {isEditMode && (
-                        <button
-                          onClick={() => handleRemoveArrayItem('reg100_supportFromOrg', index)}
-                          className="absolute top-2 right-2 text-red-500 hover:text-red-700"
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                          </svg>
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-              {isEditMode && (
-                <button
-                  onClick={() => handleAddArrayItem('reg100_supportFromOrg', { organization: '', details: '', evidenceLink: '' })}
-                  className="mt-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg hover:from-blue-600 hover:to-cyan-600 transition-all flex items-center gap-2"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                  เพิ่มรายการ
-                </button>
-              )}
-            </div>
+        {/* ── Step 6 ── */}
+        <StepSection title="การสนับสนุน" stepNumber={6}>
+          <div className="space-y-8">
 
+            {/* 1. นโยบาย แนวทางการส่งเสริมดนตรีไทยในสถานศึกษา */}
             <div>
-              <h4 className="font-semibold text-gray-900 mb-3">การสนับสนุนจากภายนอก</h4>
-              <CheckboxField 
-                label="มีการสนับสนุนจากภายนอก" 
-                value={displayData?.reg100_hasSupportFromExternal} 
+              <h4 className="font-semibold text-gray-900 mb-3">นโยบาย แนวทางการส่งเสริมดนตรีไทยในสถานศึกษา</h4>
+              <p className="text-sm text-gray-600 mb-3">ผู้มีส่วนส่งเสริม สนับสนุนการเรียนการสอนดนตรีไทย (ระบุนโยบายการจัดการเรียนการสอนดนตรีไทยของโรงเรียน วิธีการใช้ความสนับสนุน)</p>
+              <ArraySection
+                items={isEditMode ? displayData?.reg100_supportFactors : submission.reg100_supportFactors}
                 isEditMode={isEditMode}
-                onChange={(val) => handleFieldChange('reg100_hasSupportFromExternal', val)}
-                fieldName="reg100_hasSupportFromExternal"
-              />
-              {(isEditMode ? displayData?.reg100_supportFromExternal : submission.reg100_supportFromExternal) && (isEditMode ? displayData?.reg100_supportFromExternal : submission.reg100_supportFromExternal).length > 0 && (
-                <div className="mt-3 space-y-3">
-                  {(isEditMode ? displayData?.reg100_supportFromExternal : submission.reg100_supportFromExternal).map((item: any, index: number) => (
-                    <div key={index} className="bg-gray-50 p-4 rounded-lg relative">
-                      <Field 
-                        label="องค์กร" 
-                        value={item.organization} 
-                        isEditMode={isEditMode}
-                        onChange={(val) => handleArrayFieldChange('reg100_supportFromExternal', index, 'organization', val)}
-                        fieldName="organization"
-                      />
-                      <Field 
-                        label="รายละเอียด" 
-                        value={item.details} 
-                        isEditMode={isEditMode}
-                        onChange={(val) => handleArrayFieldChange('reg100_supportFromExternal', index, 'details', val)}
-                        fieldName="details"
-                      />
-                      <Field 
-                        label="ลิงก์หลักฐาน" 
-                        value={item.evidenceLink} 
-                        isEditMode={isEditMode}
-                        onChange={(val) => handleArrayFieldChange('reg100_supportFromExternal', index, 'evidenceLink', val)}
-                        fieldName="evidenceLink"
-                      />
-                      {isEditMode && (
-                        <button
-                          onClick={() => handleRemoveArrayItem('reg100_supportFromExternal', index)}
-                          className="absolute top-2 right-2 text-red-500 hover:text-red-700"
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                          </svg>
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-              {isEditMode && (
-                <button
-                  onClick={() => handleAddArrayItem('reg100_supportFromExternal', { organization: '', details: '', evidenceLink: '' })}
-                  className="mt-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg hover:from-blue-600 hover:to-cyan-600 transition-all flex items-center gap-2"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                  เพิ่มรายการ
-                </button>
-              )}
-            </div>
-
-            <div>
-              <h4 className="font-semibold text-gray-900 mb-3">รางวัล</h4>
-              {(isEditMode ? displayData?.reg100_awards : submission.reg100_awards) && (isEditMode ? displayData?.reg100_awards : submission.reg100_awards).length > 0 ? (
-                (isEditMode ? displayData?.reg100_awards : submission.reg100_awards).map((award: any, index: number) => (
-                  <div key={index} className="bg-gray-50 p-4 rounded-lg mb-3 relative">
-                    <div className="grid grid-cols-2 gap-4">
-                      <SelectField 
-                        label="ระดับรางวัล" 
-                        value={award.awardLevel}
-                        options={[
-                          'ระดับอำเภอ (5 คะแนน)',
-                          'ระดับจังหวัด (10 คะแนน)',
-                          'ระดับภาค (15 คะแนน)',
-                          'ระดับประเทศ (20 คะแนน)'
-                        ]}
-                        isEditMode={isEditMode}
-                        onChange={(val) => handleArrayFieldChange('reg100_awards', index, 'awardLevel', val)}
-                        fieldName="awardLevel"
-                        required={true}
-                      />
-                      <Field 
-                        label="ชื่อรางวัล" 
-                        value={award.awardName} 
-                        isEditMode={isEditMode}
-                        onChange={(val) => handleArrayFieldChange('reg100_awards', index, 'awardName', val)}
-                        fieldName="awardName"
-                      />
-                      <Field 
-                        label="วันที่ได้รับ" 
-                        value={award.awardDate} 
-                        isEditMode={isEditMode}
-                        onChange={(val) => handleArrayFieldChange('reg100_awards', index, 'awardDate', val)}
-                        fieldName="awardDate"
-                      />
-                      <Field 
-                        label="ลิงก์หลักฐาน" 
-                        value={award.awardEvidenceLink} 
-                        isEditMode={isEditMode}
-                        onChange={(val) => handleArrayFieldChange('reg100_awards', index, 'awardEvidenceLink', val)}
-                        fieldName="awardEvidenceLink"
-                      />
-                    </div>
-                    {isEditMode && (
-                      <button
-                        onClick={() => handleRemoveArrayItem('reg100_awards', index)}
-                        className="absolute top-2 right-2 text-red-500 hover:text-red-700"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    )}
+                onAdd={() => handleAddArrayItem('reg100_supportFactors', { sup_supportByAdmin: '', sup_supportByDescription: '' })}
+                onRemove={(i) => handleRemoveArrayItem('reg100_supportFactors', i)}
+                renderItem={(item, i) => (
+                  <div className="space-y-3">
+                    <Field label="องค์กร/หน่วยงาน/บุคคลที่ให้การส่งเสริม สนับสนุน" value={item.sup_supportByAdmin} fullWidth isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_supportFactors', i, 'sup_supportByAdmin', val)} fieldName="sup_supportByAdmin" />
+                    <Field label="บรรยาย และอธิบายสนับสนุน" value={item.sup_supportByDescription} fullWidth isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_supportFactors', i, 'sup_supportByDescription', val)} fieldName="sup_supportByDescription" />
                   </div>
-                ))
-              ) : (
-                <p className="text-gray-500">ไม่มีข้อมูล</p>
-              )}
-              {isEditMode && (
-                <button
-                  onClick={() => handleAddArrayItem('reg100_awards', { awardLevel: '', awardName: '', awardDate: '', awardEvidenceLink: '' })}
-                  className="mt-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg hover:from-blue-600 hover:to-cyan-600 transition-all flex items-center gap-2"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                  เพิ่มรางวัล
-                </button>
-              )}
+                )}
+              />
             </div>
 
-            <Field label="กรอบหลักสูตร" value={displayData?.reg100_curriculumFramework} fullWidth isEditMode={isEditMode} onChange={(val) => handleFieldChange('reg100_curriculumFramework', val)} fieldName="reg100_curriculumFramework" />
-            <Field label="ผลการเรียนรู้" value={displayData?.reg100_learningOutcomes} fullWidth isEditMode={isEditMode} onChange={(val) => handleFieldChange('reg100_learningOutcomes', val)} fieldName="reg100_learningOutcomes" />
-            <Field label="บริบทการจัดการ" value={displayData?.reg100_managementContext} fullWidth isEditMode={isEditMode} onChange={(val) => handleFieldChange('reg100_managementContext', val)} fieldName="reg100_managementContext" />
-          </div>
-        </StepSection>
+            {/* 2. การสนับสนุนวัสดุ อุปกรณ์ หรืองบประมาณ */}
+            <div className="space-y-4">
+              <h4 className="font-semibold text-gray-900 mb-3">การสนับสนุนวัสดุ อุปกรณ์ หรืองบประมาณ จากทั้งภายในและภายนอกสถานศึกษา</h4>
 
-        {/* Step 6: สื่อ */}
-        <StepSection title="Step 6: สื่อและวิดีโอ" stepNumber={6}>
-          <div className="grid grid-cols-2 gap-6">
-            <Field label="ลิงก์แกลเลอรี่รูปภาพ" value={displayData?.reg100_photoGalleryLink} isEditMode={isEditMode} onChange={(val) => handleFieldChange('reg100_photoGalleryLink', val)} fieldName="reg100_photoGalleryLink" />
-            <Field label="ลิงก์วิดีโอ" value={displayData?.reg100_videoLink} isEditMode={isEditMode} onChange={(val) => handleFieldChange('reg100_videoLink', val)} fieldName="reg100_videoLink" />
-          </div>
-        </StepSection>
+              <div>
+                <CheckboxField label="ได้รับการสนับสนุนจากต้นสังกัด (บุคคล/หน่วยงานภายใน)" value={displayData?.reg100_hasSupportFromOrg} isEditMode={isEditMode} onChange={(val) => handleFieldChange('reg100_hasSupportFromOrg', val)} fieldName="reg100_hasSupportFromOrg" />
+                {displayData?.reg100_hasSupportFromOrg && (
+                  <ArraySection
+                    items={isEditMode ? displayData?.reg100_supportFromOrg : submission.reg100_supportFromOrg}
+                    isEditMode={isEditMode}
+                    onAdd={() => handleAddArrayItem('reg100_supportFromOrg', { organization: '', details: '', evidenceLink: '' })}
+                    onRemove={(i) => handleRemoveArrayItem('reg100_supportFromOrg', i)}
+                    renderItem={(item, i) => (
+                      <div className="space-y-3">
+                        <Field label="บุคคล/หน่วยงาน" value={item.organization} fullWidth isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_supportFromOrg', i, 'organization', val)} fieldName="organization" />
+                        <Field label="รายละเอียด" value={item.details} fullWidth isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_supportFromOrg', i, 'details', val)} fieldName="details" />
+                        <Field label="หลักฐาน/ภาพถ่าย (Link/URL สำหรับ Share Drive)" value={item.evidenceLink} fullWidth isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_supportFromOrg', i, 'evidenceLink', val)} fieldName="evidenceLink" />
+                      </div>
+                    )}
+                  />
+                )}
+              </div>
 
-        {/* Step 7: กิจกรรม */}
-        <StepSection title="Step 7: กิจกรรมและการเผยแพร่" stepNumber={7}>
-          <div className="space-y-6">
-            <ActivityList 
-              title="กิจกรรมภายในจังหวัด (ภายใน)" 
-              activities={isEditMode ? displayData?.reg100_activitiesWithinProvinceInternal : submission.reg100_activitiesWithinProvinceInternal}
-              isEditMode={isEditMode}
-              arrayField="reg100_activitiesWithinProvinceInternal"
-              onFieldChange={handleArrayFieldChange}
-              onAdd={() => handleAddArrayItem('reg100_activitiesWithinProvinceInternal', { activityName: '', activityDate: '', evidenceLink: '' })}
-              onRemove={(index) => handleRemoveArrayItem('reg100_activitiesWithinProvinceInternal', index)}
-            />
-            <ActivityList 
-              title="กิจกรรมภายในจังหวัด (ภายนอก)" 
-              activities={isEditMode ? displayData?.reg100_activitiesWithinProvinceExternal : submission.reg100_activitiesWithinProvinceExternal}
-              isEditMode={isEditMode}
-              arrayField="reg100_activitiesWithinProvinceExternal"
-              onFieldChange={handleArrayFieldChange}
-              onAdd={() => handleAddArrayItem('reg100_activitiesWithinProvinceExternal', { activityName: '', activityDate: '', evidenceLink: '' })}
-              onRemove={(index) => handleRemoveArrayItem('reg100_activitiesWithinProvinceExternal', index)}
-            />
-            <ActivityList 
-              title="กิจกรรมนอกจังหวัด" 
-              activities={isEditMode ? displayData?.reg100_activitiesOutsideProvince : submission.reg100_activitiesOutsideProvince}
-              isEditMode={isEditMode}
-              arrayField="reg100_activitiesOutsideProvince"
-              onFieldChange={handleArrayFieldChange}
-              onAdd={() => handleAddArrayItem('reg100_activitiesOutsideProvince', { activityName: '', activityDate: '', evidenceLink: '' })}
-              onRemove={(index) => handleRemoveArrayItem('reg100_activitiesOutsideProvince', index)}
-            />
-          </div>
-        </StepSection>
+              <div>
+                <CheckboxField label="ได้รับการสนับสนุนจากบุคคล/หน่วยงานภายนอก" value={displayData?.reg100_hasSupportFromExternal} isEditMode={isEditMode} onChange={(val) => handleFieldChange('reg100_hasSupportFromExternal', val)} fieldName="reg100_hasSupportFromExternal" />
+                {displayData?.reg100_hasSupportFromExternal && (
+                  <ArraySection
+                    items={isEditMode ? displayData?.reg100_supportFromExternal : submission.reg100_supportFromExternal}
+                    isEditMode={isEditMode}
+                    onAdd={() => handleAddArrayItem('reg100_supportFromExternal', { organization: '', details: '', evidenceLink: '' })}
+                    onRemove={(i) => handleRemoveArrayItem('reg100_supportFromExternal', i)}
+                    renderItem={(item, i) => (
+                      <div className="space-y-3">
+                        <Field label="บุคคล/หน่วยงาน" value={item.organization} fullWidth isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_supportFromExternal', i, 'organization', val)} fieldName="organization" />
+                        <Field label="รายละเอียด" value={item.details} fullWidth isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_supportFromExternal', i, 'details', val)} fieldName="details" />
+                        <Field label="หลักฐาน/ภาพถ่าย (Link/URL สำหรับ Share Drive)" value={item.evidenceLink} fullWidth isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_supportFromExternal', i, 'evidenceLink', val)} fieldName="evidenceLink" />
+                      </div>
+                    )}
+                  />
+                )}
+              </div>
+            </div>
 
-        {/* Step 8: ประชาสัมพันธ์ */}
-        <StepSection title="Step 8: ประชาสัมพันธ์และแหล่งข้อมูล" stepNumber={8}>
-          <div className="space-y-6">
-            <ActivityList 
-              title="กิจกรรมประชาสัมพันธ์" 
-              activities={isEditMode ? displayData?.reg100_prActivities : submission.reg100_prActivities}
-              isEditMode={isEditMode}
-              arrayField="reg100_prActivities"
-              onFieldChange={handleArrayFieldChange}
-              onAdd={() => handleAddArrayItem('reg100_prActivities', { activityName: '', publishDate: '', evidenceLink: '', platform: '' })}
-              onRemove={(index) => handleRemoveArrayItem('reg100_prActivities', index)}
-              hasPlatform={true}
-            />
-
+            {/* 3. ความพร้อมของเครื่องดนตรีกับนักเรียน */}
             <div>
-              <h4 className="font-semibold text-gray-900 mb-3">แหล่งที่มาของข้อมูล</h4>
-              <div className="grid grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg">
-                <CheckboxField 
-                  label="โรงเรียน" 
-                  value={displayData?.reg100_heardFromSchool} 
-                  isEditMode={isEditMode}
-                  onChange={(val) => handleFieldChange('reg100_heardFromSchool', val)}
-                  fieldName="reg100_heardFromSchool"
+              <h4 className="font-semibold text-gray-900 mb-3">ความพร้อมของเครื่องดนตรีกับนักเรียน</h4>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">เพียงพอ</label>
+                  <Field 
+                    label="" 
+                    value={displayData?.reg100_instrumentReadiness_sufficient} 
+                    fullWidth 
+                    isEditMode={isEditMode} 
+                    onChange={(val) => handleFieldChange('reg100_instrumentReadiness_sufficient', val)} 
+                    fieldName="reg100_instrumentReadiness_sufficient" 
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">ไม่เพียงพอ</label>
+                  <Field 
+                    label="" 
+                    value={displayData?.reg100_instrumentReadiness_insufficient} 
+                    fullWidth 
+                    isEditMode={isEditMode} 
+                    onChange={(val) => handleFieldChange('reg100_instrumentReadiness_insufficient', val)} 
+                    fieldName="reg100_instrumentReadiness_insufficient" 
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* 4. กรอบการเรียนการสอน */}
+            <div>
+              <h4 className="font-semibold text-gray-900 mb-3">กรอบการเรียนการสอน</h4>
+              <div className="space-y-4">
+                <Field 
+                  label="สถานศึกษามีกรอบการเรียนการสอนดนตรีไทย หรือสาระการเรียนรู้ที่มีนักเรียนสามารถปฏิบัติได้ (เช่น วิชาพื้นฐาน/วิชาเลือก/เพิ่มเติม ที่สเสริมให้นักเรียนปฏิบัติได้)" 
+                  value={displayData?.reg100_curriculumFramework} 
+                  fullWidth 
+                  isEditMode={isEditMode} 
+                  onChange={(val) => handleFieldChange('reg100_curriculumFramework', val)} 
+                  fieldName="reg100_curriculumFramework" 
                 />
                 <Field 
-                  label="ชื่อโรงเรียน" 
-                  value={displayData?.reg100_heardFromSchoolName} 
-                  isEditMode={isEditMode}
-                  onChange={(val) => handleFieldChange('reg100_heardFromSchoolName', val)}
-                  fieldName="reg100_heardFromSchoolName"
-                />
-                <CheckboxField 
-                  label="Facebook" 
-                  value={displayData?.reg100_DCP_PR_Channel_FACEBOOK} 
-                  isEditMode={isEditMode}
-                  onChange={(val) => handleFieldChange('reg100_DCP_PR_Channel_FACEBOOK', val)}
-                  fieldName="reg100_DCP_PR_Channel_FACEBOOK"
-                />
-                <CheckboxField 
-                  label="YouTube" 
-                  value={displayData?.reg100_DCP_PR_Channel_YOUTUBE} 
-                  isEditMode={isEditMode}
-                  onChange={(val) => handleFieldChange('reg100_DCP_PR_Channel_YOUTUBE', val)}
-                  fieldName="reg100_DCP_PR_Channel_YOUTUBE"
-                />
-                <CheckboxField 
-                  label="TikTok" 
-                  value={displayData?.reg100_DCP_PR_Channel_Tiktok} 
-                  isEditMode={isEditMode}
-                  onChange={(val) => handleFieldChange('reg100_DCP_PR_Channel_Tiktok', val)}
-                  fieldName="reg100_DCP_PR_Channel_Tiktok"
-                />
-                <CheckboxField 
-                  label="สำนักงานวัฒนธรรม" 
-                  value={displayData?.reg100_heardFromCulturalOffice} 
-                  isEditMode={isEditMode}
-                  onChange={(val) => handleFieldChange('reg100_heardFromCulturalOffice', val)}
-                  fieldName="reg100_heardFromCulturalOffice"
+                  label="ผลลัพธ์ในการเรียนการสอนด้านดนตรีไทย" 
+                  value={displayData?.reg100_learningOutcomes} 
+                  fullWidth 
+                  isEditMode={isEditMode} 
+                  onChange={(val) => handleFieldChange('reg100_learningOutcomes', val)} 
+                  fieldName="reg100_learningOutcomes" 
                 />
                 <Field 
-                  label="ชื่อสำนักงาน" 
-                  value={displayData?.reg100_heardFromCulturalOfficeName} 
-                  isEditMode={isEditMode}
-                  onChange={(val) => handleFieldChange('reg100_heardFromCulturalOfficeName', val)}
-                  fieldName="reg100_heardFromCulturalOfficeName"
-                />
-                <CheckboxField 
-                  label="สำนักงานเขตพื้นที่" 
-                  value={displayData?.reg100_heardFromEducationArea} 
-                  isEditMode={isEditMode}
-                  onChange={(val) => handleFieldChange('reg100_heardFromEducationArea', val)}
-                  fieldName="reg100_heardFromEducationArea"
-                />
-                <Field 
-                  label="ชื่อสำนักงาน" 
-                  value={displayData?.reg100_heardFromEducationAreaName} 
-                  isEditMode={isEditMode}
-                  onChange={(val) => handleFieldChange('reg100_heardFromEducationAreaName', val)}
-                  fieldName="reg100_heardFromEducationAreaName"
-                />
-                <Field 
-                  label="จังหวัด" 
-                  value={displayData?.reg100_heardFromEducationAreaProvince} 
-                  isEditMode={isEditMode}
-                  onChange={(val) => handleFieldChange('reg100_heardFromEducationAreaProvince', val)}
-                  fieldName="reg100_heardFromEducationAreaProvince"
-                />
-                <CheckboxField 
-                  label="อื่นๆ" 
-                  value={displayData?.reg100_heardFromOther} 
-                  isEditMode={isEditMode}
-                  onChange={(val) => handleFieldChange('reg100_heardFromOther', val)}
-                  fieldName="reg100_heardFromOther"
-                />
-                <Field 
-                  label="รายละเอียดอื่นๆ" 
-                  value={displayData?.reg100_heardFromOtherDetail} 
-                  isEditMode={isEditMode}
-                  onChange={(val) => handleFieldChange('reg100_heardFromOtherDetail', val)}
-                  fieldName="reg100_heardFromOtherDetail"
+                  label="การบริหารจัดการสอนดนตรีไทยของสถานศึกษา โดยให้ระบุผลสะท้อนจากนักเรียน เช่น ดนตรีไทย/เพลงที่สามารถปฏิบัติให้นักเรียนปฏิบัติได้" 
+                  value={displayData?.reg100_managementContext} 
+                  fullWidth 
+                  isEditMode={isEditMode} 
+                  onChange={(val) => handleFieldChange('reg100_managementContext', val)} 
+                  fieldName="reg100_managementContext" 
                 />
               </div>
             </div>
 
-            <Field 
-              label="ปัญหาอุปสรรค" 
-              value={displayData?.reg100_obstacles} 
-              fullWidth 
-              isEditMode={isEditMode}
-              onChange={(val) => handleFieldChange('reg100_obstacles', val)}
-              fieldName="reg100_obstacles"
-            />
-            <Field 
-              label="ข้อเสนอแนะ" 
-              value={displayData?.reg100_suggestions} 
-              fullWidth 
-              isEditMode={isEditMode}
-              onChange={(val) => handleFieldChange('reg100_suggestions', val)}
-              fieldName="reg100_suggestions"
-            />
-            <CheckboxField 
-              label="รับรองความถูกต้อง" 
-              value={displayData?.reg100_certifiedINFOByAdminName} 
-              isEditMode={isEditMode}
-              onChange={(val) => handleFieldChange('reg100_certifiedINFOByAdminName', val)}
-              fieldName="reg100_certifiedINFOByAdminName"
-            />
           </div>
         </StepSection>
-      </div>
 
-      {/* Delete Confirmation Modal */}
+        {/* ── Step 7 ── */}
+        <StepSection title="ผลงาน" stepNumber={7}>
+          <div className="space-y-6">
+            {/* รางวัลและเกียรติคุณ */}
+            <div>
+              <h4 className="font-semibold text-gray-900 mb-1">รางวัลและเกียรติคุณที่ได้รับในระยะเวลา ๑ ปี ย้อนหลัง</h4>
+              <p className="text-xs text-gray-500 mb-3">อำเภอ 5 คะแนน / จังหวัด 10 คะแนน / ภาค 15 คะแนน / ประเทศ 20 คะแนน</p>
+              <ArraySection
+                items={isEditMode ? displayData?.reg100_awards : submission.reg100_awards}
+                isEditMode={isEditMode}
+                addLabel="เพิ่มรางวัล"
+                onAdd={() => handleAddArrayItem('reg100_awards', { awardLevel: '', awardName: '', awardDate: '', awardEvidenceLink: '' })}
+                onRemove={(i) => handleRemoveArrayItem('reg100_awards', i)}
+                renderItem={(award, i) => (
+                  <div className="grid grid-cols-2 gap-4">
+                    <SelectField label="ระดับรางวัล:" value={award.awardLevel} options={['อำเภอ', 'จังหวัด', 'ภาค', 'ประเทศ']} isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_awards', i, 'awardLevel', val)} fieldName="awardLevel" required />
+                    <Field label="ชื่อรางวัล:" value={award.awardName} isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_awards', i, 'awardName', val)} fieldName="awardName" />
+                    <Field label="วันที่ได้รับรางวัล:" value={award.awardDate} isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_awards', i, 'awardDate', val)} fieldName="awardDate" />
+                    <Field label="ลิงก์หลักฐาน:" value={award.awardEvidenceLink} isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_awards', i, 'awardEvidenceLink', val)} fieldName="awardEvidenceLink" />
+                  </div>
+                )}
+              />
+            </div>
+
+            {/* ภาพถ่ายผลงาน และคลิปวิดีโอ */}
+            <div>
+              <h4 className="font-semibold text-gray-900 mb-4">ภาพถ่ายผลงาน และคลิปวิดีโอที่มีความชัดเจน และสื่อให้เห็นถึงความเป็นโรงเรียนดนตรีไทย ๑๐๐ เปอร์เซ็นต์</h4>
+              
+              <div className="space-y-4">
+                <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                  <h5 className="font-medium text-gray-900 mb-2">ภาพถ่ายผลงาน หรือกิจกรรมเด่น ตั้งแต่ปีการศึกษา 2567 - พฤษภาคม 2568 จำนวน 10 - 20 ภาพ เท่านั้น!!!</h5>
+                  <p className="text-sm text-gray-600 mb-3">Link/URL สำหรับ Share Drive (Google Drive, Dropbox, etc.)</p>
+                  <Field 
+                    label="" 
+                    value={displayData?.reg100_photoGalleryLink} 
+                    fullWidth 
+                    isEditMode={isEditMode} 
+                    onChange={(val) => handleFieldChange('reg100_photoGalleryLink', val)} 
+                    fieldName="reg100_photoGalleryLink" 
+                  />
+                  <p className="text-xs text-gray-500 mt-2">กรุณาเปลี่ยนที่สามารถเข้าถึงได้ "ทุกคนในอินเทอร์เน็ต จะดูได้ทั้งหมดโดยไม่ต้องลงชื่อเข้าใช้"</p>
+                </div>
+
+                <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                  <h5 className="font-medium text-gray-900 mb-2">วิดีโอ/คลิป</h5>
+                  <div className="space-y-3">
+                    <div>
+                      <p className="text-sm text-gray-700 mb-2">1 บรรยากาศการเรียนการสอนในชั้นเรียน และในสถานศึกษา ความยาวไม่เกิน 3 นาที</p>
+                      <p className="text-sm text-gray-700 mb-2">2 การแสดงผลงานด้านดนตรีของนักเรียน ความยาวไม่เกิน 3 นาที</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-700 mb-2">Link/URL สำหรับ Share Drive (Google Drive, Dropbox, etc.)</p>
+                      <Field 
+                        label="" 
+                        value={displayData?.reg100_videoLink} 
+                        fullWidth 
+                        isEditMode={isEditMode} 
+                        onChange={(val) => handleFieldChange('reg100_videoLink', val)} 
+                        fieldName="reg100_videoLink" 
+                      />
+                      <p className="text-xs text-gray-500 mt-2">กรุณาเปลี่ยนที่สามารถเข้าถึงได้ "ทุกคนในอินเทอร์เน็ต จะดูได้ทั้งหมดโดยไม่ต้องลงชื่อเข้าใช้"</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </StepSection>
+
+        {/* ๘. การเผยแพร่ */}
+        <StepSection title="การเผยแพร่" stepNumber={8}>
+          <div className="space-y-6">
+            <ActivityList title="กิจกรรมภายในจังหวัด (ภายใน)" activities={isEditMode ? displayData?.reg100_activitiesWithinProvinceInternal : submission.reg100_activitiesWithinProvinceInternal} isEditMode={isEditMode} arrayField="reg100_activitiesWithinProvinceInternal" onFieldChange={handleArrayFieldChange} onAdd={() => handleAddArrayItem('reg100_activitiesWithinProvinceInternal', { activityName: '', activityDate: '', evidenceLink: '' })} onRemove={(i) => handleRemoveArrayItem('reg100_activitiesWithinProvinceInternal', i)} />
+            
+            <ActivityList title="กิจกรรมภายในจังหวัด (ภายนอก)" activities={isEditMode ? displayData?.reg100_activitiesWithinProvinceExternal : submission.reg100_activitiesWithinProvinceExternal} isEditMode={isEditMode} arrayField="reg100_activitiesWithinProvinceExternal" onFieldChange={handleArrayFieldChange} onAdd={() => handleAddArrayItem('reg100_activitiesWithinProvinceExternal', { activityName: '', activityDate: '', evidenceLink: '' })} onRemove={(i) => handleRemoveArrayItem('reg100_activitiesWithinProvinceExternal', i)} />
+            
+            <ActivityList title="กิจกรรมนอกจังหวัด" activities={isEditMode ? displayData?.reg100_activitiesOutsideProvince : submission.reg100_activitiesOutsideProvince} isEditMode={isEditMode} arrayField="reg100_activitiesOutsideProvince" onFieldChange={handleArrayFieldChange} onAdd={() => handleAddArrayItem('reg100_activitiesOutsideProvince', { activityName: '', activityDate: '', evidenceLink: '' })} onRemove={(i) => handleRemoveArrayItem('reg100_activitiesOutsideProvince', i)} />
+          </div>
+        </StepSection>
+
+        {/* ๙. การประชาสัมพันธ์ */}
+        <StepSection title="การประชาสัมพันธ์" stepNumber={9}>
+          <div className="space-y-6">
+            <ActivityList title="การประชาสัมพันธ์ผลงานของสถานศึกษา" activities={isEditMode ? displayData?.reg100_prActivities : submission.reg100_prActivities} isEditMode={isEditMode} arrayField="reg100_prActivities" onFieldChange={handleArrayFieldChange} onAdd={() => handleAddArrayItem('reg100_prActivities', { activityName: '', publishDate: '', evidenceLink: '', platform: '' })} onRemove={(i) => handleRemoveArrayItem('reg100_prActivities', i)} hasPlatform />
+
+            {/* Information Sources */}
+            <div>
+              <h4 className="font-semibold text-gray-900 mb-4">ได้รับข้อมูลการสมัครโรงเรียนดนตรีไทย ๑๐๐ เปอร์เซ็นต์จาก</h4>
+              <div className="space-y-4">
+                <div>
+                  <CheckboxField label="โรงเรียน:" value={displayData?.reg100_heardFromSchool} isEditMode={isEditMode} onChange={(val) => handleFieldChange('reg100_heardFromSchool', val)} fieldName="reg100_heardFromSchool" />
+                  {displayData?.reg100_heardFromSchool && (
+                    <div className="ml-6 mt-2 space-y-2">
+                      <Field label="ชื่อโรงเรียน:" value={displayData?.reg100_heardFromSchoolName} isEditMode={isEditMode} onChange={(val) => handleFieldChange('reg100_heardFromSchoolName', val)} fieldName="reg100_heardFromSchoolName" />
+                      
+                      <Field label="อำเภอ:" value={displayData?.reg100_heardFromSchoolDistrict} isEditMode={isEditMode} onChange={(val) => handleFieldChange('reg100_heardFromSchoolDistrict', val)} fieldName="reg100_heardFromSchoolDistrict" />
+                      
+                      <Field label="จังหวัด:" value={displayData?.reg100_heardFromSchoolProvince} isEditMode={isEditMode} onChange={(val) => handleFieldChange('reg100_heardFromSchoolProvince', val)} fieldName="reg100_heardFromSchoolProvince" />
+                    </div>
+                  )}
+                </div>
+                <div className="mt-4">
+                  <h5 className="font-medium text-gray-900 mb-3">ช่องทางการประชาสัมพันธ์ของกรมส่งเสริมวัฒนธรรม</h5>
+                  <div className="grid grid-cols-2 gap-4">
+                    <CheckboxField label="เฟซบุ๊ก (Facebook):" value={displayData?.reg100_DCP_PR_Channel_FACEBOOK} isEditMode={isEditMode} onChange={(val) => handleFieldChange('reg100_DCP_PR_Channel_FACEBOOK', val)} fieldName="reg100_DCP_PR_Channel_FACEBOOK" />
+                    
+                    <CheckboxField label="ยูทูบ (YouTube):" value={displayData?.reg100_DCP_PR_Channel_YOUTUBE} isEditMode={isEditMode} onChange={(val) => handleFieldChange('reg100_DCP_PR_Channel_YOUTUBE', val)} fieldName="reg100_DCP_PR_Channel_YOUTUBE" />
+                    
+                    <CheckboxField label="ติ๊กต๊อก (TikTok):" value={displayData?.reg100_DCP_PR_Channel_Tiktok} isEditMode={isEditMode} onChange={(val) => handleFieldChange('reg100_DCP_PR_Channel_Tiktok', val)} fieldName="reg100_DCP_PR_Channel_Tiktok" />
+                  </div>
+                </div>
+                <div>
+                  <CheckboxField label="สำนักงานวัฒนธรรมจังหวัด:" value={displayData?.reg100_heardFromCulturalOffice} isEditMode={isEditMode} onChange={(val) => handleFieldChange('reg100_heardFromCulturalOffice', val)} fieldName="reg100_heardFromCulturalOffice" />
+                  {displayData?.reg100_heardFromCulturalOffice && (
+                    <div className="ml-6 mt-2">
+                      <Field label="ระบุสำนักงานวัฒนธรรมจังหวัด:" value={displayData?.reg100_heardFromCulturalOfficeName} isEditMode={isEditMode} onChange={(val) => handleFieldChange('reg100_heardFromCulturalOfficeName', val)} fieldName="reg100_heardFromCulturalOfficeName" />
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <CheckboxField label="สำนักงานเขตพื้นที่การศึกษา:" value={displayData?.reg100_heardFromEducationArea} isEditMode={isEditMode} onChange={(val) => handleFieldChange('reg100_heardFromEducationArea', val)} fieldName="reg100_heardFromEducationArea" />
+                  {displayData?.reg100_heardFromEducationArea && (
+                    <div className="ml-6 mt-2 space-y-2">
+                      <Field label="ระบุสำนักงานเขตพื้นที่การศึกษา:" value={displayData?.reg100_heardFromEducationAreaName} isEditMode={isEditMode} onChange={(val) => handleFieldChange('reg100_heardFromEducationAreaName', val)} fieldName="reg100_heardFromEducationAreaName" />
+                      
+                      <Field label="จังหวัด:" value={displayData?.reg100_heardFromEducationAreaProvince} isEditMode={isEditMode} onChange={(val) => handleFieldChange('reg100_heardFromEducationAreaProvince', val)} fieldName="reg100_heardFromEducationAreaProvince" />
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <CheckboxField label="อื่น ๆ ระบุ:" value={displayData?.reg100_heardFromOther} isEditMode={isEditMode} onChange={(val) => handleFieldChange('reg100_heardFromOther', val)} fieldName="reg100_heardFromOther" />
+                  {displayData?.reg100_heardFromOther && (
+                    <div className="ml-6 mt-2">
+                      <Field label="ระบุ:" value={displayData?.reg100_heardFromOtherDetail} isEditMode={isEditMode} onChange={(val) => handleFieldChange('reg100_heardFromOtherDetail', val)} fieldName="reg100_heardFromOtherDetail" />
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <Field label="ปัญหาและอุปสรรคที่มีผลกระทบต่อการเรียนการสอนดนตรีไทย:" value={displayData?.reg100_obstacles} fullWidth isEditMode={isEditMode} onChange={(val) => handleFieldChange('reg100_obstacles', val)} fieldName="reg100_obstacles" />
+            
+            <Field label="ข้อเสนอแนะในการส่งเสริมดนตรีไทยในสถานศึกษา:" value={displayData?.reg100_suggestions} fullWidth isEditMode={isEditMode} onChange={(val) => handleFieldChange('reg100_suggestions', val)} fieldName="reg100_suggestions" />
+
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <CheckboxField label="ข้าพเจ้าขอรับรองว่าข้อมูลที่กรอกในแบบฟอร์มนี้เป็นความจริงทุกประการ:" value={displayData?.reg100_certifiedByAdmin} isEditMode={isEditMode} onChange={(val) => handleFieldChange('reg100_certifiedByAdmin', val)} fieldName="reg100_certifiedByAdmin" />
+            </div>
+          </div>
+        </StepSection>
+
+      </div>{/* end container */}
+
+      {/* Delete Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
             <h3 className="text-xl font-semibold text-gray-900 mb-4">ยืนยันการลบ</h3>
             <p className="text-gray-600 mb-6">
-              คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลของ <strong>{submission.reg100_schoolName}</strong>?
-              <br />
+              คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลของ <strong>{submission.reg100_schoolName}</strong>?<br />
               <span className="text-red-600">การดำเนินการนี้ไม่สามารถย้อนกลับได้</span>
             </p>
             <div className="flex gap-3 justify-end">
-              <button
-                onClick={() => setShowDeleteModal(false)}
-                className="px-4 py-2 bg-gradient-to-r from-gray-400 to-gray-500 text-white rounded-lg hover:from-gray-500 hover:to-gray-600 transition-all"
-              >
-                ยกเลิก
-              </button>
-              <button
-                onClick={handleDelete}
-                className="px-4 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg hover:from-red-600 hover:to-pink-600 transition-all"
-              >
-                ลบข้อมูล
-              </button>
+              <button onClick={() => setShowDeleteModal(false)} className="px-4 py-2 bg-gradient-to-r from-gray-400 to-gray-500 text-white rounded-lg hover:from-gray-500 hover:to-gray-600 transition-all">ยกเลิก</button>
+              <button onClick={handleDelete} className="px-4 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg hover:from-red-600 hover:to-pink-600 transition-all">ลบข้อมูล</button>
             </div>
           </div>
         </div>
@@ -1439,25 +901,12 @@ export default function Register100DetailView({ id, hideScores = false, readOnly
 
       {/* Image Modal */}
       {showImageModal && (
-        <div 
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
-          onClick={() => setShowImageModal(false)}
-        >
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4" onClick={() => setShowImageModal(false)}>
           <div className="relative max-w-7xl max-h-[90vh]">
-            <button
-              onClick={() => setShowImageModal(false)}
-              className="absolute -top-10 right-0 text-white hover:text-gray-300 transition-colors"
-            >
-              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
+            <button onClick={() => setShowImageModal(false)} className="absolute -top-10 right-0 text-white hover:text-gray-300 transition-colors">
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
-            <img 
-              src={selectedImage.startsWith('http') ? selectedImage : selectedImage}
-              alt="Preview" 
-              className="max-w-full max-h-[90vh] object-contain rounded-lg"
-              onClick={(e) => e.stopPropagation()}
-            />
+            <img src={selectedImage} alt="Preview" className="max-w-full max-h-[90vh] object-contain rounded-lg" onClick={(e) => e.stopPropagation()} />
           </div>
         </div>
       )}
@@ -1465,257 +914,212 @@ export default function Register100DetailView({ id, hideScores = false, readOnly
   );
 }
 
-// Helper Components
+// ── Utility ───────────────────────────────────────────────────────────────────
+
+function resolveImageUrl(src: string): string {
+  if (!src) return '';
+  if (src.startsWith('http')) return src;
+  if (src.startsWith('/uploads/')) return src.replace('/uploads/', '/api/uploads/');
+  return src;
+}
+
+// ── Sub-components ────────────────────────────────────────────────────────────
+
+function ScoreCard({ step, title, subtitle, score, max, color, note }: { step: string; title: string; subtitle: string; score: number; max: number; color: string; note: string }) {
+  const colors: Record<string, string> = {
+    blue: 'bg-blue-50 border-blue-200 text-blue-800 text-blue-600 bg-blue-100 text-blue-700',
+    purple: 'bg-purple-50 border-purple-200 text-purple-800 text-purple-600 bg-purple-100 text-purple-700',
+    teal: 'bg-teal-50 border-teal-200 text-teal-800 text-teal-600 bg-teal-100 text-teal-700',
+    orange: 'bg-orange-50 border-orange-200 text-orange-800 text-orange-600 bg-orange-100 text-orange-700',
+    amber: 'bg-amber-50 border-amber-200 text-amber-800 text-amber-600 bg-amber-100 text-amber-700',
+    cyan: 'bg-cyan-50 border-cyan-200 text-cyan-800 text-cyan-600 bg-cyan-100 text-cyan-700',
+    indigo: 'bg-indigo-50 border-indigo-200 text-indigo-800 text-indigo-600 bg-indigo-100 text-indigo-700',
+    pink: 'bg-pink-50 border-pink-200 text-pink-800 text-pink-600 bg-pink-100 text-pink-700',
+    rose: 'bg-rose-50 border-rose-200 text-rose-800 text-rose-600 bg-rose-100 text-rose-700',
+  };
+  const [bg, border, stepColor, scoreColor, noteBg, noteText] = colors[color]?.split(' ') ?? Array(6).fill('');
+  return (
+    <div className={`${bg} p-4 rounded-lg border ${border}`}>
+      <div className="flex items-start justify-between mb-2">
+        <div className="flex-1">
+          <div className={`text-xs font-semibold ${stepColor} mb-1`}>{step}</div>
+          <div className="text-sm font-medium text-gray-700">{title}</div>
+          <div className="text-xs text-gray-600 mt-1">{subtitle}</div>
+        </div>
+        <div className="text-right ml-3">
+          <div className={`text-2xl font-bold ${scoreColor}`}>{score}</div>
+          <div className="text-xs text-gray-500">/ {max}</div>
+        </div>
+      </div>
+      <div className={`text-xs ${noteText} ${noteBg} px-2 py-1 rounded mt-2`}>{note}</div>
+    </div>
+  );
+}
+
 function StepSection({ title, stepNumber, children }: { title: string; stepNumber: number; children: React.ReactNode }) {
   return (
     <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
       <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200">
-        <div className="w-10 h-10 bg-[#00B050] text-white rounded-full flex items-center justify-center font-bold">
-          {stepNumber}
-        </div>
-        <h2 className="text-xl font-bold text-gray-900">{title}</h2>
+        <h2 className="text-xl font-bold text-gray-900">
+          {stepNumber}. {title}
+        </h2>
       </div>
       {children}
     </div>
   );
 }
 
-function Field({ label, value, fullWidth = false, isEditMode = false, onChange, fieldName }: { 
-  label: string; 
-  value: any; 
-  fullWidth?: boolean;
-  isEditMode?: boolean;
-  onChange?: (value: any) => void;
-  fieldName?: string;
+function ArraySection({ title, items, isEditMode, addLabel = 'เพิ่มรายการ', onAdd, onRemove, renderItem }: {
+  title?: string;
+  items: any[];
+  isEditMode: boolean;
+  addLabel?: string;
+  onAdd: () => void;
+  onRemove: (i: number) => void;
+  renderItem: (item: any, i: number) => React.ReactNode;
 }) {
-  const isUrl = (str: string) => {
-    if (!str || typeof str !== 'string') return false;
-    return str.startsWith('http://') || str.startsWith('https://');
-  };
+  return (
+    <div>
+      {title && <h4 className="font-semibold text-gray-900 mb-3">{title}</h4>}
+      {items?.length > 0 ? items.map((item, i) => (
+        <div key={i} className="bg-gray-50 p-4 rounded-lg mb-3 relative">
+          {renderItem(item, i)}
+          {isEditMode && (
+            <button onClick={() => onRemove(i)} className="absolute top-2 right-2 text-red-500 hover:text-red-700">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          )}
+        </div>
+      )) : <p className="text-gray-500">ไม่มีข้อมูล</p>}
+      {isEditMode && (
+        <button onClick={onAdd} className="mt-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg hover:from-blue-600 hover:to-cyan-600 transition-all flex items-center gap-2">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+          {addLabel}
+        </button>
+      )}
+    </div>
+  );
+}
 
-  const renderValue = () => {
-    if (!value) return <span className="text-gray-400">-</span>;
-    
-    if (isUrl(value)) {
-      return (
-        <a 
-          href={value} 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="text-blue-600 hover:text-blue-800 underline break-all"
-        >
-          {value}
-        </a>
-      );
-    }
-    
-    return value;
+const SCHOOL_SIZE_MAP: Record<string, string> = {
+  SMALL:       'ขนาดเล็ก (119 คนลงมา)',
+  MEDIUM:      'ขนาดกลาง (120 - 719 คน)',
+  LARGE:       'ขนาดใหญ่ (720 - 1,679 คน)',
+  EXTRA_LARGE: 'ขนาดใหญ่พิเศษ (1,680 คนขึ้นไป)',
+};
+
+function Field({ label, value, fullWidth = false, isEditMode = false, onChange, fieldName }: {
+  label: string; value: any; fullWidth?: boolean; isEditMode?: boolean; onChange?: (v: any) => void; fieldName?: string;
+}) {
+  const isUrl = (s: string) => typeof s === 'string' && (s.startsWith('http://') || s.startsWith('https://'));
+  const longFields = ['reg100_obstacles', 'reg100_suggestions', 'reg100_curriculumFramework', 'reg100_learningOutcomes', 'reg100_managementContext', 'reg100_teachingLocation', 'reg100_studentCountByGrade', 'reg100_mgtAddress'];
+
+  // Map English school size values to Thai display labels
+  const displayValue = (v: any) => {
+    if (typeof v === 'string' && SCHOOL_SIZE_MAP[v]) return SCHOOL_SIZE_MAP[v];
+    return v;
   };
 
   if (isEditMode && onChange && fieldName) {
-    // Use textarea for long text fields
-    const isLongTextField = ['reg100_obstacles', 'reg100_suggestions', 'reg100_curriculumFramework', 'reg100_learningOutcomes', 'reg100_managementContext', 'reg100_teachingLocation', 'reg100_studentCountByGrade', 'reg100_mgtAddress'].includes(fieldName);
-    
     return (
       <div className={fullWidth ? 'col-span-2' : ''}>
         <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
-        {isLongTextField ? (
-          <textarea
-            value={value || ''}
-            onChange={(e) => onChange(e.target.value)}
-            rows={4}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          />
+        {longFields.includes(fieldName) ? (
+          <textarea value={value || ''} onChange={(e) => onChange(e.target.value)} rows={4} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
         ) : (
-          <input
-            type="text"
-            value={value || ''}
-            onChange={(e) => onChange(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          />
+          <input type="text" value={value || ''} onChange={(e) => onChange(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
         )}
       </div>
     );
   }
-
   return (
     <div className={fullWidth ? 'col-span-2' : ''}>
       <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
       <div className="text-gray-900 bg-gray-50 p-3 rounded-lg min-h-[44px]">
-        {renderValue()}
+        {value
+          ? (isUrl(value)
+              ? <a href={value} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline break-all">{value}</a>
+              : displayValue(value))
+          : <span className="text-gray-400">-</span>}
       </div>
     </div>
   );
 }
 
-function SelectField({ label, value, options, fullWidth = false, isEditMode = false, onChange, fieldName, required = false }: { 
-  label: string; 
-  value: any; 
-  options: string[];
-  fullWidth?: boolean;
-  isEditMode?: boolean;
-  onChange?: (value: any) => void;
-  fieldName?: string;
-  required?: boolean;
+function SelectField({ label, value, options, fullWidth = false, isEditMode = false, onChange, fieldName, required = false }: {
+  label: string; value: any; options: string[]; fullWidth?: boolean; isEditMode?: boolean; onChange?: (v: any) => void; fieldName?: string; required?: boolean;
 }) {
   if (isEditMode && onChange && fieldName) {
     return (
       <div className={fullWidth ? 'col-span-2' : ''}>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
-        </label>
-        <select
-          value={value || ''}
-          onChange={(e) => onChange(e.target.value)}
-          required={required}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
-        >
+        <label className="block text-sm font-medium text-gray-700 mb-1">{label}{required && <span className="text-red-500 ml-1">*</span>}</label>
+        <select value={value || ''} onChange={(e) => onChange(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
           <option value="">เลือก{label}</option>
-          {/* Show current value if it's not in options (for backward compatibility) */}
-          {value && !options.includes(value) && (
-            <option value={value} className="bg-yellow-50">
-              {value} (ค่าเดิม)
-            </option>
-          )}
-          {options.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
+          {value && !options.includes(value) && <option value={value} className="bg-yellow-50">{value} (ค่าเดิม)</option>}
+          {options.map((o) => <option key={o} value={o}>{o}</option>)}
         </select>
-        {required && !value && (
-          <p className="mt-1 text-sm text-red-500">กรุณาเลือก{label}</p>
-        )}
+        {required && !value && <p className="mt-1 text-sm text-red-500">กรุณาเลือก{label}</p>}
       </div>
     );
   }
-
   return (
     <div className={fullWidth ? 'col-span-2' : ''}>
       <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
-      <div className="text-gray-900 bg-gray-50 p-3 rounded-lg min-h-[44px]">
-        {value || <span className="text-gray-400">-</span>}
-      </div>
+      <div className="text-gray-900 bg-gray-50 p-3 rounded-lg min-h-[44px]">{value || <span className="text-gray-400">-</span>}</div>
     </div>
   );
 }
 
-function CheckboxField({ label, value, isEditMode = false, onChange, fieldName }: { 
-  label: string; 
-  value: boolean;
-  isEditMode?: boolean;
-  onChange?: (value: boolean) => void;
-  fieldName?: string;
+function CheckboxField({ label, value, isEditMode = false, onChange, fieldName }: {
+  label: string; value: boolean; isEditMode?: boolean; onChange?: (v: boolean) => void; fieldName?: string;
 }) {
   if (isEditMode && onChange && fieldName) {
     return (
       <div className="flex items-center gap-2">
-        <input
-          type="checkbox"
-          checked={value || false}
-          onChange={(e) => onChange(e.target.checked)}
-          className="w-5 h-5 text-[#00B050] border-gray-300 rounded focus:ring-2 focus:ring-blue-500 cursor-pointer"
-        />
+        <input type="checkbox" checked={value || false} onChange={(e) => onChange(e.target.checked)} className="w-5 h-5 text-[#00B050] border-gray-300 rounded focus:ring-2 focus:ring-blue-500 cursor-pointer" />
         <span className="text-sm text-gray-700">{label}</span>
       </div>
     );
   }
-
   return (
     <div className="flex items-center gap-2">
       <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${value ? 'bg-[#00B050] border-[#00B050]' : 'border-gray-300'}`}>
-        {value && (
-          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-          </svg>
-        )}
+        {value && <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
       </div>
       <span className="text-sm text-gray-700">{label}</span>
     </div>
   );
 }
 
-function ActivityList({ 
-  title, 
-  activities, 
-  isEditMode = false, 
-  arrayField = '', 
-  onFieldChange, 
-  onAdd, 
-  onRemove,
-  hasPlatform = false 
-}: { 
-  title: string; 
-  activities: any[];
-  isEditMode?: boolean;
-  arrayField?: string;
-  onFieldChange?: (arrayField: string, index: number, field: string, value: any) => void;
-  onAdd?: () => void;
-  onRemove?: (index: number) => void;
-  hasPlatform?: boolean;
+function ActivityList({ title, activities, isEditMode = false, arrayField = '', onFieldChange, onAdd, onRemove, hasPlatform = false }: {
+  title: string; activities: any[]; isEditMode?: boolean; arrayField?: string;
+  onFieldChange?: (f: string, i: number, field: string, v: any) => void;
+  onAdd?: () => void; onRemove?: (i: number) => void; hasPlatform?: boolean;
 }) {
   return (
     <div>
       <h4 className="font-semibold text-gray-900 mb-3">{title}</h4>
-      {activities && activities.length > 0 ? (
-        activities.map((activity: any, index: number) => (
-          <div key={index} className="bg-gray-50 p-4 rounded-lg mb-3 relative">
-            <div className="grid grid-cols-3 gap-4">
-              <Field 
-                label="ชื่อกิจกรรม" 
-                value={activity.activityName} 
-                isEditMode={isEditMode}
-                onChange={(val) => onFieldChange && onFieldChange(arrayField, index, 'activityName', val)}
-                fieldName="activityName"
-              />
-              <Field 
-                label="วันที่" 
-                value={activity.activityDate || activity.publishDate} 
-                isEditMode={isEditMode}
-                onChange={(val) => onFieldChange && onFieldChange(arrayField, index, hasPlatform ? 'publishDate' : 'activityDate', val)}
-                fieldName={hasPlatform ? 'publishDate' : 'activityDate'}
-              />
-              <Field 
-                label="ลิงก์หลักฐาน" 
-                value={activity.evidenceLink} 
-                isEditMode={isEditMode}
-                onChange={(val) => onFieldChange && onFieldChange(arrayField, index, 'evidenceLink', val)}
-                fieldName="evidenceLink"
-              />
-              {hasPlatform && (
-                <Field 
-                  label="แพลตฟอร์ม" 
-                  value={activity.platform} 
-                  isEditMode={isEditMode}
-                  onChange={(val) => onFieldChange && onFieldChange(arrayField, index, 'platform', val)}
-                  fieldName="platform"
-                />
-              )}
+      {activities?.length > 0 ? activities.map((a: any, i: number) => (
+        <div key={i} className="bg-gray-50 p-4 rounded-lg mb-3 relative">
+          <div className="flex items-start gap-4">
+            <div className="flex-shrink-0 mt-1 w-8 h-8 bg-black text-white rounded-full flex items-center justify-center font-bold text-sm">{i + 1}</div>
+            <div className="flex-1 grid grid-cols-3 gap-4">
+              <Field label="ชื่อกิจกรรม/งาน" value={a.activityName} isEditMode={isEditMode} onChange={(v) => onFieldChange?.(arrayField, i, 'activityName', v)} fieldName="activityName" />
+              <Field label="วันที่เผยแพร่" value={a.activityDate || a.publishDate} isEditMode={isEditMode} onChange={(v) => onFieldChange?.(arrayField, i, hasPlatform ? 'publishDate' : 'activityDate', v)} fieldName={hasPlatform ? 'publishDate' : 'activityDate'} />
+              <Field label="หลักฐานการเผยแพร่ (Link/URL)" value={a.evidenceLink} isEditMode={isEditMode} onChange={(v) => onFieldChange?.(arrayField, i, 'evidenceLink', v)} fieldName="evidenceLink" />
+              {hasPlatform && <Field label="แหล่งเผยแพร่/ประชาสัมพันธ์ในสื่อสังคมออนไลน์" value={a.platform} isEditMode={isEditMode} onChange={(v) => onFieldChange?.(arrayField, i, 'platform', v)} fieldName="platform" />}
             </div>
-            {isEditMode && onRemove && (
-              <button
-                onClick={() => onRemove(index)}
-                className="absolute top-2 right-2 text-red-500 hover:text-red-700"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            )}
           </div>
-        ))
-      ) : (
-        <p className="text-gray-500">ไม่มีข้อมูล</p>
-      )}
+          {isEditMode && onRemove && (
+            <button onClick={() => onRemove(i)} className="absolute top-2 right-2 text-red-500 hover:text-red-700">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          )}
+        </div>
+      )) : <p className="text-gray-500">ไม่มีข้อมูล</p>}
       {isEditMode && onAdd && (
-        <button
-          onClick={onAdd}
-          className="mt-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg hover:from-blue-600 hover:to-cyan-600 transition-all flex items-center gap-2"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
+        <button onClick={onAdd} className="mt-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg hover:from-blue-600 hover:to-cyan-600 transition-all flex items-center gap-2">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
           เพิ่มกิจกรรม
         </button>
       )}

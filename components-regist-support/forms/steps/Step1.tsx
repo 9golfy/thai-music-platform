@@ -551,7 +551,7 @@ export default function Step1({ form, isRestoringData = false }: Step1Props) {
           {/* ชื่อสถานศึกษา */}
           <div>
             <label className="block text-sm font-medium text-gray-900 mb-2">
-              ชื่อสถานศึกษาของผู้สมัคร <span className="text-red-500">*</span>
+              ชื่อสถานศึกษา<span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -707,6 +707,18 @@ export default function Step1({ form, isRestoringData = false }: Step1Props) {
                 {errors.regsup_affiliation.message as string}
               </p>
             )}
+
+            <div className="mt-3">
+              <label className="block text-sm font-medium text-gray-900 mb-2">
+                ระบุ
+              </label>
+              <input
+                type="text"
+                {...register('regsup_affiliationDetail')}
+                className="w-full px-4 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
+                placeholder="กรุณาระบุรายละเอียดสังกัด"
+              />
+            </div>
           </div>
 
           
@@ -771,7 +783,7 @@ export default function Step1({ form, isRestoringData = false }: Step1Props) {
               )}
               
               {/* Size criteria list */}
-              <div className="text-sm text-gray-600 space-y-1 mt-2">
+              <div className="mt-2 text-xs text-gray-500 space-y-0.5">
                 <p>• ขนาดเล็ก: 119 คนลงมา</p>
                 <p>• ขนาดกลาง: 120 - 719 คน</p>
                 <p>• ขนาดใหญ่: 720 - 1,679 คน</p>
@@ -905,10 +917,7 @@ export default function Step1({ form, isRestoringData = false }: Step1Props) {
             </div>
           </div>
 
-          {/* Helper Text */}
-          <p className="text-sm text-[#0FA968] bg-[#f0f9f5] p-3 rounded-lg border border-[#c3e9d7]">
-            💡 พิมพ์ ตำบล/อำเภอ/จังหวัด เพื่อให้ระบบแนะนำอัตโนมัติ
-          </p>
+          
 
           {/* โทรศัพท์ */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

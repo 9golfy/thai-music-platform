@@ -96,6 +96,15 @@ export default function DashboardLayout({
         </svg>
       ),
     },
+    {
+      name: 'ปิดการรับสมัคร',
+      href: '/dcp-admin/dashboard/registration-control',
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M5.455 19h13.09A1.455 1.455 0 0020 17.545V6.455A1.455 1.455 0 0018.545 5H5.455A1.455 1.455 0 004 6.455v11.09A1.455 1.455 0 005.455 19z" />
+        </svg>
+      ),
+    },
   ];
 
   return (

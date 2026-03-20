@@ -6,6 +6,8 @@ import { generateSchoolId, getNextSchoolIdSequence } from '@/lib/utils/schoolId'
 import { hashPassword, generateTeacherPassword } from '@/lib/auth/password';
 import { sendTeacherLoginInfoEmail } from '@/lib/email/mailer';
 import { sendEmailWithRateLimit } from '@/lib/email/rateLimiter';
+import { validateUploadedImage } from '@/lib/utils/fileValidation';
+import { devLog } from '@/lib/utils/devLogger';
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/thai_music_school';
 
@@ -19,9 +21,11 @@ export async function POST(request: NextRequest) {
     const data: any = {};
     const files: { [key: string]: File } = {};
 
+    console.log('📋 Parsing form data...');
     for (const [key, value] of formData.entries()) {
       if (value instanceof File) {
         files[key] = value;
+        console.log(`📁 Found file: ${key} (${value.name}, ${value.size} bytes)`);
       } else {
         try {
           // Try to parse JSON arrays
@@ -32,6 +36,9 @@ export async function POST(request: NextRequest) {
         }
       }
     }
+    
+    console.log('📊 Files received:', Object.keys(files));
+    console.log('📊 Data fields received:', Object.keys(data).length);
 
     // Convert boolean strings to actual booleans
     const booleanFields = [
@@ -46,6 +53,7 @@ export async function POST(request: NextRequest) {
       'DCP_PR_Channel_Tiktok', 'reg100_DCP_PR_Channel_Tiktok',
       'heardFromOther', 'reg100_heardFromOther',
       'certifiedINFOByAdminName', 'reg100_certifiedINFOByAdminName',
+      'certifiedByAdmin', 'reg100_certifiedByAdmin',
     ];
 
     booleanFields.forEach((field) => {
@@ -86,36 +94,65 @@ export async function POST(request: NextRequest) {
     }
 
     // Save management image
+    devLog.log('Checking for mgtImage file...');
     if (files.mgtImage) {
       const file = files.mgtImage;
+      
+      // Validate file type using magic bytes (security check)
+      const bytes = await file.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+      
+      const validation = await validateUploadedImage(buffer, 1); // 1MB max
+      if (!validation.valid) {
+        return NextResponse.json(
+          { error: `Management image validation failed: ${validation.error}` },
+          { status: 400 }
+        );
+      }
+      
+      devLog.log('Management image validated:', validation.detectedType);
+      
       const timestamp = Date.now();
       const filename = `mgt_${timestamp}_${file.name}`;
       const filepath = path.join(uploadDir, filename);
       
-      const bytes = await file.arrayBuffer();
-      const buffer = Buffer.from(bytes);
       await writeFile(filepath, buffer);
       
       data.reg100_mgtImage = `/uploads/${filename}`;
-      console.log('✅ Saved mgtImage:', filename);
+      devLog.log('Saved mgtImage:', filename);
     }
 
     // Save teacher images
+    devLog.log('Checking for teacher images...');
     if (data.reg100_thaiMusicTeachers && Array.isArray(data.reg100_thaiMusicTeachers)) {
+      devLog.log(`Found ${data.reg100_thaiMusicTeachers.length} teachers in data`);
       for (let i = 0; i < data.reg100_thaiMusicTeachers.length; i++) {
         const fileKey = `teacherImage_${i}`;
         if (files[fileKey]) {
           const file = files[fileKey];
+          
+          // Validate file type using magic bytes (security check)
+          const bytes = await file.arrayBuffer();
+          const buffer = Buffer.from(bytes);
+          
+          const validation = await validateUploadedImage(buffer, 1); // 1MB max
+          if (!validation.valid) {
+            return NextResponse.json(
+              { error: `Teacher image ${i} validation failed: ${validation.error}` },
+              { status: 400 }
+            );
+          }
+          
+          devLog.log(`Teacher image ${i} validated:`, validation.detectedType);
+          
           const timestamp = Date.now();
           const filename = `teacher_${i}_${timestamp}_${file.name}`;
           const filepath = path.join(uploadDir, filename);
           
-          const bytes = await file.arrayBuffer();
-          const buffer = Buffer.from(bytes);
           await writeFile(filepath, buffer);
           
           data.reg100_thaiMusicTeachers[i].teacherImage = `/uploads/${filename}`;
-          console.log(`✅ Saved teacherImage_${i}:`, filename);
+          devLog.log(`Saved teacherImage_${i}:`, filename);
         }
       }
     }

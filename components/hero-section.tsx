@@ -9,11 +9,17 @@ export default function HeroSection() {
       id="hero"
       className="relative min-h-screen flex items-start justify-center overflow-hidden"
     >
-      {/* Background Image (เหมือนเดิม) */}
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: "url('/images/hero-bg2.jpg')" }}
-      />
+      {/* Video Background */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover"
+        style={{ transform: 'translateY(-100px)' }}
+      >
+        <source src="/hero-vdo/hero-vdo.mp4" type="video/mp4" />
+      </video>
 
       {/* Overlays (เหมือนเดิม) */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#0A3625]/40 via-transparent to-black/60" />
@@ -65,7 +71,7 @@ export default function HeroSection() {
 
           {/* CTA Buttons - Luxury 4 💎 Emerald 🤍 Ivory Style */}
           <motion.div
-            className="flex flex-col sm:flex-row gap-4 mt-[250px]"
+            className="flex flex-col sm:flex-row gap-4 mt-[300px]"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.8 }}
@@ -108,8 +114,14 @@ export default function HeroSection() {
         </motion.div>
       </div>
 
-      {/* Bottom fade (เหมือนเดิม) */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent" />
+      {/* Bottom fade - linear gradient from bottom to top */}
+      <div 
+        className="absolute bottom-0 left-0 right-0 pointer-events-none"
+        style={{
+          height: '60%',
+          background: 'linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 20%, rgba(0,0,0,0.4) 40%, transparent 100%)'
+        }}
+      />
     </section>
   )
 }

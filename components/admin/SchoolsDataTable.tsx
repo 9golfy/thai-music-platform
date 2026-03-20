@@ -77,8 +77,15 @@ export default function SchoolsDataTable({
     if (searchTerm) {
       const schoolName = school.reg100_schoolName || school.regsup_schoolName || '';
       const province = school.reg100_schoolProvince || school.regsup_schoolProvince || '';
+      const schoolId = school.schoolId || '';
+      
+      // Normalize search term and schoolId by removing hyphens for comparison
+      const normalizedSearchTerm = searchTerm.replace(/-/g, '').toLowerCase();
+      const normalizedSchoolId = schoolId.replace(/-/g, '').toLowerCase();
+      
       const searchMatch = schoolName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         province.toLowerCase().includes(searchTerm.toLowerCase());
+                         province.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         normalizedSchoolId.includes(normalizedSearchTerm);
       if (!searchMatch) return false;
     }
 
@@ -97,7 +104,9 @@ export default function SchoolsDataTable({
     // Grade filter
     if (gradeFilter) {
       const totalScore = school.total_score || 0;
-      const grade = calculateGrade(totalScore);
+      // Determine maxScore based on type
+      const maxScore = type === 'register-support' ? 80 : 100;
+      const grade = calculateGrade(totalScore, maxScore);
       if (grade !== gradeFilter) return false;
     }
 
@@ -127,7 +136,8 @@ export default function SchoolsDataTable({
       // Create Excel data from current filtered schools
       const excelData = filteredSchools.map((school, index) => {
         const totalScore = school.total_score || 0;
-        const grade = calculateGrade(totalScore);
+        const maxScore = type === 'register-support' ? 80 : 100;
+        const grade = calculateGrade(totalScore, maxScore);
         
         return {
           'ลำดับ': index + 1,
@@ -196,7 +206,8 @@ export default function SchoolsDataTable({
 
   // Function to get grade styling for display
   const getGradeStyle = (score: number) => {
-    const grade = calculateGrade(score);
+    const maxScore = type === 'register-support' ? 80 : 100;
+    const grade = calculateGrade(score, maxScore);
     switch (grade) {
       case 'A':
         return { grade: 'A', color: 'bg-green-100 text-green-800' };
@@ -262,19 +273,27 @@ export default function SchoolsDataTable({
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <span className="inline-block w-3 h-3 rounded-full bg-green-500"></span>
-                <span className="text-sm text-gray-600">A: 90-100 คะแนน</span>
+                <span className="text-sm text-gray-600">
+                  A: {type === 'register-support' ? '64-80' : '80-100'} คะแนน (80-100%)
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="inline-block w-3 h-3 rounded-full bg-blue-500"></span>
-                <span className="text-sm text-gray-600">B: 70-89 คะแนน</span>
+                <span className="text-sm text-gray-600">
+                  B: {type === 'register-support' ? '56-63' : '70-79'} คะแนน (70-79%)
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="inline-block w-3 h-3 rounded-full bg-orange-500"></span>
-                <span className="text-sm text-gray-600">C: 50-69 คะแนน</span>
+                <span className="text-sm text-gray-600">
+                  C: {type === 'register-support' ? '40-55' : '50-69'} คะแนน (50-69%)
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="inline-block w-3 h-3 rounded-full bg-red-500"></span>
-                <span className="text-sm text-gray-600">F: 0-49 คะแนน</span>
+                <span className="text-sm text-gray-600">
+                  F: {type === 'register-support' ? '0-39' : '0-49'} คะแนน (0-49%)
+                </span>
               </div>
             </div>
             <button 
@@ -291,7 +310,7 @@ export default function SchoolsDataTable({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
           <Input
             type="search"
-            placeholder="ค้นหาโรงเรียน..."
+            placeholder="ค้นหาโรงเรียน, รหัสโรงเรียน..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />

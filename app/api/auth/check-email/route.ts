@@ -5,6 +5,8 @@ const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://root:rootpass@localhos
 const DB_NAME = 'thai_music_school';
 
 export async function POST(request: NextRequest) {
+  let client: MongoClient | null = null;
+
   try {
     const { email } = await request.json();
 
@@ -15,33 +17,36 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const client = new MongoClient(MONGODB_URI);
+    const normalizedEmail = String(email).trim().toLowerCase();
+
+    client = new MongoClient(MONGODB_URI);
     await client.connect();
 
     const database = client.db(DB_NAME);
-    
-    // Check in both collections
+
+    // Match the final submit route by checking the users collection first.
+    const usersCollection = database.collection('users');
     const register100Collection = database.collection('register100_submissions');
     const registerSupportCollection = database.collection('register_support_submissions');
 
-    const [register100User, registerSupportUser] = await Promise.all([
+    const [existingUser, register100User, registerSupportUser] = await Promise.all([
+      usersCollection.findOne({ email: normalizedEmail }),
       register100Collection.findOne({ 
         $or: [
-          { 'teacherEmail': email },
-          { 'thaiMusicTeachers.teacherEmail': email }
+          { teacherEmail: normalizedEmail },
+          { 'thaiMusicTeachers.teacherEmail': normalizedEmail }
         ]
       }),
       registerSupportCollection.findOne({ 
         $or: [
-          { 'teacherEmail': email },
-          { 'thaiMusicTeachers.teacherEmail': email }
+          { teacherEmail: normalizedEmail },
+          { 'regsup_thaiMusicTeachers.teacherEmail': normalizedEmail },
+          { 'thaiMusicTeachers.teacherEmail': normalizedEmail }
         ]
       })
     ]);
 
-    await client.close();
-
-    const exists = !!(register100User || registerSupportUser);
+    const exists = !!(existingUser || register100User || registerSupportUser);
 
     return NextResponse.json({
       exists,
@@ -54,5 +59,9 @@ export async function POST(request: NextRequest) {
       { error: 'Internal server error' },
       { status: 500 }
     );
+  } finally {
+    if (client) {
+      await client.close();
+    }
   }
 }

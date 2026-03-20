@@ -1,101 +1,67 @@
+require('dotenv').config({ path: '.env.local' });
 const { MongoClient } = require('mongodb');
-const fs = require('fs');
-const path = require('path');
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/thai_music_school';
 
 async function checkTeacherImages() {
-  const client = new MongoClient(MONGODB_URI);
+  console.log('🔍 Checking Teacher Images in Database...\n');
+
+  let client;
   
   try {
+    console.log('🔌 Connecting to MongoDB...');
+    client = new MongoClient(MONGODB_URI);
     await client.connect();
-    console.log('🔗 Connected to MongoDB');
+    console.log('✅ Connected successfully!\n');
     
     const db = client.db('thai_music_school');
-    const collection = db.collection('register_support_submissions');
+    const collection = db.collection('register100_submissions');
     
-    // Find the specific submission
-    const submissionId = '69ad7476fcaa2809454bab85';
-    const { ObjectId } = require('mongodb');
+    const submissions = await collection.find({}).toArray();
     
-    const submission = await collection.findOne({ _id: new ObjectId(submissionId) });
-    
-    if (!submission) {
-      console.log('❌ Submission not found with ID:', submissionId);
+    if (submissions.length === 0) {
+      console.log('❌ No submissions found');
       return;
     }
     
-    console.log('✅ Found submission:');
-    console.log('- School Name:', submission.regsup_schoolName);
-    console.log('- School ID:', submission.schoolId);
-    console.log('- Created At:', submission.createdAt);
-    console.log('- Teachers Count:', submission.regsup_thaiMusicTeachers?.length || 0);
+    const latest = submissions[submissions.length - 1];
+    console.log(`📋 Latest submission: ${latest.reg100_schoolName}`);
+    console.log(`🆔 School ID: ${latest.schoolId}`);
+    console.log(`📅 Created: ${latest.createdAt}\n`);
     
-    // Check manager image
-    console.log('\n📸 Manager Image:');
-    if (submission.mgtImage) {
-      console.log('- Path:', submission.mgtImage);
-      const fullPath = path.join(process.cwd(), 'public', submission.mgtImage);
-      const exists = fs.existsSync(fullPath);
-      console.log('- File exists:', exists ? '✅' : '❌');
-      if (exists) {
-        const stats = fs.statSync(fullPath);
-        console.log('- File size:', Math.round(stats.size / 1024), 'KB');
-      }
+    // Check management image
+    console.log('👨‍💼 Management Image:');
+    if (latest.reg100_mgtImage) {
+      console.log(`  ✅ Found: ${latest.reg100_mgtImage}`);
     } else {
-      console.log('- No manager image path found ❌');
+      console.log('  ❌ Not found');
     }
     
     // Check teacher images
     console.log('\n👨‍🏫 Teacher Images:');
-    if (submission.regsup_thaiMusicTeachers && Array.isArray(submission.regsup_thaiMusicTeachers)) {
-      submission.regsup_thaiMusicTeachers.forEach((teacher, index) => {
-        console.log(`\n  Teacher ${index + 1}: ${teacher.teacherFullName}`);
-        if (teacher.teacherImage) {
-          console.log('  - Image Path:', teacher.teacherImage);
-          const fullPath = path.join(process.cwd(), 'public', teacher.teacherImage);
-          const exists = fs.existsSync(fullPath);
-          console.log('  - File exists:', exists ? '✅' : '❌');
-          if (exists) {
-            const stats = fs.statSync(fullPath);
-            console.log('  - File size:', Math.round(stats.size / 1024), 'KB');
-          }
-        } else {
-          console.log('  - No image path found ❌');
-        }
+    if (latest.reg100_thaiMusicTeachers && Array.isArray(latest.reg100_thaiMusicTeachers)) {
+      console.log(`  Total teachers: ${latest.reg100_thaiMusicTeachers.length}`);
+      
+      latest.reg100_thaiMusicTeachers.forEach((teacher, index) => {
+        console.log(`  Teacher ${index + 1}:`);
+        console.log(`    Name: ${teacher.teacherFullName || 'N/A'}`);
+        console.log(`    Email: ${teacher.teacherEmail || 'N/A'}`);
+        console.log(`    Image: ${teacher.teacherImage || 'NOT FOUND'}`);
+        console.log('');
       });
     } else {
-      console.log('- No teachers data found');
+      console.log('  ❌ No teachers found');
     }
     
-    // Check uploads directory
-    console.log('\n📁 Uploads Directory Check:');
-    const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
-    if (fs.existsSync(uploadsDir)) {
-      const files = fs.readdirSync(uploadsDir);
-      const teacherFiles = files.filter(f => f.includes('teacher_support_'));
-      const mgtFiles = files.filter(f => f.includes('mgt_support_'));
-      
-      console.log('- Total files in uploads:', files.length);
-      console.log('- Teacher image files:', teacherFiles.length);
-      console.log('- Manager image files:', mgtFiles.length);
-      
-      if (teacherFiles.length > 0) {
-        console.log('\n📋 Recent teacher image files:');
-        teacherFiles.slice(-10).forEach(file => {
-          const filePath = path.join(uploadsDir, file);
-          const stats = fs.statSync(filePath);
-          console.log(`  - ${file} (${Math.round(stats.size / 1024)} KB, ${stats.mtime.toISOString()})`);
-        });
-      }
-    } else {
-      console.log('- Uploads directory does not exist ❌');
-    }
+    console.log('✅ Check completed successfully!');
     
   } catch (error) {
     console.error('❌ Error:', error.message);
+    process.exit(1);
   } finally {
-    await client.close();
+    if (client) {
+      await client.close();
+    }
   }
 }
 

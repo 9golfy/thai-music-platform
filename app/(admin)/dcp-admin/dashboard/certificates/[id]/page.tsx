@@ -55,7 +55,7 @@ export default async function CertificateDetailPage({
   const session = await getSession();
   const { id } = await params;
 
-  if (!session || !['root', 'admin'].includes(session.role)) {
+  if (!session || !['root', 'admin', 'super_admin'].includes(session.role)) {
     redirect('/login');
   }
 

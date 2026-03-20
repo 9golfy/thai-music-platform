@@ -247,7 +247,7 @@ export default function SchoolCertificateAssignment() {
   };
 
   const handleDeleteCertificate = async (certificateId: string, schoolName: string) => {
-    if (!confirm(`ต้องการยกเลิกใบประกาศของ "${schoolName}" ใช่หรือไม่?`)) {
+    if (!confirm(`\u0E15\u0E49\u0E2D\u0E07\u0E01\u0E32\u0E23\u0E22\u0E01\u0E40\u0E25\u0E34\u0E01 "${schoolName}" \u0E43\u0E0A\u0E48\u0E2B\u0E23\u0E37\u0E2D\u0E44\u0E21\u0E48?`)) {
       return;
     }
 
@@ -260,7 +260,7 @@ export default function SchoolCertificateAssignment() {
       const data = await response.json();
       
       if (data.success) {
-        alert('ยกเลิกใบประกาศเรียบร้อยแล้ว');
+        alert('\u0E22\u0E01\u0E40\u0E25\u0E34\u0E01\u0E40\u0E23\u0E35\u0E22\u0E1A\u0E23\u0E49\u0E2D\u0E22\u0E41\u0E25\u0E49\u0E27');
         // Reload data
         await fetchData();
       } else {
@@ -268,7 +268,7 @@ export default function SchoolCertificateAssignment() {
       }
     } catch (error) {
       console.error('Error deleting certificate:', error);
-      alert('เกิดข้อผิดพลาดในการยกเลิกใบประกาศ');
+      alert('\u0E40\u0E01\u0E34\u0E14\u0E02\u0E49\u0E2D\u0E1C\u0E34\u0E14\u0E1E\u0E25\u0E32\u0E14\u0E43\u0E19\u0E01\u0E32\u0E23\u0E22\u0E01\u0E40\u0E25\u0E34\u0E01');
     } finally {
       setDeletingCertId(null);
     }
@@ -815,7 +815,7 @@ export default function SchoolCertificateAssignment() {
                                 <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                                 </svg>
-                                ยกเลิกใบประกาศ
+                                {'\u0E22\u0E01\u0E40\u0E25\u0E34\u0E01'}
                               </>
                             )}
                           </Button>
