@@ -167,20 +167,6 @@ export default function TeacherLoginPage() {
                 </button>
               </div>
             </form>
-
-            {/* Test Credentials */}
-            <div className="mt-6 pt-6 border-t border-gray-200">
-              <div className="bg-gray-50 rounded-lg p-4">
-                <div className="text-xs text-gray-500 mb-2">
-                  <strong className="text-gray-700">ข้อมูลทดสอบ:</strong>
-                </div>
-                <div className="text-xs space-y-1 text-gray-600">
-                  <div>Email: <span className="font-mono font-semibold text-gray-800">teacher@test.com</span></div>
-                  <div>Password: <span className="font-mono font-semibold text-gray-800">123456</span></div>
-                  <div>School ID: <span className="font-mono font-semibold text-gray-800">SCH-20260228-0001</span></div>
-                </div>
-              </div>
-            </div>
           </div>
 
           {/* Info Panel - Request Password */}
