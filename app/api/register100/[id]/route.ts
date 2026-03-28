@@ -61,7 +61,7 @@ export async function DELETE(
     const database = client.db(dbName);
     const collection = database.collection('register100_submissions');
 
-    // First, get the submission to find the schoolId
+    // First, get the submission to find the schoolId and teacher email
     const submission = await collection.findOne({
       _id: new ObjectId(id)
     });
@@ -85,11 +85,24 @@ export async function DELETE(
       );
     }
 
-    // Also delete associated certificates
+    // Delete associated certificates
     const certificatesCollection = database.collection('certificates');
     await certificatesCollection.deleteMany({
       schoolId: submission.schoolId || id
     });
+
+    // Delete associated teacher user account
+    if (submission.teacherEmail) {
+      const usersCollection = database.collection('users');
+      const deleteUserResult = await usersCollection.deleteOne({
+        email: submission.teacherEmail,
+        role: 'teacher' // Only delete teacher accounts, not admin accounts
+      });
+      
+      if (deleteUserResult.deletedCount > 0) {
+        console.log(`✅ Deleted teacher user: ${submission.teacherEmail}`);
+      }
+    }
 
     return NextResponse.json({
       success: true,
