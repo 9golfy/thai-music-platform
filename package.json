@@ -13,6 +13,7 @@
     "test:selenium": "ts-node tests/register100-selenium.test.ts",
     "db:setup": "node scripts/setup-database.js",
     "db:clear": "node scripts/clear-database.js",
+    "db:clear:prod": "node scripts/clear-database-production.js",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
     "docker:logs": "docker-compose logs -f",
