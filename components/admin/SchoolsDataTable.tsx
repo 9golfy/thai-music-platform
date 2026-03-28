@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Download, ChevronLeft, ChevronRight } from 'lucide-react';
 import DeleteSchoolButton from './DeleteSchoolButton';
-import { calculateGrade } from '@/lib/utils/gradeCalculator';
+import { calculateGrade, calculateGradeRegister100 } from '@/lib/utils/gradeCalculator';
 
 interface SchoolsDataTableProps {
   type: 'register100' | 'register-support';
@@ -27,6 +27,32 @@ export default function SchoolsDataTable({
   const [provinceFilter, setProvinceFilter] = useState('');
   const [levelFilter, setLevelFilter] = useState('');
   const [gradeFilter, setGradeFilter] = useState('');
+
+  // Helper function to calculate total score including video scores
+  const calculateTotalScore = (school: any) => {
+    // For register100, calculate Part 1 score from individual components
+    if (type === 'register100') {
+      const part1Score = 
+        (school.teaching_curriculum_score || 0) +
+        (school.teacher_qualification_score || 0) +
+        (school.support_from_org_score || 0) +
+        (school.support_from_external_score || 0) +
+        (school.award_score || 0) +
+        (school.activity_within_province_internal_score || 0) +
+        (school.activity_within_province_external_score || 0) +
+        (school.activity_outside_province_score || 0) +
+        (school.pr_activity_score || 0);
+      const video1Score = school.video1_score || 0;
+      const video2Score = school.video2_score || 0;
+      return part1Score + video1Score + video2Score;
+    } else {
+      // For register-support, use total_score
+      const part1Score = school.total_score || 0;
+      const video1Score = school.video1_score || 0;
+      const video2Score = school.video2_score || 0;
+      return part1Score + video1Score + video2Score;
+    }
+  };
 
   useEffect(() => {
     fetchSchools();
@@ -69,7 +95,7 @@ export default function SchoolsDataTable({
     school.reg100_schoolLevel || school.regsup_schoolLevel || ''
   ).filter(Boolean))].sort();
 
-  const uniqueGrades = ['A', 'B', 'C', 'F'];
+  const uniqueGrades = ['A', 'B', 'C', 'D', 'F'];
 
   // Filter schools based on all criteria
   const filteredSchools = schools.filter(school => {
@@ -103,10 +129,11 @@ export default function SchoolsDataTable({
 
     // Grade filter
     if (gradeFilter) {
-      const totalScore = school.total_score || 0;
-      // Determine maxScore based on type
-      const maxScore = type === 'register-support' ? 80 : 100;
-      const grade = calculateGrade(totalScore, maxScore);
+      const totalScore = calculateTotalScore(school);
+      // Use different grade calculation based on type
+      const grade = type === 'register100' 
+        ? calculateGradeRegister100(totalScore)
+        : calculateGrade(totalScore, 180);
       if (grade !== gradeFilter) return false;
     }
 
@@ -135,9 +162,10 @@ export default function SchoolsDataTable({
       
       // Create Excel data from current filtered schools
       const excelData = filteredSchools.map((school, index) => {
-        const totalScore = school.total_score || 0;
-        const maxScore = type === 'register-support' ? 80 : 100;
-        const grade = calculateGrade(totalScore, maxScore);
+        const totalScore = calculateTotalScore(school);
+        const grade = type === 'register100'
+          ? calculateGradeRegister100(totalScore)
+          : calculateGrade(totalScore, 180);
         
         return {
           'ลำดับ': index + 1,
@@ -206,8 +234,9 @@ export default function SchoolsDataTable({
 
   // Function to get grade styling for display
   const getGradeStyle = (score: number) => {
-    const maxScore = type === 'register-support' ? 80 : 100;
-    const grade = calculateGrade(score, maxScore);
+    const grade = type === 'register100'
+      ? calculateGradeRegister100(score)
+      : calculateGrade(score, 180);
     switch (grade) {
       case 'A':
         return { grade: 'A', color: 'bg-green-100 text-green-800' };
@@ -215,6 +244,8 @@ export default function SchoolsDataTable({
         return { grade: 'B', color: 'bg-blue-100 text-blue-800' };
       case 'C':
         return { grade: 'C', color: 'bg-orange-100 text-orange-800' };
+      case 'D':
+        return { grade: 'D', color: 'bg-yellow-100 text-yellow-800' };
       case 'F':
         return { grade: 'F', color: 'bg-red-100 text-red-800' };
       default:
@@ -271,30 +302,53 @@ export default function SchoolsDataTable({
           <div className="flex items-center gap-6">
             {/* Grade Legend */}
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <span className="inline-block w-3 h-3 rounded-full bg-green-500"></span>
-                <span className="text-sm text-gray-600">
-                  A: {type === 'register-support' ? '64-80' : '80-100'} คะแนน (80-100%)
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="inline-block w-3 h-3 rounded-full bg-blue-500"></span>
-                <span className="text-sm text-gray-600">
-                  B: {type === 'register-support' ? '56-63' : '70-79'} คะแนน (70-79%)
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="inline-block w-3 h-3 rounded-full bg-orange-500"></span>
-                <span className="text-sm text-gray-600">
-                  C: {type === 'register-support' ? '40-55' : '50-69'} คะแนน (50-69%)
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="inline-block w-3 h-3 rounded-full bg-red-500"></span>
-                <span className="text-sm text-gray-600">
-                  F: {type === 'register-support' ? '0-39' : '0-49'} คะแนน (0-49%)
-                </span>
-              </div>
+              {type === 'register100' ? (
+                <>
+                  <div className="flex items-center gap-2">
+                    <span className="inline-block w-3 h-3 rounded-full bg-green-500"></span>
+                    <span className="text-sm text-gray-600">A: 160-200 คะแนน</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="inline-block w-3 h-3 rounded-full bg-blue-500"></span>
+                    <span className="text-sm text-gray-600">B: 150-159 คะแนน</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="inline-block w-3 h-3 rounded-full bg-orange-500"></span>
+                    <span className="text-sm text-gray-600">C: 120-149 คะแนน</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="inline-block w-3 h-3 rounded-full bg-yellow-500"></span>
+                    <span className="text-sm text-gray-600">D: 100-119 คะแนน</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="inline-block w-3 h-3 rounded-full bg-red-500"></span>
+                    <span className="text-sm text-gray-600">F: 0-99 คะแนน</span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center gap-2">
+                    <span className="inline-block w-3 h-3 rounded-full bg-green-500"></span>
+                    <span className="text-sm text-gray-600">A: 145-180 คะแนน</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="inline-block w-3 h-3 rounded-full bg-blue-500"></span>
+                    <span className="text-sm text-gray-600">B: 126-144 คะแนน</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="inline-block w-3 h-3 rounded-full bg-orange-500"></span>
+                    <span className="text-sm text-gray-600">C: 109-125 คะแนน</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="inline-block w-3 h-3 rounded-full bg-yellow-500"></span>
+                    <span className="text-sm text-gray-600">D: 90-108 คะแนน</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="inline-block w-3 h-3 rounded-full bg-red-500"></span>
+                    <span className="text-sm text-gray-600">F: 0-89 คะแนน</span>
+                  </div>
+                </>
+              )}
             </div>
             <button 
               onClick={handleExportExcel}
@@ -402,7 +456,7 @@ export default function SchoolsDataTable({
                 </tr>
               ) : (
                 currentSchools.map((school: any, index: number) => {
-                  const totalScore = school.total_score || 0;
+                  const totalScore = calculateTotalScore(school);
                   const gradeInfo = getGradeStyle(totalScore);
                   const globalIndex = startIndex + index + 1;
                   

@@ -25,10 +25,10 @@ export default function Footer() {
               />
               <div className="flex flex-col leading-tight text-left">
                 <span className="text-white font-bold text-[15px]">
-                  {"โครงการคัดเลือกสถานศึกษา"}
+                  {"กิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์"}
                 </span>
                 <span className="text-white/80 text-[11px]">
-                  {"ตามกิจกรรมโรงเรียนดนตรีไทย ๑๐๐ เปอร์เซ็นต์"}
+                  {"ประจำปีงบประมาณ พ.ศ.2569"}
                 </span>
               </div>
             </div>
@@ -44,7 +44,7 @@ export default function Footer() {
               {"ลิงก์ด่วน"}
             </h3>
             <ul className="flex flex-col gap-2 items-center lg:items-start">
-              {["หน้าแรก", "ข้อมูลโครงการ", "ประกาศนียบัตร", "ดาวน์โหลด", "ติดต่อ"].map(
+              {["หน้าแรก", "สมัครกิจกรรม", "ข้อมูลกิจกรรม", "ประกาศนียบัตร", "ดาวน์โหลด", "ติดต่อ"].map(
                 (label) => (
                   <li key={label}>
                     <a
@@ -98,13 +98,13 @@ export default function Footer() {
               <li className="flex items-start gap-3">
                 <MapPin className="h-4 w-4 text-white/50 mt-0.5 shrink-0" />
                 <span className="text-sm text-white/60 leading-relaxed text-left">
-                  {"กระทรวงวัฒนธรรม เลขที่ ๖๖๖ ถนนบรมราชชนนี แขวงบางบำหรุ เขตบางพลัด กรุงเทพฯ ๑๐๗๐๐"}
+                  {"กระทรวงวัฒนธรรม เลขที่ 666 ถนนบรมราชชนนี แขวงบางบำหรุ เขตบางพลัด กรุงเทพฯ 10700"}
                 </span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="h-4 w-4 text-white/50 shrink-0" />
                 <span className="text-sm text-white/60">
-                  {"๐๒-๔๒๒-๘๘๘๘"}
+                  {"02-422-8888"}
                 </span>
               </li>
               <li className="flex items-center gap-3">
@@ -120,7 +120,7 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="border-t border-white/20 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-white/40">
-            {"© ๒๕๖๙ กระทรวงวัฒนธรรม. สงวนลิขสิทธิ์."}
+            {"© 2026 Thai Music Platform. Some images are AI-generated using Google Gemini."}
           </p>
           <div className="flex items-center gap-3">
             {socialLinks.map((link) => {

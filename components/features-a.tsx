@@ -76,16 +76,16 @@ export default function FeaturesA() {
             </blockquote>
 
             <p className="text-white/70 leading-relaxed">
-              {"โครงการคัดเลือกสถานศึกษา ตามกิจกรรมโรงเรียนดนตรีไทย ๑๐๐ เปอร์เซ็นต์ มีวัตถุประสงค์เพื่อส่งเสริมให้สถานศึกษาจัดกิจกรรมการเรียนการสอนดนตรีไทย อย่างเป็นรูปธรรม เพื่อปลูกฝังให้เยาวชนมีความรักและภาคภูมิใจในศิลปวัฒนธรรมไทย"}
+              {"โครงการคัดเลือกสถานศึกษา ตามกิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์ มีวัตถุประสงค์เพื่อส่งเสริมให้สถานศึกษาจัดกิจกรรมการเรียนการสอนดนตรีไทย อย่างเป็นรูปธรรม เพื่อปลูกฝังให้เยาวชนมีความรักและภาคภูมิใจในศิลปวัฒนธรรมไทย"}
             </p>
 
             <div className="flex flex-wrap gap-4">
               <div className="rounded-xl border border-white/15 bg-white/10 px-6 py-4 text-center">
-                <p className="text-2xl font-bold text-[#BE8C13]">{"๑๐๐%"}</p>
+                <p className="text-2xl font-bold text-[#BE8C13]">{"100%"}</p>
                 <p className="text-xs text-white/60 mt-1">{"โรงเรียนดนตรีไทย"}</p>
               </div>
               <div className="rounded-xl border border-white/15 bg-white/10 px-6 py-4 text-center">
-                <p className="text-2xl font-bold text-[#BE8C13]">{"พ.ศ. ๒๕๖๙"}</p>
+                <p className="text-2xl font-bold text-[#BE8C13]">{"พ.ศ. 2569"}</p>
                 <p className="text-xs text-white/60 mt-1">{"ปีงบประมาณ"}</p>
               </div>
               <div className="rounded-xl border border-white/15 bg-white/10 px-6 py-4 text-center">

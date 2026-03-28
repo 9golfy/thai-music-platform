@@ -32,6 +32,7 @@ const thaiMusicTeacherSchema = z.object({
 // Support factor schema (for Step 6)
 const supportFactorSchema = z.object({
   sup_supportByAdmin: z.string().optional(),
+  sup_supportByOther: z.string().optional(),
   sup_supportByDescription: z.string().optional(),
   sup_supportByDate: z.string().optional(),
   sup_supportByDriveLink: z.string().optional(),
@@ -216,8 +217,9 @@ export const register100Schema = z.object({
   reg100_award_score: z.number().default(0), // 5/10/15/20 คะแนน
 
   // Step 6: การสนับสนุน
-  reg100_photoGalleryLink: z.string().optional(),
-  reg100_videoLink: z.string().optional(),
+  reg100_photoGalleryLink: z.string().min(1, 'กรุณากรอก Link ภาพถ่ายผลงาน'),
+  reg100_videoLink: z.string().min(1, 'กรุณากรอก Link วีดิโอที่ 1'),
+  reg100_videoLink2: z.string().min(1, 'กรุณากรอก Link วีดิโอที่ 2'),
 
   // Step 7: การเผยแพร่
   reg100_activitiesWithinProvinceInternal: z.array(activityWithinProvinceInternalSchema).default([]),

@@ -36,7 +36,7 @@ function generateCSV(data) {
     
     // Footer
     ['สร้างเมื่อ', new Date().toLocaleDateString('th-TH')],
-    ['ระบบบริหารจัดการข้อมูลการจัดการเรียนรู้ดนตรีไทย ๑๐๐ ปี']
+    ['ระบบบริหารจัดการข้อมูลการจัดการเรียนรู้ดนตรีไทย 100 ปี']
   ];
 
   // Convert to CSV format with proper escaping

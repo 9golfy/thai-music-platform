@@ -36,6 +36,7 @@ export default function Step6({ form }: Step6Props) {
       if (supportFactorFields.length === 0) {
         appendSupportFactor({
           sup_supportByAdmin: '',
+          sup_supportByOther: '',
           sup_supportByDescription: '',
           sup_supportByDate: '',
           sup_supportByDriveLink: '',
@@ -92,6 +93,20 @@ export default function Step6({ form }: Step6Props) {
                 </select>
               </div>
 
+              {form.watch(`reg100_supportFactors.${idx}.sup_supportByAdmin`) === 'อื่นๆ' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-900 mb-1">
+                    ระบุชื่อองค์กร เช่น วัด สมาคม มูลนิธิ
+                  </label>
+                  <input
+                    {...register(`reg100_supportFactors.${idx}.sup_supportByOther`)}
+                    type="text"
+                    placeholder="ระบุชื่อองค์กร เช่น วัด สมาคม มูลนิธิ"
+                    className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  />
+                </div>
+              )}
+
               <div>
                 <label className="block text-sm font-medium text-gray-900 mb-1">
                   บรรยาย และอธิบายรายละเอียดการสนับสนุน
@@ -111,6 +126,7 @@ export default function Step6({ form }: Step6Props) {
               type="button"
               onClick={() => appendSupportFactor({
                 sup_supportByAdmin: '',
+                sup_supportByOther: '',
                 sup_supportByDescription: '',
                 sup_supportByDate: '',
                 sup_supportByDriveLink: '',

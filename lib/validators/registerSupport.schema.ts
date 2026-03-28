@@ -195,8 +195,9 @@ export const registerSupportSchema = z.object({
   regsup_award_score: z.number().default(0), // 5/10/15/20 คะแนน
 
   // Step 6: การสนับสนุน
-  regsup_photoGalleryLink: z.string().optional(),
-  regsup_videoLink: z.string().optional(),
+  regsup_photoGalleryLink: z.string().min(1, 'กรุณากรอก Link ภาพถ่ายผลงาน'),
+  regsup_videoLink: z.string().min(1, 'กรุณากรอก Link วีดิโอที่ 1'),
+  regsup_videoLink2: z.string().min(1, 'กรุณากรอก Link วีดิโอที่ 2'),
 
   // Step 7: การเผยแพร่
   regsup_activitiesWithinProvinceInternal: z.array(activityWithinProvinceInternalSchema).default([]),

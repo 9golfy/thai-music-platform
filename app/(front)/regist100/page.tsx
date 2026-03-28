@@ -10,8 +10,8 @@ export default async function Regist100Page() {
   if (!isRegistrationOpen(settings, 'register100')) {
     return (
       <RegistrationClosedNotice
-        title="โรงเรียนดนตรีไทย ๑๐๐%"
-        detail="ขออภัย ขณะนี้ปิดรับการลงทะเบียนสำหรับโรงเรียนดนตรีไทย ๑๐๐% แล้ว"
+        title="โรงเรียนดนตรีไทย 100%"
+        detail="ขออภัย ขณะนี้ปิดรับการลงทะเบียนสำหรับโรงเรียนดนตรีไทย 100% แล้ว"
       />
     );
   }

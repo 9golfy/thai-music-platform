@@ -461,7 +461,8 @@ test('Register-Support Full Test (Step 1-9) — MAX SCORE 80pts', async ({ page 
   await page.fill('input[name="regsup_awards.0.awardDate"]', '2025-12-15');
   await page.fill('input[name="regsup_awards.0.awardEvidenceLink"]', 'https://drive.google.com/award1');
   await page.fill('input[name="regsup_photoGalleryLink"]', 'https://drive.google.com/photos');
-  await page.fill('input[name="regsup_videoLink"]', 'https://youtube.com/watch?v=example');
+  await page.fill('input[name="regsup_videoLink"]', 'https://youtube.com/watch?v=classroom-example');
+  await page.fill('input[name="regsup_videoLink2"]', 'https://youtube.com/watch?v=performance-example');
 
   console.log('✅ Step 7 completed');
   await clickNext(page, 'Step 7');

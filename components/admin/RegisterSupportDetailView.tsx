@@ -361,17 +361,50 @@ export default function RegisterSupportDetailView({ id, hideScores = false, read
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-lg font-semibold text-gray-700">คะแนนรวมทั้งหมด</div>
-                <div className="text-sm text-gray-600 mt-1">Total Score</div>
+                <div className="text-sm text-gray-600 mt-1">Total Score (Part 1 + Part 2)</div>
               </div>
               <div className="text-right">
                 <div className="flex items-center justify-end gap-3">
-                  <span className={`text-3xl font-bold ${getGradeColor(calculateGrade(displayedRegisterSupportGradeScore, 80))}`}>
-                    Grade {calculateGrade(displayedRegisterSupportGradeScore, 80)}
+                  <span className={`text-3xl font-bold ${getGradeColor(calculateGrade(
+                    ((editedData?.teacher_qualification_score ?? submission.teacher_qualification_score ?? 0) + 
+                     (editedData?.support_from_org_score ?? submission.support_from_org_score ?? 0) + 
+                     (editedData?.support_from_external_score ?? submission.support_from_external_score ?? 0) + 
+                     (editedData?.award_score ?? submission.award_score ?? 0) + 
+                     (editedData?.activity_within_province_internal_score ?? submission.activity_within_province_internal_score ?? 0) + 
+                     (editedData?.activity_within_province_external_score ?? submission.activity_within_province_external_score ?? 0) + 
+                     (editedData?.activity_outside_province_score ?? submission.activity_outside_province_score ?? 0) + 
+                     (editedData?.pr_activity_score ?? submission.pr_activity_score ?? 0) +
+                     (editedData?.video1_score ?? submission.video1_score ?? 0) +
+                     (editedData?.video2_score ?? submission.video2_score ?? 0))
+                  ))}`}>
+                    Grade {calculateGrade(
+                      ((editedData?.teacher_qualification_score ?? submission.teacher_qualification_score ?? 0) + 
+                       (editedData?.support_from_org_score ?? submission.support_from_org_score ?? 0) + 
+                       (editedData?.support_from_external_score ?? submission.support_from_external_score ?? 0) + 
+                       (editedData?.award_score ?? submission.award_score ?? 0) + 
+                       (editedData?.activity_within_province_internal_score ?? submission.activity_within_province_internal_score ?? 0) + 
+                       (editedData?.activity_within_province_external_score ?? submission.activity_within_province_external_score ?? 0) + 
+                       (editedData?.activity_outside_province_score ?? submission.activity_outside_province_score ?? 0) + 
+                       (editedData?.pr_activity_score ?? submission.pr_activity_score ?? 0) +
+                       (editedData?.video1_score ?? submission.video1_score ?? 0) +
+                       (editedData?.video2_score ?? submission.video2_score ?? 0))
+                    )}
                   </span>
                   <span className="text-gray-400">|</span>
-                  <span className="text-5xl font-bold text-green-600">{displayedRegisterSupportTotal}</span>
+                  <span className="text-5xl font-bold text-green-600">
+                    {(editedData?.teacher_qualification_score ?? submission.teacher_qualification_score ?? 0) + 
+                     (editedData?.support_from_org_score ?? submission.support_from_org_score ?? 0) + 
+                     (editedData?.support_from_external_score ?? submission.support_from_external_score ?? 0) + 
+                     (editedData?.award_score ?? submission.award_score ?? 0) + 
+                     (editedData?.activity_within_province_internal_score ?? submission.activity_within_province_internal_score ?? 0) + 
+                     (editedData?.activity_within_province_external_score ?? submission.activity_within_province_external_score ?? 0) + 
+                     (editedData?.activity_outside_province_score ?? submission.activity_outside_province_score ?? 0) + 
+                     (editedData?.pr_activity_score ?? submission.pr_activity_score ?? 0) +
+                     (editedData?.video1_score ?? submission.video1_score ?? 0) +
+                     (editedData?.video2_score ?? submission.video2_score ?? 0)}
+                  </span>
                 </div>
-                <div className="text-lg text-gray-600 font-medium">/ 80 คะแนน</div>
+                <div className="text-lg text-gray-600 font-medium">/ 180 คะแนน</div>
               </div>
             </div>
           </div>
@@ -452,7 +485,7 @@ export default function RegisterSupportDetailView({ id, hideScores = false, read
           </div>
 
           <div className="mt-6 bg-gray-50 p-4 rounded-lg border border-gray-200">
-            <div className="text-sm font-semibold text-gray-700 mb-2">สรุปการคำนวณคะแนน:</div>
+            <div className="text-sm font-semibold text-gray-700 mb-2">ส่วนที่ 1: สรุปการคำนวณคะแนน</div>
             <div className="text-xs text-gray-600 space-y-1">
               <div className="flex justify-between">
                 <span>Step 4: คุณลักษณะครูผู้สอน</span>
@@ -489,6 +522,108 @@ export default function RegisterSupportDetailView({ id, hideScores = false, read
               <div className="flex justify-between pt-2 mt-2 border-t-2 border-gray-300 font-bold text-green-700">
                 <span>รวมทั้งหมด</span>
                 <span>{displayedRegisterSupportTotal} / 80 คะแนน</span>
+              </div>
+            </div>
+
+            {/* ส่วนที่ 2: คะแนนจากรายงานที่ส่ง */}
+            <div className="mt-6 pt-6 border-t-2 border-gray-300">
+              <div className="text-sm font-semibold text-gray-700 mb-3">ส่วนที่ 2: คะแนนจากรายงานที่ส่ง</div>
+              <div className="text-xs text-gray-600 mb-1 font-semibold">วิดีโอ/คลิป</div>
+              <div className="text-xs text-red-600 font-medium mb-3">
+                กรุณาแชร์ลิงก์ที่สามารถเข้าถึงได้ "หากไม่สามารถเปิดได้ จะถือว่าสละสิทธิ์รับคะแนนส่วนนี้"
+              </div>
+              
+              <div className="space-y-3">
+                <div className="flex items-center justify-between py-2">
+                  <div className="flex-1">
+                    <div className="text-xs text-gray-700 font-medium">1. บรรยากาศการเรียนการสอนในชั้นเรียน และในสถานศึกษา</div>
+                    <div className="text-xs text-gray-500 mt-1">Link/URL สำหรับ Share Drive (Google Drive, Dropbox, etc.)</div>
+                  </div>
+                  <div className="flex items-center gap-2 ml-4">
+                    {isEditMode ? (
+                      <input
+                        type="number"
+                        min="0"
+                        max="50"
+                        value={editedData?.video1_score ?? submission.video1_score ?? 0}
+                        onChange={(e) => {
+                          const value = Math.min(50, Math.max(0, parseInt(e.target.value) || 0));
+                          handleFieldChange('video1_score', value);
+                        }}
+                        className="w-16 px-2 py-1 text-center font-semibold border-2 border-green-500 rounded focus:outline-none focus:ring-2 focus:ring-green-500 bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      />
+                    ) : (
+                      <div className="w-16 px-2 py-1 text-center font-semibold bg-gray-200 border border-gray-300 rounded">
+                        {submission.video1_score ?? 0}
+                      </div>
+                    )}
+                    <span className="text-xs text-gray-600 whitespace-nowrap">คะแนนเต็ม 50 คะแนน</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between py-2">
+                  <div className="flex-1">
+                    <div className="text-xs text-gray-700 font-medium">2. การแสดงผลงานด้านดนตรีของนักเรียน</div>
+                    <div className="text-xs text-gray-500 mt-1">Link/URL สำหรับ Share Drive (Google Drive, Dropbox, etc.)</div>
+                  </div>
+                  <div className="flex items-center gap-2 ml-4">
+                    {isEditMode ? (
+                      <input
+                        type="number"
+                        min="0"
+                        max="50"
+                        value={editedData?.video2_score ?? submission.video2_score ?? 0}
+                        onChange={(e) => {
+                          const value = Math.min(50, Math.max(0, parseInt(e.target.value) || 0));
+                          handleFieldChange('video2_score', value);
+                        }}
+                        className="w-16 px-2 py-1 text-center font-semibold border-2 border-green-500 rounded focus:outline-none focus:ring-2 focus:ring-green-500 bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      />
+                    ) : (
+                      <div className="w-16 px-2 py-1 text-center font-semibold bg-gray-200 border border-gray-300 rounded">
+                        {submission.video2_score ?? 0}
+                      </div>
+                    )}
+                    <span className="text-xs text-gray-600 whitespace-nowrap">คะแนนเต็ม 50 คะแนน</span>
+                  </div>
+                </div>
+              </div>
+
+              {isEditMode && (
+                <div className="mt-4 flex gap-2 justify-start">
+                  <button
+                    onClick={handleSave}
+                    disabled={isSaving}
+                    className="px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-all disabled:opacity-50 text-sm font-medium"
+                  >
+                    {isSaving ? 'กำลังบันทึก...' : 'แก้ไขคะแนน'}
+                  </button>
+                  <button
+                    onClick={handleCancelEdit}
+                    className="px-6 py-2 bg-black text-white rounded hover:bg-gray-800 transition-all text-sm font-medium"
+                  >
+                    ยกเลิกคะแนน
+                  </button>
+                </div>
+              )}
+
+              <div className="flex items-center justify-end pt-3 mt-3">
+                <span className="text-sm font-bold text-green-700">
+                  รวมคะแนนทั้ง 2 ส่วน {' '}
+                  <span className="text-2xl">
+                    {(editedData?.teacher_qualification_score ?? submission.teacher_qualification_score ?? 0) + 
+                     (editedData?.support_from_org_score ?? submission.support_from_org_score ?? 0) + 
+                     (editedData?.support_from_external_score ?? submission.support_from_external_score ?? 0) + 
+                     (editedData?.award_score ?? submission.award_score ?? 0) + 
+                     (editedData?.activity_within_province_internal_score ?? submission.activity_within_province_internal_score ?? 0) + 
+                     (editedData?.activity_within_province_external_score ?? submission.activity_within_province_external_score ?? 0) + 
+                     (editedData?.activity_outside_province_score ?? submission.activity_outside_province_score ?? 0) + 
+                     (editedData?.pr_activity_score ?? submission.pr_activity_score ?? 0) +
+                     (editedData?.video1_score ?? submission.video1_score ?? 0) +
+                     (editedData?.video2_score ?? submission.video2_score ?? 0)}
+                  </span>
+                  {' '} คะแนน
+                </span>
               </div>
             </div>
           </div>
@@ -1259,13 +1394,13 @@ export default function RegisterSupportDetailView({ id, hideScores = false, read
 
                 <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
                   <h5 className="font-medium text-gray-900 mb-2">วิดีโอ/คลิป</h5>
-                  <div className="space-y-3">
-                    <div>
-                      <p className="text-sm text-gray-700 mb-2">1 บรรยากาศการเรียนการสอนในชั้นเรียน และในสถานศึกษา ความยาวไม่เกิน 3 นาที</p>
-                      <p className="text-sm text-gray-700 mb-2">2 การแสดงผลงานด้านดนตรีของนักเรียน ความยาวไม่เกิน 3 นาที</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-700 mb-2">Link/URL สำหรับ Share Drive (Google Drive, Dropbox, etc.)</p>
+                  <p className="text-xs text-red-600 font-medium mb-3">กรุณาแชร์ลิงก์ที่สามารถเข้าถึงได้ "หากไม่สามารถเปิดได้ จะถือว่าสละสิทธิ์รับคะแนนส่วนนี้"</p>
+                  
+                  <div className="space-y-4">
+                    {/* Video 1 */}
+                    <div className="bg-white p-3 rounded border border-blue-200">
+                      <p className="text-sm font-medium text-gray-900 mb-2">1 บรรยากาศการเรียนการสอนในชั้นเรียน และในสถานศึกษา ความยาวไม่เกิน 3 นาที</p>
+                      <p className="text-xs text-gray-600 mb-2">Link/URL สำหรับ Share Drive (Google Drive, Dropbox, etc.)</p>
                       <Field 
                         label="" 
                         value={displayData?.videoLink} 
@@ -1274,7 +1409,20 @@ export default function RegisterSupportDetailView({ id, hideScores = false, read
                         onChange={(val) => handleFieldChange('videoLink', val)} 
                         fieldName="videoLink" 
                       />
-                      <p className="text-xs text-gray-500 mt-2">กรุณาเปลี่ยนที่สามารถเข้าถึงได้ "ทุกคนในอินเทอร์เน็ต จะดูได้ทั้งหมดโดยไม่ต้องลงชื่อเข้าใช้"</p>
+                    </div>
+
+                    {/* Video 2 */}
+                    <div className="bg-white p-3 rounded border border-blue-200">
+                      <p className="text-sm font-medium text-gray-900 mb-2">2 การแสดงผลงานด้านดนตรีของนักเรียน ความยาวไม่เกิน 3 นาที</p>
+                      <p className="text-xs text-gray-600 mb-2">Link/URL สำหรับ Share Drive (Google Drive, Dropbox, etc.)</p>
+                      <Field 
+                        label="" 
+                        value={displayData?.videoLink2} 
+                        fullWidth 
+                        isEditMode={isEditMode} 
+                        onChange={(val) => handleFieldChange('videoLink2', val)} 
+                        fieldName="videoLink2" 
+                      />
                     </div>
                   </div>
                 </div>

@@ -94,10 +94,10 @@ export default function TeacherDashboardLayout({
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-white text-sm font-medium leading-tight">
-              โครงการคัดเลือกสถานศึกษา
+              กิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์
             </div>
             <div className="text-white/75 text-xs leading-tight">
-              ตามกิจกรรมโรงเรียนดนตรีไทย ๑๐๐ เปอร์เซ็นต์
+              กิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์
             </div>
           </div>
         </div>
@@ -157,7 +157,7 @@ export default function TeacherDashboardLayout({
                 </svg>
               </button>
               <h1 className="text-xl font-bold text-gray-900">
-                ระบบบริหารจัดการข้อมูลกิจกรรมโรงเรียนดนตรีไทย ๑๐๐ เปอร์เซ็นต์
+                กิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์ ประจำปีงบประมาณ พ.ศ. 2569
               </h1>
             </div>
             <div className="flex items-center gap-3">

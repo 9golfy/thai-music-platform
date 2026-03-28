@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { calculateGrade, getGradeColor, getGradeBgColor } from '@/lib/utils/gradeCalculator';
+import { calculateGradeRegister100, getGradeColor, getGradeBgColor } from '@/lib/utils/gradeCalculator';
 
 interface Submission {
   _id: string;
@@ -300,46 +300,82 @@ export default function Register100DetailView({ id, hideScores = false, readOnly
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-lg font-semibold text-gray-700">คะแนนรวมทั้งหมด</div>
-                  <div className="text-sm text-gray-600 mt-1">Total Score</div>
+                  <div className="text-sm text-gray-600 mt-1">Total Score (Part 1 + Part 2)</div>
                 </div>
                 <div className="text-right">
                   <div className="flex items-center justify-end gap-3">
-                    <span className={`text-3xl font-bold ${getGradeColor(calculateGrade(submission.total_score || 0))}`}>
-                      Grade {calculateGrade(submission.total_score || 0)}
+                    <span className={`text-3xl font-bold ${getGradeColor(calculateGradeRegister100(
+                      ((editedData?.teaching_curriculum_score ?? submission.teaching_curriculum_score ?? 0) +
+                       (editedData?.teacher_qualification_score ?? submission.teacher_qualification_score ?? 0) + 
+                       (editedData?.support_from_org_score ?? submission.support_from_org_score ?? 0) + 
+                       (editedData?.support_from_external_score ?? submission.support_from_external_score ?? 0) + 
+                       (editedData?.award_score ?? submission.award_score ?? 0) + 
+                       (editedData?.activity_within_province_internal_score ?? submission.activity_within_province_internal_score ?? 0) + 
+                       (editedData?.activity_within_province_external_score ?? submission.activity_within_province_external_score ?? 0) + 
+                       (editedData?.activity_outside_province_score ?? submission.activity_outside_province_score ?? 0) + 
+                       (editedData?.pr_activity_score ?? submission.pr_activity_score ?? 0) +
+                       (editedData?.video1_score ?? submission.video1_score ?? 0) +
+                       (editedData?.video2_score ?? submission.video2_score ?? 0))
+                    ))}`}>
+                      Grade {calculateGradeRegister100(
+                        ((editedData?.teaching_curriculum_score ?? submission.teaching_curriculum_score ?? 0) +
+                         (editedData?.teacher_qualification_score ?? submission.teacher_qualification_score ?? 0) + 
+                         (editedData?.support_from_org_score ?? submission.support_from_org_score ?? 0) + 
+                         (editedData?.support_from_external_score ?? submission.support_from_external_score ?? 0) + 
+                         (editedData?.award_score ?? submission.award_score ?? 0) + 
+                         (editedData?.activity_within_province_internal_score ?? submission.activity_within_province_internal_score ?? 0) + 
+                         (editedData?.activity_within_province_external_score ?? submission.activity_within_province_external_score ?? 0) + 
+                         (editedData?.activity_outside_province_score ?? submission.activity_outside_province_score ?? 0) + 
+                         (editedData?.pr_activity_score ?? submission.pr_activity_score ?? 0) +
+                         (editedData?.video1_score ?? submission.video1_score ?? 0) +
+                         (editedData?.video2_score ?? submission.video2_score ?? 0))
+                      )}
                     </span>
                     <span className="text-gray-400">|</span>
-                    <span className="text-5xl font-bold text-green-600">{submission.total_score || 0}</span>
+                    <span className="text-5xl font-bold text-green-600">
+                      {(editedData?.teaching_curriculum_score ?? submission.teaching_curriculum_score ?? 0) +
+                       (editedData?.teacher_qualification_score ?? submission.teacher_qualification_score ?? 0) + 
+                       (editedData?.support_from_org_score ?? submission.support_from_org_score ?? 0) + 
+                       (editedData?.support_from_external_score ?? submission.support_from_external_score ?? 0) + 
+                       (editedData?.award_score ?? submission.award_score ?? 0) + 
+                       (editedData?.activity_within_province_internal_score ?? submission.activity_within_province_internal_score ?? 0) + 
+                       (editedData?.activity_within_province_external_score ?? submission.activity_within_province_external_score ?? 0) + 
+                       (editedData?.activity_outside_province_score ?? submission.activity_outside_province_score ?? 0) + 
+                       (editedData?.pr_activity_score ?? submission.pr_activity_score ?? 0) +
+                       (editedData?.video1_score ?? submission.video1_score ?? 0) +
+                       (editedData?.video2_score ?? submission.video2_score ?? 0)}
+                    </span>
                   </div>
-                  <div className="text-lg text-gray-600 font-medium">/ 100 คะแนน</div>
+                  <div className="text-lg text-gray-600 font-medium">/ 200 คะแนน</div>
                 </div>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <ScoreCard step="STEP 5" title="การเรียนการสอนดนตรีไทย" subtitle="วิชาบังคับ, หลังเลิกเรียน, วิชาเลือก, หลักสูตรท้องถิ่น" score={submission.teacher_training_score || 0} max={20} color="blue" note="5 คะแนน/ข้อ × 4 ข้อ" />
-              <ScoreCard step="STEP 4" title="คุณลักษณะครูผู้สอน" subtitle="ครูดนตรีไทย, ครูภูมิปัญญา, ผู้ทรงคุณวุฒิ, วิทยากร" score={submission.teacher_qualification_score || 0} max={20} color="purple" note="5 คะแนน/ประเภท (สูงสุด 4 ประเภท)" />
-              <ScoreCard step="STEP 7" title="การสนับสนุนจากต้นสังกัด" subtitle="บุคคล/หน่วยงานภายใน" score={submission.support_from_org_score || 0} max={5} color="teal" note="ติ๊กถูก = 5 คะแนน" />
-              <ScoreCard step="STEP 7" title="การสนับสนุนจากภายนอก" subtitle="บุคคล/หน่วยงานภายนอก" score={submission.support_from_external_score || 0} max={15} color="orange" note="1 คน=5, 2 คน=10, 3+ คน=15" />
-              <ScoreCard step="STEP 7" title="รางวัลและเกียรติคุณ" subtitle="อำเภอ, จังหวัด, ภาค, ประเทศ" score={submission.award_score || 0} max={20} color="amber" note="อำเภอ=5, จังหวัด=10, ภาค=15, ประเทศ=20" />
-              <ScoreCard step="STEP 8" title="กิจกรรมภายในสถานศึกษา" subtitle="ภายในจังหวัด - ภายในโรงเรียน" score={submission.activity_within_province_internal_score || 0} max={5} color="cyan" note="≥ 3 กิจกรรม = 5 คะแนน" />
-              <ScoreCard step="STEP 8" title="กิจกรรมภายนอกสถานศึกษา" subtitle="ภายในจังหวัด - นอกโรงเรียน" score={submission.activity_within_province_external_score || 0} max={5} color="indigo" note="≥ 3 กิจกรรม = 5 คะแนน" />
-              <ScoreCard step="STEP 8" title="กิจกรรมนอกจังหวัด" subtitle="ภายนอกจังหวัด" score={submission.activity_outside_province_score || 0} max={5} color="pink" note="≥ 3 กิจกรรม = 5 คะแนน" />
-              <ScoreCard step="STEP 9" title="การประชาสัมพันธ์" subtitle="Facebook, YouTube, TikTok, Website" score={submission.pr_activity_score || 0} max={5} color="rose" note="≥ 3 กิจกรรม = 5 คะแนน" />
+              <ScoreCard step="STEP 5" title="การเรียนการสอนดนตรีไทย" subtitle="วิชาบังคับ, หลักสูตรเรียน, วิชาเลือก, หลักสูตรท้องถิ่น" score={editedData?.teaching_curriculum_score ?? submission.teaching_curriculum_score ?? 0} max={20} color="blue" note="5 คะแนน/ข้อ (สูงสุด 4 ข้อ)" />
+              <ScoreCard step="STEP 4" title="คุณลักษณะครูผู้สอน" subtitle="ครูดนตรีไทย, ครูภูมิปัญญา, ผู้ทรงคุณวุฒิ, วิทยากร" score={editedData?.teacher_qualification_score ?? submission.teacher_qualification_score ?? 0} max={20} color="purple" note="5 คะแนน/ประเภท (สูงสุด 4 ประเภท)" />
+              <ScoreCard step="STEP 7" title="การสนับสนุนจากหน่วยงาน" subtitle="บุคคล/หน่วยงานภายในสถานศึกษา" score={editedData?.support_from_org_score ?? submission.support_from_org_score ?? 0} max={5} color="teal" note="ติ๊กถูก = 5 คะแนน" />
+              <ScoreCard step="STEP 7" title="การสนับสนุนจากภายนอก" subtitle="บุคคล/หน่วยงานภายนอกสถานศึกษา" score={editedData?.support_from_external_score ?? submission.support_from_external_score ?? 0} max={15} color="orange" note="1 คน = 5, 2 คน = 10, 3+ คน = 15 คะแนน" />
+              <ScoreCard step="STEP 7" title="รางวัลและเกียรติคุณ" subtitle="อำเภอ, จังหวัด, ภาค, ประเทศ" score={editedData?.award_score ?? submission.award_score ?? 0} max={20} color="amber" note="อำเภอ=5, จังหวัด=10, ภาค=15, ประเทศ=20 คะแนน" />
+              <ScoreCard step="STEP 8" title="กิจกรรมภายในสถานศึกษา" subtitle="ภายในจังหวัด - ภายในโรงเรียน" score={editedData?.activity_within_province_internal_score ?? submission.activity_within_province_internal_score ?? 0} max={5} color="cyan" note="≥ 3 กิจกรรม = 5 คะแนน" />
+              <ScoreCard step="STEP 8" title="กิจกรรมนอกสถานศึกษา" subtitle="ภายนอกจังหวัด" score={editedData?.activity_within_province_external_score ?? submission.activity_within_province_external_score ?? 0} max={5} color="indigo" note="≥ 3 กิจกรรม = 5 คะแนน" />
+              <ScoreCard step="STEP 8" title="กิจกรรมนอกจังหวัด" subtitle="กรอกข้อมูล 3 ครั้งขึ้นไป" score={editedData?.activity_outside_province_score ?? submission.activity_outside_province_score ?? 0} max={5} color="pink" note="≥ 3 กิจกรรม = 5 คะแนน" />
+              <ScoreCard step="STEP 9" title="การประชาสัมพันธ์พันธ์" subtitle="Facebook, YouTube, TikTok, Website" score={editedData?.pr_activity_score ?? submission.pr_activity_score ?? 0} max={5} color="rose" note="≥ 3 กิจกรรม = 5 คะแนน" />
             </div>
 
             <div className="mt-6 bg-gray-50 p-4 rounded-lg border border-gray-200">
-              <div className="text-sm font-semibold text-gray-700 mb-2">สรุปการคำนวณคะแนน:</div>
+              <div className="text-sm font-semibold text-gray-700 mb-2">ส่วนที่ 1: สรุปการคำนวณคะแนน</div>
               <div className="text-xs text-gray-600 space-y-1">
                 {[
-                  ['Step 5: การเรียนการสอน (4 ข้อ × 5)', submission.teacher_training_score || 0, 20],
-                  ['Step 4: คุณลักษณะครู (ประเภทที่ไม่ซ้ำ × 5)', submission.teacher_qualification_score || 0, 20],
-                  ['Step 7: สนับสนุนจากต้นสังกัด', submission.support_from_org_score || 0, 5],
-                  ['Step 7: สนับสนุนจากภายนอก', submission.support_from_external_score || 0, 15],
-                  ['Step 7: รางวัล (ระดับสูงสุด)', submission.award_score || 0, 20],
-                  ['Step 8: กิจกรรมภายในสถานศึกษา', submission.activity_within_province_internal_score || 0, 5],
-                  ['Step 8: กิจกรรมภายนอกสถานศึกษา', submission.activity_within_province_external_score || 0, 5],
-                  ['Step 8: กิจกรรมนอกจังหวัด', submission.activity_outside_province_score || 0, 5],
-                  ['Step 9: การประชาสัมพันธ์', submission.pr_activity_score || 0, 5],
+                  ['Step 5: การเรียนการสอนดนตรีไทย (4 ข้อ × 5)', editedData?.teaching_curriculum_score ?? submission.teaching_curriculum_score ?? 0, 20],
+                  ['Step 4: คุณลักษณะครูผู้สอน (ประเภทที่ไม่ซ้ำ × 5)', editedData?.teacher_qualification_score ?? submission.teacher_qualification_score ?? 0, 20],
+                  ['Step 7: การสนับสนุนจากหน่วยงาน (ติ๊กถูก)', editedData?.support_from_org_score ?? submission.support_from_org_score ?? 0, 5],
+                  ['Step 7: การสนับสนุนจากภายนอก (บุคคล/หน่วยงานภายนอก)', editedData?.support_from_external_score ?? submission.support_from_external_score ?? 0, 15],
+                  ['Step 7: รางวัล (ระดับสูงสุด)', editedData?.award_score ?? submission.award_score ?? 0, 20],
+                  ['Step 8: กิจกรรมภายในสถานศึกษา (ภายในจังหวัด - ภายในโรงเรียน)', editedData?.activity_within_province_internal_score ?? submission.activity_within_province_internal_score ?? 0, 5],
+                  ['Step 8: กิจกรรมนอกสถานศึกษา (ภายในจังหวัด - ภายนอกโรงเรียน)', editedData?.activity_within_province_external_score ?? submission.activity_within_province_external_score ?? 0, 5],
+                  ['Step 8: กิจกรรมนอกจังหวัด', editedData?.activity_outside_province_score ?? submission.activity_outside_province_score ?? 0, 5],
+                  ['Step 9: การประชาสัมพันธ์พันธ์', editedData?.pr_activity_score ?? submission.pr_activity_score ?? 0, 5],
                 ].map(([label, score, max]) => (
                   <div key={label as string} className="flex justify-between">
                     <span>{label}</span>
@@ -348,7 +384,117 @@ export default function Register100DetailView({ id, hideScores = false, readOnly
                 ))}
                 <div className="flex justify-between pt-2 mt-2 border-t-2 border-gray-300 font-bold text-green-700">
                   <span>รวมทั้งหมด</span>
-                  <span>{submission.total_score || 0} / 100 คะแนน</span>
+                  <span>{(editedData?.teaching_curriculum_score ?? submission.teaching_curriculum_score ?? 0) +
+                         (editedData?.teacher_qualification_score ?? submission.teacher_qualification_score ?? 0) + 
+                         (editedData?.support_from_org_score ?? submission.support_from_org_score ?? 0) + 
+                         (editedData?.support_from_external_score ?? submission.support_from_external_score ?? 0) + 
+                         (editedData?.award_score ?? submission.award_score ?? 0) + 
+                         (editedData?.activity_within_province_internal_score ?? submission.activity_within_province_internal_score ?? 0) + 
+                         (editedData?.activity_within_province_external_score ?? submission.activity_within_province_external_score ?? 0) + 
+                         (editedData?.activity_outside_province_score ?? submission.activity_outside_province_score ?? 0) + 
+                         (editedData?.pr_activity_score ?? submission.pr_activity_score ?? 0)} / 100 คะแนน</span>
+                </div>
+              </div>
+
+              {/* ส่วนที่ 2: คะแนนจากรายงานที่ส่ง */}
+              <div className="mt-6 pt-6 border-t-2 border-gray-300">
+                <div className="text-sm font-semibold text-gray-700 mb-3">ส่วนที่ 2: คะแนนจากรายงานที่ส่ง</div>
+                <div className="text-xs text-gray-600 mb-1 font-semibold">วิดีโอ/คลิป</div>
+                <div className="text-xs text-red-600 font-medium mb-3">
+                  กรุณาแชร์ลิงก์ที่สามารถเข้าถึงได้ "หากไม่สามารถเปิดได้ จะถือว่าสละสิทธิ์รับคะแนนส่วนนี้"
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between py-2">
+                    <div className="flex-1">
+                      <div className="text-xs text-gray-700 font-medium">1 บรรยากาศการเรียนการสอนในชั้นเรียน และในสถานศึกษา ความยาวไม่เกิน 3 นาที</div>
+                      <div className="text-xs text-gray-500 mt-1">Link/URL สำหรับ Share Drive (Google Drive, Dropbox, etc.)</div>
+                    </div>
+                    <div className="flex items-center gap-2 ml-4">
+                      {isEditMode ? (
+                        <input
+                          type="number"
+                          min="0"
+                          max="50"
+                          value={editedData?.video1_score ?? submission.video1_score ?? 0}
+                          onChange={(e) => {
+                            const value = Math.min(50, Math.max(0, parseInt(e.target.value) || 0));
+                            handleFieldChange('video1_score', value);
+                          }}
+                          className="w-16 px-2 py-1 text-center font-semibold border-2 border-green-500 rounded focus:outline-none focus:ring-2 focus:ring-green-500 bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        />
+                      ) : (
+                        <div className="w-16 px-2 py-1 text-center font-semibold bg-gray-200 border border-gray-300 rounded">
+                          {submission.video1_score ?? 0}
+                        </div>
+                      )}
+                      <span className="text-xs text-gray-600 whitespace-nowrap">คะแนนเต็ม 50 คะแนน</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between py-2">
+                    <div className="flex-1">
+                      <div className="text-xs text-gray-700 font-medium">2 การแสดงผลงานด้านดนตรีของนักเรียน ความยาวไม่เกิน 3 นาที</div>
+                      <div className="text-xs text-gray-500 mt-1">Link/URL สำหรับ Share Drive (Google Drive, Dropbox, etc.)</div>
+                    </div>
+                    <div className="flex items-center gap-2 ml-4">
+                      {isEditMode ? (
+                        <input
+                          type="number"
+                          min="0"
+                          max="50"
+                          value={editedData?.video2_score ?? submission.video2_score ?? 0}
+                          onChange={(e) => {
+                            const value = Math.min(50, Math.max(0, parseInt(e.target.value) || 0));
+                            handleFieldChange('video2_score', value);
+                          }}
+                          className="w-16 px-2 py-1 text-center font-semibold border-2 border-green-500 rounded focus:outline-none focus:ring-2 focus:ring-green-500 bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        />
+                      ) : (
+                        <div className="w-16 px-2 py-1 text-center font-semibold bg-gray-200 border border-gray-300 rounded">
+                          {submission.video2_score ?? 0}
+                        </div>
+                      )}
+                      <span className="text-xs text-gray-600 whitespace-nowrap">คะแนนเต็ม 50 คะแนน</span>
+                    </div>
+                  </div>
+                </div>
+
+                {isEditMode && (
+                  <div className="mt-4 flex gap-2 justify-start">
+                    <button
+                      onClick={handleSave}
+                      disabled={isSaving}
+                      className="px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-all disabled:opacity-50 text-sm font-medium"
+                    >
+                      {isSaving ? 'กำลังบันทึก...' : 'แก้ไขคะแนน'}
+                    </button>
+                    <button
+                      onClick={handleCancelEdit}
+                      className="px-6 py-2 bg-black text-white rounded hover:bg-gray-800 transition-all text-sm font-medium"
+                    >
+                      ยกเลิกคะแนน
+                    </button>
+                  </div>
+                )}
+
+                <div className="flex items-center justify-end pt-3 mt-3">
+                  <span className="text-sm font-bold text-green-700">
+                    รวมคะแนนทั้ง 2 ส่วน {' '}
+                    <span className="text-2xl">
+                      {(editedData?.teacher_qualification_score ?? submission.teacher_qualification_score ?? 0) + 
+                       (editedData?.support_from_org_score ?? submission.support_from_org_score ?? 0) + 
+                       (editedData?.support_from_external_score ?? submission.support_from_external_score ?? 0) + 
+                       (editedData?.award_score ?? submission.award_score ?? 0) + 
+                       (editedData?.activity_within_province_internal_score ?? submission.activity_within_province_internal_score ?? 0) + 
+                       (editedData?.activity_within_province_external_score ?? submission.activity_within_province_external_score ?? 0) + 
+                       (editedData?.activity_outside_province_score ?? submission.activity_outside_province_score ?? 0) + 
+                       (editedData?.pr_activity_score ?? submission.pr_activity_score ?? 0) +
+                       (editedData?.video1_score ?? submission.video1_score ?? 0) +
+                       (editedData?.video2_score ?? submission.video2_score ?? 0)}
+                    </span>
+                    {' '} คะแนน
+                  </span>
                 </div>
               </div>
             </div>
@@ -775,13 +921,13 @@ export default function Register100DetailView({ id, hideScores = false, readOnly
 
                 <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
                   <h5 className="font-medium text-gray-900 mb-2">วิดีโอ/คลิป</h5>
-                  <div className="space-y-3">
-                    <div>
-                      <p className="text-sm text-gray-700 mb-2">1 บรรยากาศการเรียนการสอนในชั้นเรียน และในสถานศึกษา ความยาวไม่เกิน 3 นาที</p>
-                      <p className="text-sm text-gray-700 mb-2">2 การแสดงผลงานด้านดนตรีของนักเรียน ความยาวไม่เกิน 3 นาที</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-700 mb-2">Link/URL สำหรับ Share Drive (Google Drive, Dropbox, etc.)</p>
+                  <p className="text-xs text-red-600 font-medium mb-3">กรุณาแชร์ลิงก์ที่สามารถเข้าถึงได้ "หากไม่สามารถเปิดได้ จะถือว่าสละสิทธิ์รับคะแนนส่วนนี้"</p>
+                  
+                  <div className="space-y-4">
+                    {/* Video 1 */}
+                    <div className="bg-white p-3 rounded border border-blue-200">
+                      <p className="text-sm font-medium text-gray-900 mb-2">1. บรรยากาศการเรียนการสอนในชั้นเรียน (ทุกระดับชั้น) </p>
+                      <p className="text-xs text-gray-600 mb-2">Link/URL สำหรับ Share Drive (Google Drive, Dropbox, etc.)</p>
                       <Field 
                         label="" 
                         value={displayData?.reg100_videoLink} 
@@ -790,7 +936,20 @@ export default function Register100DetailView({ id, hideScores = false, readOnly
                         onChange={(val) => handleFieldChange('reg100_videoLink', val)} 
                         fieldName="reg100_videoLink" 
                       />
-                      <p className="text-xs text-gray-500 mt-2">กรุณาเปลี่ยนที่สามารถเข้าถึงได้ "ทุกคนในอินเทอร์เน็ต จะดูได้ทั้งหมดโดยไม่ต้องลงชื่อเข้าใช้"</p>
+                    </div>
+
+                    {/* Video 2 */}
+                    <div className="bg-white p-3 rounded border border-blue-200">
+                      <p className="text-sm font-medium text-gray-900 mb-2">2. การแสดงผลงานด้านดนตรีไทยของนักเรียนทั้งโรงเรียน</p>
+                      <p className="text-xs text-gray-600 mb-2">Link/URL สำหรับ Share Drive (Google Drive, Dropbox, etc.)</p>
+                      <Field 
+                        label="" 
+                        value={displayData?.reg100_videoLink2} 
+                        fullWidth 
+                        isEditMode={isEditMode} 
+                        onChange={(val) => handleFieldChange('reg100_videoLink2', val)} 
+                        fieldName="reg100_videoLink2" 
+                      />
                     </div>
                   </div>
                 </div>
@@ -952,6 +1111,62 @@ function ScoreCard({ step, title, subtitle, score, max, color, note }: { step: s
         </div>
       </div>
       <div className={`text-xs ${noteText} ${noteBg} px-2 py-1 rounded mt-2`}>{note}</div>
+    </div>
+  );
+}
+
+function EditableScoreSection({ 
+  title, 
+  items, 
+  isEditMode, 
+  onScoreChange 
+}: { 
+  title: string; 
+  items: Array<{ label: string; score: number; max: number; fieldName: string }>; 
+  isEditMode: boolean;
+  onScoreChange: (fieldName: string, value: number) => void;
+}) {
+  const totalScore = items.reduce((sum, item) => sum + item.score, 0);
+  const totalMax = items.reduce((sum, item) => sum + item.max, 0);
+
+  return (
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-6">
+      <div className="bg-green-50 px-6 py-3 border-b border-gray-200">
+        <h3 className="font-semibold text-gray-900">{title}</h3>
+      </div>
+      <div className="p-6">
+        <div className="bg-gray-50 rounded-lg p-4 mb-4">
+          <h4 className="font-semibold text-gray-900 mb-3">สรุปการคำนวณคะแนน:</h4>
+          <div className="space-y-2">
+            {items.map((item) => (
+              <div key={item.fieldName} className="flex items-center justify-between py-2 border-b border-gray-200 last:border-0">
+                <span className="text-sm text-gray-700">{item.label}</span>
+                <div className="flex items-center gap-2">
+                  {isEditMode ? (
+                    <>
+                      <input
+                        type="number"
+                        min="0"
+                        max={item.max}
+                        value={item.score}
+                        onChange={(e) => onScoreChange(item.fieldName, parseInt(e.target.value) || 0)}
+                        className="w-16 px-2 py-1 text-right border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                      />
+                      <span className="text-sm text-gray-600">/ {item.max} คะแนน</span>
+                    </>
+                  ) : (
+                    <span className="text-sm font-medium text-gray-900">{item.score}/{item.max} คะแนน</span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="flex items-center justify-between pt-3 mt-3 border-t-2 border-gray-300">
+            <span className="font-bold text-green-700">รวมทั้งหมด</span>
+            <span className="text-lg font-bold text-green-700">{totalScore} / {totalMax} คะแนน</span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

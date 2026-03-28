@@ -164,7 +164,7 @@ export async function sendTeacherPasswordEmail(
         
         <div class="footer">
           <p>หากคุณไม่ได้ขอรหัสผ่านนี้ กรุณาติดต่อผู้ดูแลระบบ</p>
-          <p>© ๒๕๖๙ Thai Music Platform. สงวนลิขสิทธิ์.</p>
+          <p>© 2569 Thai Music Platform. สงวนลิขสิทธิ์.</p>
         </div>
       </div>
     </body>

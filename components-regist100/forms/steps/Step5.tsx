@@ -387,7 +387,7 @@ export default function Step5({ form }: Step5Props) {
                 type="checkbox"
                 className="mt-1 w-4 h-4 text-[#00B050] border-gray-300 rounded focus:ring-[#00B050]"
               />
-              <span className="text-sm font-medium text-gray-900">นอกเวลาราชการ</span>
+              <span className="text-sm font-medium text-gray-900">มีการเรียนการสอนนอกเวลาราชการ</span>
             </label>
 
             <div className="ml-7 space-y-4">

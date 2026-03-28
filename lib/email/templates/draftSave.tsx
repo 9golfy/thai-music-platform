@@ -23,7 +23,7 @@ interface DraftSaveEmailProps {
  */
 function getSubmissionTypeDisplay(type: 'register100' | 'register-support'): string {
   return type === 'register100' 
-    ? 'สมัครประเภทโรงเรียนดนตรีไทย ๑๐๐ เปอร์เซ็นต์' 
+    ? 'สมัครประเภทโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์' 
     : 'สมัครประเภทโรงเรียนสนับสนุนและส่งเสริมดนตรีไทย';
 }
 

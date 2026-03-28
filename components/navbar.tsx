@@ -7,7 +7,8 @@ import { Menu, X, LogIn } from "lucide-react"
 
 const navItems = [
   { label: "หน้าแรก", href: "/" },
-  { label: "ข้อมูลโครงการ", href: "/about" },
+  { label: "สมัครกิจกรรม", href: "/regist-activities" },
+  { label: "ข้อมูลกิจกรรม", href: "/about" },
   { label: "ประกาศนียบัตร", href: "/certificate" },
   { label: "ดาวน์โหลด", href: "/download" },
   { label: "ติดต่อ", href: "/contract" },
@@ -79,10 +80,10 @@ export default function Navbar() {
             />
             <div className="flex flex-col leading-tight">
               <span className="text-white font-bold text-[15px]">
-                {"กิจกรรมโรงเรียนดนตรีไทย ๑๐๐ เปอร์เซ็นต์"}
+                {"กิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์"}
               </span>
               <span className="text-white/80 text-[11px]">
-                {"ประจำปีงบประมาณ พ.ศ. ๒๕๖๙"}
+                {"ประจำปีงบประมาณ พ.ศ.2569"}
               </span>
             </div>
           </a>

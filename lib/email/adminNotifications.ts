@@ -57,7 +57,7 @@ export async function notifyAdminNewRegistration(
             
             <div class="info-item">
               <span class="label">📝 ประเภทการสมัคร:</span>
-              <span class="value">${submissionType === 'register100' ? 'โรงเรียนดนตรีไทย ๑๐๐ เปอร์เซ็นต์' : 'โรงเรียนสนับสนุนและส่งเสริมดนตรีไทย'}</span>
+              <span class="value">${submissionType === 'register100' ? 'โรงเรียนดนตรีไทย 100 เปอร์เซ็นต์' : 'โรงเรียนสนับสนุนและส่งเสริมดนตรีไทย'}</span>
             </div>
             
             <div class="info-item">
@@ -89,7 +89,7 @@ export async function notifyAdminNewRegistration(
         </div>
         
         <div class="footer">
-          <p>© ๒๕๖๙ Thai Music Platform. สงวนลิขสิทธิ์.</p>
+          <p>© 2569 Thai Music Platform. สงวนลิขสิทธิ์.</p>
         </div>
       </div>
     </body>
@@ -104,7 +104,7 @@ Thai Music Platform - การลงทะเบียนใหม่
 ชื่อโรงเรียน: ${schoolName}
 School ID: ${schoolId}
 Email: ${email}
-ประเภทการสมัคร: ${submissionType === 'register100' ? 'โรงเรียนดนตรีไทย ๑๐๐ เปอร์เซ็นต์' : 'โรงเรียนสนับสนุนและส่งเสริมดนตรีไทย'}
+ประเภทการสมัคร: ${submissionType === 'register100' ? 'โรงเรียนดนตรีไทย 100 เปอร์เซ็นต์' : 'โรงเรียนสนับสนุนและส่งเสริมดนตรีไทย'}
 Submission ID: ${submissionId}
 วันที่ลงทะเบียน: ${new Date().toLocaleString('th-TH')}
 
@@ -196,7 +196,7 @@ export async function notifyAdminPasswordReset(
         </div>
         
         <div class="footer">
-          <p>© ๒๕๖๙ Thai Music Platform. สงวนลิขสิทธิ์.</p>
+          <p>© 2569 Thai Music Platform. สงวนลิขสิทธิ์.</p>
         </div>
       </div>
     </body>
@@ -287,7 +287,7 @@ export async function sendDailySummaryToAdmin(
         </div>
         
         <div class="footer">
-          <p>© ๒๕๖๙ Thai Music Platform. สงวนลิขสิทธิ์.</p>
+          <p>© 2569 Thai Music Platform. สงวนลิขสิทธิ์.</p>
         </div>
       </div>
     </body>

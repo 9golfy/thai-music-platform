@@ -330,7 +330,7 @@ export default function Step1({ form, isRestoringData = false }: Step1Props) {
                 {...register('regsup_supportTypeSchoolName')}
                 disabled={supportType !== 'สถานศึกษา'}
                 className="w-full px-4 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-gray-100 disabled:cursor-not-allowed"
-                placeholder="ระบุชื่อสถานศึกษาที่ต้องการสนับสนุน"
+                placeholder="ระบุชื่อสถานศึกษา"
               />
             </div>
           </div>
@@ -354,7 +354,7 @@ export default function Step1({ form, isRestoringData = false }: Step1Props) {
                   {...register('regsup_supportTypeClubName')}
                   disabled={supportType !== 'ชุมนุม'}
                   className="w-full px-4 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-gray-100 disabled:cursor-not-allowed"
-                  placeholder="ระบุชื่อชุมนุมที่ต้องการสนับสนุน"
+                  placeholder="ระบุชื่อชุมนุม"
                 />
               </div>
               <div>
@@ -405,7 +405,7 @@ export default function Step1({ form, isRestoringData = false }: Step1Props) {
                   {...register('regsup_supportTypeAssociationName')}
                   disabled={supportType !== 'ชมรม'}
                   className="w-full px-4 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-gray-100 disabled:cursor-not-allowed"
-                  placeholder="ระบุชื่อชมรมที่ต้องการสนับสนุน"
+                  placeholder="ระบุชื่อชมรม"
                 />
               </div>
               <div>
@@ -456,7 +456,7 @@ export default function Step1({ form, isRestoringData = false }: Step1Props) {
                   {...register('regsup_supportTypeGroupName')}
                   disabled={supportType !== 'กลุ่ม'}
                   className="w-full px-4 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-gray-100 disabled:cursor-not-allowed"
-                  placeholder="ระบุชื่อกลุ่มที่ต้องการสนับสนุน"
+                  placeholder="ระบุชื่อกลุ่ม"
                 />
               </div>
               <div>
@@ -507,7 +507,7 @@ export default function Step1({ form, isRestoringData = false }: Step1Props) {
                   {...register('regsup_supportTypeBandName')}
                   disabled={supportType !== 'วงดนตรีไทย'}
                   className="w-full px-4 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-gray-100 disabled:cursor-not-allowed"
-                  placeholder="ระบุชื่อวงดนตรีไทยที่ต้องการสนับสนุน"
+                  placeholder="ระบุชื่อวงดนตรีไทย"
                 />
               </div>
               <div>

@@ -24,7 +24,7 @@ import Step9 from './steps/Step9';
 const STEPS = STEP_TITLES;
 
 const toThaiNumerals = (value: number | string) =>
-  String(value).replace(/\d/g, (d) => '๐๑๒๓๔๕๖๗๘๙'[Number(d)]);
+  String(value);
 
 export default function RegisterSupportWizard() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -432,6 +432,16 @@ export default function RegisterSupportWizard() {
       const emailValue = form.getValues('regsup_mgtEmail');
       if (emailValue && emailValue.trim() !== '') {
         requiredFields.push('regsup_mgtEmail');
+      }
+    } else if (currentStep === 7) {
+      // Check for required photo and video links
+      const photoLink = form.getValues('regsup_photoGalleryLink');
+      const videoLink1 = form.getValues('regsup_videoLink');
+      const videoLink2 = form.getValues('regsup_videoLink2');
+      
+      if (!photoLink || !videoLink1 || !videoLink2) {
+        alert('กรุณากรอกข้อมูล ภาพถ่ายผลงาน และวีดิโอ/คลิป ให้ครบถ้วน');
+        return;
       }
     }
     

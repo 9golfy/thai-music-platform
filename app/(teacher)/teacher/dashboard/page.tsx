@@ -129,22 +129,7 @@ export default async function TeacherDashboardPage() {
         </div>
       </div>
 
-      {/* Info Note */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-start gap-3">
-          <svg className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <div className="flex-1">
-            <p className="text-sm text-blue-800 font-medium mb-1">
-              หมายเหตุสำหรับครู
-            </p>
-            <p className="text-sm text-blue-700">
-              คะแนนจะไม่แสดงในระบบครู เฉพาะเจ้าหน้าที่เท่านั้นที่สามารถดูคะแนนได้
-            </p>
-          </div>
-        </div>
-      </div>
+      
 
       {/* Quick Access Card */}
       <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">

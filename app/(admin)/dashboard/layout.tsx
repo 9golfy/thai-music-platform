@@ -89,7 +89,7 @@ export default function DashboardLayout({
               โครงการคัดเลือกสถานศึกษา
             </div>
             <div className="text-white/75 text-xs leading-tight">
-              ตามกิจกรรมโรงเรียนดนตรีไทย ๑๐๐ เปอร์เซ็นต์
+              กิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์
             </div>
           </div>
         </div>
@@ -147,7 +147,7 @@ export default function DashboardLayout({
                 </svg>
               </button>
               <h1 className="text-2xl font-bold text-gray-900">
-                ระบบบริหารจัดการข้อมูลกิจกรรมโรงเรียนดนตรีไทย ๑๐๐ เปอร์เซ็นต์
+                กิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์ ประจำปีงบประมาณ พ.ศ. 2569
               </h1>
             </div>
             <div className="text-sm text-gray-600">{displayName}</div>

@@ -35,7 +35,6 @@ export default function Step9({ form }: Step9Props) {
   const heardFromSchoolProvince = watch('regsup_heardFromSchoolProvince');
   const heardFromCulturalOfficeName = watch('regsup_heardFromCulturalOfficeName');
   const heardFromEducationAreaName = watch('regsup_heardFromEducationAreaName');
-  const heardFromEducationAreaProvince = watch('regsup_heardFromEducationAreaProvince');
   const heardFromOtherDetail = watch('regsup_heardFromOtherDetail');
   
   // Watch checkboxes
@@ -54,8 +53,7 @@ export default function Step9({ form }: Step9Props) {
     (!heardFromCulturalOfficeName || heardFromCulturalOfficeName.trim() === '');
     
   const isEducationAreaFieldsEmpty = heardFromEducationArea && 
-    (!heardFromEducationAreaName || heardFromEducationAreaName.trim() === '') &&
-    (!heardFromEducationAreaProvince || heardFromEducationAreaProvince.trim() === '');
+    (!heardFromEducationAreaName || heardFromEducationAreaName.trim() === '');
     
   const isOtherFieldEmpty = heardFromOther && 
     (!heardFromOtherDetail || heardFromOtherDetail.trim() === '');
@@ -78,15 +76,12 @@ export default function Step9({ form }: Step9Props) {
     }
   }, [heardFromCulturalOfficeName, setValue]);
 
-  // Auto-check "สำนักงานเขตพื้นที่การศึกษา" checkbox when user fills ANY of the education area fields
+  // Auto-check "สำนักงานเขตพื้นที่การศึกษา" checkbox when user fills the education area field
   useEffect(() => {
-    if (
-      (heardFromEducationAreaName && heardFromEducationAreaName.trim() !== '') ||
-      (heardFromEducationAreaProvince && heardFromEducationAreaProvince.trim() !== '')
-    ) {
+    if (heardFromEducationAreaName && heardFromEducationAreaName.trim() !== '') {
       setValue('regsup_heardFromEducationArea', true, { shouldValidate: true });
     }
-  }, [heardFromEducationAreaName, heardFromEducationAreaProvince, setValue]);
+  }, [heardFromEducationAreaName, setValue]);
 
   // Auto-check "อื่น ๆ" checkbox
   useEffect(() => {
@@ -328,7 +323,7 @@ export default function Step9({ form }: Step9Props) {
       {/* แหล่งที่มาของข้อมูล */}
       <div className="bg-white rounded-lg shadow-sm border border-neutral-border overflow-hidden">
         <div className="bg-green-50 px-6 py-3 border-b border-neutral-border">
-          <h3 className="font-semibold text-gray-900">ได้รับข้อมูลการสมัครโรงเรียนดนตรีไทย ๑๐๐ เปอร์เซ็นต์จาก</h3>
+          <h3 className="font-semibold text-gray-900">ได้รับข้อมูลการสมัครโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์จาก</h3>
         </div>
         <div className="p-6 space-y-4">
           {/* โรงเรียน */}
@@ -445,29 +440,15 @@ export default function Step9({ form }: Step9Props) {
               <span className="text-sm font-medium text-gray-900">สำนักงานเขตพื้นที่การศึกษา</span>
             </label>
 
-            <div className="ml-6 space-y-2">
+            <div className="ml-6">
               <input
                 {...register('regsup_heardFromEducationAreaName')}
                 type="text"
                 placeholder="ระบุสำนักงานเขตพื้นที่การศึกษา"
                 className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
               />
-              <div>
-                <label className="block text-sm text-gray-900 mb-1">จังหวัด</label>
-                <select
-                  {...register('regsup_heardFromEducationAreaProvince')}
-                  className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
-                >
-                  <option value="">เลือกจังหวัด</option>
-                  {provinces.map((province) => (
-                    <option key={province} value={province}>
-                      {province}
-                    </option>
-                  ))}
-                </select>
-              </div>
               {isEducationAreaFieldsEmpty && (
-                <p className="text-red-500 text-sm">กรุณากรอกข้อมูลให้ครบถ้วน</p>
+                <p className="text-red-500 text-sm mt-1">กรุณากรอกข้อมูลให้ครบถ้วน</p>
               )}
             </div>
           </div>

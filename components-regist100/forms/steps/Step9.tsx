@@ -210,7 +210,7 @@ export default function Step9({ form }: Step9Props) {
       {/* แหล่งที่มาของข้อมูล */}
       <div className="bg-white rounded-lg shadow-sm border border-neutral-border overflow-hidden">
         <div className="bg-green-50 px-6 py-3 border-b border-neutral-border">
-          <h3 className="font-semibold text-gray-900">ได้รับข้อมูลการสมัครโรงเรียนดนตรีไทย ๑๐๐ เปอร์เซ็นต์จาก</h3>
+          <h3 className="font-semibold text-gray-900">ได้รับข้อมูลการสมัครโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์จาก</h3>
         </div>
         <div className="p-6 space-y-4">
           {/* โรงเรียน */}
@@ -321,27 +321,13 @@ export default function Step9({ form }: Step9Props) {
               <span className="text-sm font-medium text-gray-900">สำนักงานเขตพื้นที่การศึกษา</span>
             </label>
 
-            <div className="ml-6 space-y-2">
+            <div className="ml-6">
               <input
                 {...register('reg100_heardFromEducationAreaName')}
                 type="text"
                 placeholder="ระบุสำนักงานเขตพื้นที่การศึกษา"
                 className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
               />
-              <div>
-                <label className="block text-sm text-gray-900 mb-1">จังหวัด</label>
-                <select
-                  {...register('reg100_heardFromEducationAreaProvince')}
-                  className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
-                >
-                  <option value="">เลือกจังหวัด</option>
-                  {provinces.map((province) => (
-                    <option key={province} value={province}>
-                      {province}
-                    </option>
-                  ))}
-                </select>
-              </div>
             </div>
           </div>
 

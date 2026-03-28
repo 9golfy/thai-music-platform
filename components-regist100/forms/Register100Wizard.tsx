@@ -24,10 +24,9 @@ import Step9 from './steps/Step9';
 
 const STEPS = STEP_TITLES;
 
-// Convert Arabic numerals to Thai numerals
+// Convert Arabic numerals to Arabic numerals (no conversion needed)
 const toThaiNumeral = (num: number): string => {
-  const thaiNumerals = ['๐', '๑', '๒', '๓', '๔', '๕', '๖', '๗', '๘', '๙'];
-  return num.toString().split('').map(digit => thaiNumerals[parseInt(digit)]).join('');
+  return num.toString();
 };
 
 export default function Register100Wizard() {
@@ -381,6 +380,16 @@ export default function Register100Wizard() {
         setShowValidationErrorModal(true);
         return;
       }
+      
+      // Check for required photo and video links
+      const photoLink = form.getValues('reg100_photoGalleryLink');
+      const videoLink1 = form.getValues('reg100_videoLink');
+      const videoLink2 = form.getValues('reg100_videoLink2');
+      
+      if (!photoLink || !videoLink1 || !videoLink2) {
+        alert('กรุณากรอกข้อมูล ภาพถ่ายผลงาน และวีดิโอ/คลิป ให้ครบถ้วน');
+        return;
+      }
     }
     
     if (requiredFields.length > 0) {
@@ -730,7 +739,7 @@ export default function Register100Wizard() {
                   แบบฟอร์มลงทะเบียน
                 </h2>
                 <p className="text-base font-normal text-gray-600 leading-tight">
-                  ประเภทโรงเรียนดนตรีไทย ๑๐๐ เปอร์เซ็นต์
+                  ประเภทโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์
                 </p>
               </div>
             </div>

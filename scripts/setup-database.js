@@ -96,7 +96,7 @@ async function setupDatabase() {
     } else {
       // Create root user
       console.log('🔐 Creating root user...');
-      const password = 'admin123'; // Change this in production!
+      const password = 'P@sswordAdmin123';
       const hashedPassword = await bcrypt.hash(password, 10);
 
       const rootUser = {
@@ -115,8 +115,8 @@ async function setupDatabase() {
       console.log('✅ Root user created successfully!');
       console.log('\n📧 Root User Credentials:');
       console.log(`   Email: root@thaimusic.com`);
-      console.log(`   Password: admin123`);
-      console.log('\n⚠️  IMPORTANT: Change the password after first login!');
+      console.log(`   Password: P@sswordAdmin123`);
+      console.log('\n⚠️  IMPORTANT: This is the super admin account with root privileges!');
     }
 
     // Summary

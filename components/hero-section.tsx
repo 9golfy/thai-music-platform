@@ -48,7 +48,7 @@ export default function HeroSection() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            {"ขอเชิญลงทะเบียนเสนอผลงาน ๖๙"}
+            {"ขอเชิญลงทะเบียนเสนอผลงาน 69"}
           </motion.h1>
 
           <motion.p
@@ -57,7 +57,7 @@ export default function HeroSection() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            {"เพื่อเข้าร่วมรับการคัดเลือกกิจกรรมโรงเรียนดนตรีไทย ๑๐๐ เปอร์เซ็นต์ ประจำปีงบประมาณ พ.ศ. ๒๕๖๙"}
+            {"เพื่อเข้าร่วมรับการคัดเลือกกิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์ ประจำปีงบประมาณ พ.ศ. 2569"}
           </motion.p>
 
           <motion.p
@@ -88,7 +88,7 @@ export default function HeroSection() {
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" className="text-white">
                   <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
                 </svg>
-                {"สมัครประเภทโรงเรียนดนตรีไทย ๑๐๐ เปอร์เซ็นต์"}
+                {"สมัครประเภทโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์"}
               </span>
             </a>
 

@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
     const numericFields = [
       'staffCount', 'reg100_staffCount',
       'studentCount', 'reg100_studentCount',
-      'teacher_training_score',
+      'teaching_curriculum_score',
       'teacher_qualification_score',
       'support_from_org_score',
       'support_from_external_score',
@@ -165,7 +165,7 @@ export async function POST(request: NextRequest) {
     // Calculate scores for register100
     const calculateRegister100Scores = (submissionData: any) => {
       let scores = {
-        teacher_training_score: 0,
+        teaching_curriculum_score: 0,
         teacher_qualification_score: 0,
         support_from_org_score: 0,
         support_from_external_score: 0,
@@ -182,13 +182,13 @@ export async function POST(request: NextRequest) {
         return submissionData[`reg100_${fieldName}`] ?? submissionData[fieldName];
       };
 
-      // Step 4: Teacher Training Score (4 checkboxes × 5 points each = 20 max)
-      let trainingScore = 0;
-      if (getFieldValue('isCompulsorySubject')) trainingScore += 5;
-      if (getFieldValue('hasAfterSchoolTeaching')) trainingScore += 5;
-      if (getFieldValue('hasElectiveSubject')) trainingScore += 5;
-      if (getFieldValue('hasLocalCurriculum')) trainingScore += 5;
-      scores.teacher_training_score = trainingScore;
+      // Step 5: Teaching Curriculum Score (4 checkboxes × 5 points each = 20 max)
+      let curriculumScore = 0;
+      if (getFieldValue('isCompulsorySubject')) curriculumScore += 5;
+      if (getFieldValue('hasAfterSchoolTeaching')) curriculumScore += 5;
+      if (getFieldValue('hasElectiveSubject')) curriculumScore += 5;
+      if (getFieldValue('hasLocalCurriculum')) curriculumScore += 5;
+      scores.teaching_curriculum_score = curriculumScore;
 
       // Step 4: Teacher Qualification Score (unique qualifications × 5 points each = 20 max)
       const teachers = getFieldValue('thaiMusicTeachers') || [];
@@ -239,8 +239,8 @@ export async function POST(request: NextRequest) {
       const prActivities = getFieldValue('prActivities') || [];
       scores.pr_activity_score = (Array.isArray(prActivities) && prActivities.length >= 3) ? 5 : 0;
 
-      // Calculate total score
-      scores.total_score = scores.teacher_training_score + 
+      // Calculate total score (Part 1 only - video scores added separately)
+      scores.total_score = scores.teaching_curriculum_score + 
                           scores.teacher_qualification_score + 
                           scores.support_from_org_score + 
                           scores.support_from_external_score + 

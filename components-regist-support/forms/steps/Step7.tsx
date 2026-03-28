@@ -34,7 +34,7 @@ export default function Step7({ form }: Step7Props) {
       {/* รางวัล */}
       <div className="bg-white rounded-lg shadow-sm border border-neutral-border overflow-hidden">
         <div className="bg-green-50 px-6 py-3 border-b border-neutral-border">
-          <h3 className="font-semibold text-gray-900">รางวัลและเกียรติคุณที่ได้รับในระยะเวลา ๑ ปี ย้อนหลัง</h3>
+          <h3 className="font-semibold text-gray-900">รางวัลและเกียรติคุณที่ได้รับในระยะเวลา 1 ปี ย้อนหลัง</h3>
 
         </div>
         <div className="p-6 space-y-4">
@@ -65,10 +65,10 @@ export default function Step7({ form }: Step7Props) {
                     className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
                   >
                     <option value="">เลือกระดับรางวัล</option>
-                    <option value="อำเภอ">อำเภอ (5 คะแนน)</option>
-                    <option value="จังหวัด">จังหวัด (10 คะแนน)</option>
-                    <option value="ภาค">ภาค (15 คะแนน)</option>
-                    <option value="ประเทศ">ประเทศ (20 คะแนน)</option>
+                    <option value="อำเภอ">อำเภอ</option>
+                    <option value="จังหวัด">จังหวัด</option>
+                    <option value="ภาค">ภาค </option>
+                    <option value="ประเทศ">ประเทศ</option>
                   </select>
                 </div>
 
@@ -91,8 +91,9 @@ export default function Step7({ form }: Step7Props) {
                   </label>
                   <input
                     {...register(`regsup_awards.${idx}.awardDate`)}
-                    type="date"
+                    type="text"
                     className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    placeholder="เช่น 15/03/2568"
                   />
                 </div>
 
@@ -131,45 +132,64 @@ export default function Step7({ form }: Step7Props) {
       {/* ภาพถ่ายผลงาน */}
       <div className="bg-white rounded-lg shadow-sm border border-neutral-border overflow-hidden">
         <div className="bg-green-50 px-6 py-3 border-b border-neutral-border">
-          <h3 className="font-semibold text-gray-900">ภาพถ่ายผลงาน และคลิปวิดีโอที่มีความชัดเจน และสื่อให้เห็นถึงความเป็นโรงเรียนดนตรีไทย ๑๐๐ เปอร์เซ็นต์</h3>
+          <h3 className="font-semibold text-gray-900">ภาพถ่ายผลงาน และคลิปวิดีโอที่มีความชัดเจน และสื่อให้เห็นถึงความเป็นโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์ <span className="text-red-500">*</span></h3>
         </div>
         <div className="p-6">
           <div>
             <label className="block text-sm font-medium text-gray-900 mb-1">
               <p>ภาพถ่ายผลงาน หรือกิจกรรมเด่น ตั้งแต่พฤษภาคม 2567 - พฤษภาคม 2568
-                จำนวน 10 - 20 ภาพ เท่านั้น!!</p><p>  Link/URL สำหรับ Share Drive (Google Drive, Dropbox, etc.)</p>
+                จำนวน 10 - 20 ภาพ เท่านั้น!! <span className="text-red-500">*</span></p><p>  Link/URL สำหรับ Share Drive (Google Drive, Dropbox, etc.)</p>
             </label>
             <input
-              {...register('regsup_photoGalleryLink')}
+              {...register('regsup_photoGalleryLink', { required: true })}
               type="url"
               className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
               placeholder="https://drive.google.com/..."
             />
-            <p className="text-xs text-gray-600 mt-1">กรุณาแชร์ลิงก์ที่สามารถเข้าถึงได้ "หากไม่สามารถเปิดได้ จะถือว่าสละสิทธิ์รับคะแนนส่วนนี้"</p>
+            <p className="text-xs text-red-600 font-medium mt-1">กรุณาแชร์ลิงก์ที่สามารถเข้าถึงได้ "หากไม่สามารถเปิดได้ จะถือว่าสละสิทธิ์รับคะแนนส่วนนี้"</p>
           </div>
         </div>
       </div>
 
       {/* วีดิโอ/คลิป */}
       <div className="bg-white rounded-lg shadow-sm border border-neutral-border overflow-hidden">
-        <div className="bg-green-50 px-6 py-3 border-b border-neutral-border">
-          <h3 className="font-semibold text-gray-900">วีดิโอ/คลิป</h3>
-          <p className="text-sm text-gray-600 mt-1">1 บรรยากาศการเรียนการสอนในชั้นเรียน และในสถานศึกษา  ความยาวไม่เกิน 3 นาที</p>
-          <p className="text-sm text-gray-600 mt-1">2 การแสดงผลงานด้านดนตรีของนักเรียน ความยาวไม่เกิน 3 นาที</p>
+        <div className="bg-blue-50 px-6 py-3 border-b border-neutral-border">
+          <h3 className="font-semibold text-gray-900">วีดิโอ/คลิป <span className="text-red-500">*</span></h3><p className="text-xs text-red-600 font-medium mt-3">กรุณาแชร์ลิงก์ที่สามารถเข้าถึงได้ "หากไม่สามารถเปิดได้ จะถือว่าสละสิทธิ์รับคะแนนส่วนนี้"</p>
         </div>
-        <div className="p-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-900 mb-1">
-              <p>  Link/URL สำหรับ Share Drive (Google Drive, Dropbox, etc.)</p>
+        <div className="p-6 bg-blue-50/30">
+          {/* ส่วนที่ 1 */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-900 mb-2">
+              1 บรรยากาศการเรียนการสอนในชั้นเรียน และในสถานศึกษา ความยาวไม่เกิน 3 นาที <span className="text-red-500">*</span>
+            </label>
+            <label className="block text-sm text-gray-600 mb-2">
+              Link/URL สำหรับ Share Drive (Google Drive, Dropbox, etc.)
             </label>
             <input
-              {...register('regsup_videoLink')}
+              {...register('regsup_videoLink', { required: true })}
               type="url"
-              className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
-              placeholder="https://youtube.com/..."
+              className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 bg-white"
+              placeholder="https://..."
             />
-            <p className="text-xs text-gray-600 mt-1">กรุณาแชร์ลิงก์ที่สามารถเข้าถึงได้ "หากไม่สามารถเปิดได้ จะถือว่าสละสิทธิ์รับคะแนนส่วนนี้"</p>
           </div>
+
+          {/* ส่วนที่ 2 */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-900 mb-2">
+              2 การแสดงผลงานด้านดนตรีของนักเรียน ความยาวไม่เกิน 3 นาที <span className="text-red-500">*</span>
+            </label>
+            <label className="block text-sm text-gray-600 mb-2">
+              Link/URL สำหรับ Share Drive (Google Drive, Dropbox, etc.)
+            </label>
+            <input
+              {...register('regsup_videoLink2', { required: true })}
+              type="url"
+              className="w-full px-3 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 bg-white"
+              placeholder="https://..."
+            />
+          </div>
+
+          
         </div>
       </div>
 
