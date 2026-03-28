@@ -246,7 +246,7 @@ export default async function UsersDataTable({ session }: UsersDataTableProps) {
                                 Edit
                               </button>
                             </Link>
-                            {((session.role === 'root') || (session.role === 'admin')) && 
+                            {session.role === 'root' && 
                              user.isSystemAdmin !== true && 
                              user.email !== 'root@thaimusic.com' && (
                               <DeleteUserButton 
