@@ -146,7 +146,7 @@ export default async function UsersDataTable({ session }: UsersDataTableProps) {
                                 Edit
                               </button>
                             </Link>
-                            {session.role === 'root' && 
+                            {(session.role === 'root' || session.role === 'super_admin') && 
                              user.role !== 'root' && 
                              user.isSystemAdmin !== true && 
                              user.email !== 'root@thaimusic.com' && (
@@ -246,7 +246,7 @@ export default async function UsersDataTable({ session }: UsersDataTableProps) {
                                 Edit
                               </button>
                             </Link>
-                            {session.role === 'root' && 
+                            {(session.role === 'root' || session.role === 'super_admin') && 
                              user.isSystemAdmin !== true && 
                              user.email !== 'root@thaimusic.com' && (
                               <DeleteUserButton 
