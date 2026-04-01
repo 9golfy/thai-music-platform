@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ทดสอบ Auto Deploy - Thai Music Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 50px;
+            max-width: 600px;
+            text-align: center;
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .success-icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+        
+        .success-icon svg {
+            width: 50px;
+            height: 50px;
+            fill: white;
+        }
+        
+        h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+        
+        .status {
+            display: inline-block;
+            background: #10b981;
+            color: white;
+            padding: 10px 30px;
+            border-radius: 50px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            animation: slideIn 0.5s ease-out 0.3s both;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .info {
+            background: #f3f4f6;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #6b7280;
+        }
+        
+        .info-value {
+            color: #111827;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .timestamp {
+            color: #9ca3af;
+            font-size: 0.9em;
+            margin-top: 20px;
+        }
+        
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e5e7eb;
+            color: #6b7280;
+        }
+        
+        .badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="success-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+            </svg>
+        </div>
+        
+        <h1>🎉 Auto Deploy สำเร็จ!</h1>
+        
+        <div class="status">✓ ระบบทำงานปกติ</div>
+        
+        <div class="info">
+            <div class="info-item">
+                <span class="info-label">Server:</span>
+                <span class="info-value">164.115.41.34</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Domain:</span>
+                <span class="info-value">dcpschool100.net</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Repository:</span>
+                <span class="info-value">9golfy/thai-music-platform</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Branch:</span>
+                <span class="info-value">master</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Deploy Method:</span>
+                <span class="info-value">GitHub Webhook</span>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <div>
+                <span class="badge">✓ Security Headers</span>
+                <span class="badge">✓ Auto Deploy</span>
+                <span class="badge">✓ SSL/TLS</span>
+            </div>
+            
+            <p class="timestamp">
+                <strong>Test File Created:</strong> April 1, 2026<br>
+                <strong>Last Updated:</strong> <span id="datetime"></span>
+            </p>
+        </div>
+    </div>
+    
+    <script>
+        // แสดงเวลาปัจจุบัน
+        function updateDateTime() {
+            const now = new Date();
+            const options = { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric', 
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit',
+                timeZone: 'Asia/Bangkok'
+            };
+            document.getElementById('datetime').textContent = 
+                now.toLocaleDateString('th-TH', options);
+        }
+        
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+        
+        // Log to console
+        console.log('🎉 Auto Deploy Test Successful!');
+        console.log('Server: 164.115.41.34');
+        console.log('Domain: dcpschool100.net');
+        console.log('Webhook: Active');
+    </script>
+</body>
+</html>
