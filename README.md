@@ -575,3 +575,15 @@ This project is proprietary and confidential.
 พัฒนาด้วย ❤️ สำหรับโครงการโรงเรียนดนตรีไทย 100%
 "# CI/CD Test" 
 "# CI/CD Working!" 
+
+
+---
+
+## 🧪 Auto Deploy Test
+
+- **Test Date**: 2026-04-01
+- **Target Server**: 164.115.41.34
+- **Status**: Testing GitHub Actions auto deploy...
+- **Expected**: This text should appear on server after 2-3 minutes
+
+If you see this on the server, auto deploy is working! ✅
