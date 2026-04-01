@@ -27,7 +27,7 @@ jobs:
             echo "🚀 Starting deployment to 164.115.41.34..."
             
             # Navigate to project directory
-            cd /root/thai-music-platform
+            cd /var/www/thai-music-platform
             
             # Pull latest code
             echo "📥 Pulling latest code from GitHub..."
