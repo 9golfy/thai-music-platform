@@ -581,9 +581,10 @@ This project is proprietary and confidential.
 
 ## 🧪 Auto Deploy Test
 
-- **Test Date**: 2026-04-01
+- **Test Date**: 2026-04-01 (Test #2)
 - **Target Server**: 164.115.41.34
-- **Status**: Testing GitHub Actions auto deploy...
+- **User**: root
+- **Status**: Testing GitHub Actions with root user...
 - **Expected**: This text should appear on server after 2-3 minutes
 
 If you see this on the server, auto deploy is working! ✅

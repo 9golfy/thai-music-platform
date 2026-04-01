@@ -47,8 +47,11 @@ DEPLOYMENT-ISSUES.md
 AWS-DEPLOY-STEPS.md
 AWS-CONFIG-ISSUE.md
 DEPLOYMENT-SUCCESS.md
-deploy-to-aws.sh
+deploy-to-server.sh
 quick-commands.sh
+
+# generated secrets
+.env.production.generated
 
 # vercel
 .vercel

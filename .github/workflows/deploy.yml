@@ -3,12 +3,13 @@ name: Deploy to Production
 on:
   push:
     branches:
+      - main
       - master
   workflow_dispatch:  # Allow manual trigger
 
 jobs:
   deploy:
-    name: Deploy to Server
+    name: Deploy to Server (164.115.41.34)
     runs-on: ubuntu-latest
     
     steps:
@@ -21,20 +22,20 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.SSH_PORT }}
+          port: ${{ secrets.SSH_PORT || 22 }}
           script: |
-            echo "🚀 Starting deployment..."
+            echo "🚀 Starting deployment to 164.115.41.34..."
             
             # Navigate to project directory
-            cd /var/www/thai-music-platform
+            cd /root/thai-music-platform
             
             # Pull latest code
             echo "📥 Pulling latest code from GitHub..."
-            git pull origin master
+            git pull origin main || git pull origin master
             
-            # Install dependencies
+            # Install dependencies (production only)
             echo "📦 Installing dependencies..."
-            npm install
+            npm ci --only=production
             
             # Build application
             echo "🔨 Building application..."
@@ -42,16 +43,29 @@ jobs:
             
             # Restart PM2
             echo "🔄 Restarting application..."
-            pm2 restart thai-music-platform
+            pm2 restart thai-music || pm2 start npm --name thai-music -- start
+            pm2 save
+            
+            # Reload Nginx
+            echo "🔄 Reloading Nginx..."
+            systemctl reload nginx || echo "⚠️  Nginx reload skipped"
             
             # Show status
             echo "✅ Deployment completed!"
             pm2 status
             
+            # Show recent logs
+            echo "📋 Recent logs:"
+            pm2 logs thai-music --lines 10 --nostream
+            
       - name: Deployment Status
         if: success()
-        run: echo "✅ Deployment successful!"
+        run: |
+          echo "✅ Deployment successful!"
+          echo "🌐 Application URL: http://164.115.41.34"
         
       - name: Deployment Failed
         if: failure()
-        run: echo "❌ Deployment failed!"
+        run: |
+          echo "❌ Deployment failed!"
+          echo "Please check the logs above for errors"

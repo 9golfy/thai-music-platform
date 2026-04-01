@@ -1,0 +1,106 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run security scan ทุกวันจันทร์ เวลา 00:00 UTC
+    - cron: '0 0 * * 1'
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run npm audit
+      run: npm audit --audit-level=moderate
+      continue-on-error: true
+
+    - name: Check for security vulnerabilities
+      run: |
+        echo "Checking for known vulnerabilities..."
+        npm audit --json > audit-report.json || true
+        
+    - name: Upload audit report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: security-audit-report
+        path: audit-report.json
+
+    - name: Check for outdated packages
+      run: npm outdated || true
+
+    - name: Verify security headers in config
+      run: |
+        echo "Checking next.config.ts for security headers..."
+        if grep -q "Content-Security-Policy" next.config.ts; then
+          echo "✅ CSP header found"
+        else
+          echo "❌ CSP header not found"
+          exit 1
+        fi
+        
+        if grep -q "X-Frame-Options" next.config.ts; then
+          echo "✅ X-Frame-Options found"
+        else
+          echo "❌ X-Frame-Options not found"
+          exit 1
+        fi
+        
+        if grep -q "Strict-Transport-Security" next.config.ts; then
+          echo "✅ HSTS header found"
+        else
+          echo "❌ HSTS header not found"
+          exit 1
+        fi
+
+    - name: Check for sensitive data in code
+      run: |
+        echo "Checking for potential secrets in code..."
+        
+        # Check for hardcoded passwords
+        if grep -r "password.*=.*['\"]" --include="*.ts" --include="*.tsx" --include="*.js" --exclude-dir=node_modules .; then
+          echo "⚠️  Warning: Potential hardcoded passwords found"
+        fi
+        
+        # Check for API keys
+        if grep -r "api[_-]key.*=.*['\"]" --include="*.ts" --include="*.tsx" --include="*.js" --exclude-dir=node_modules .; then
+          echo "⚠️  Warning: Potential hardcoded API keys found"
+        fi
+
+    - name: Verify .env files are not committed
+      run: |
+        if [ -f ".env" ] || [ -f ".env.production" ] || [ -f ".env.local" ]; then
+          echo "❌ Error: .env files should not be committed"
+          exit 1
+        else
+          echo "✅ No .env files committed"
+        fi
+
+    - name: Check TypeScript for type safety
+      run: npx tsc --noEmit || true
+
+    - name: Summary
+      if: always()
+      run: |
+        echo "================================"
+        echo "Security Scan Summary"
+        echo "================================"
+        echo "✅ Security scan completed"
+        echo "Check the logs above for any issues"
+        echo "================================"
