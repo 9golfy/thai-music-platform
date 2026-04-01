@@ -9,63 +9,44 @@ on:
 
 jobs:
   deploy:
-    name: Deploy to Server (164.115.41.34)
+    name: Trigger Webhook Deploy (164.115.41.34)
     runs-on: ubuntu-latest
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy to Server
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.SSH_PORT || 22 }}
-          script: |
-            echo "🚀 Starting deployment to 164.115.41.34..."
-            
-            # Navigate to project directory
-            cd /var/www/thai-music-platform
-            
-            # Pull latest code
-            echo "📥 Pulling latest code from GitHub..."
-            git pull origin main || git pull origin master
-            
-            # Install dependencies (production only)
-            echo "📦 Installing dependencies..."
-            npm ci --only=production
-            
-            # Build application
-            echo "🔨 Building application..."
-            npm run build
-            
-            # Restart PM2
-            echo "🔄 Restarting application..."
-            pm2 restart thai-music || pm2 start npm --name thai-music -- start
-            pm2 save
-            
-            # Reload Nginx
-            echo "🔄 Reloading Nginx..."
-            systemctl reload nginx || echo "⚠️  Nginx reload skipped"
-            
-            # Show status
-            echo "✅ Deployment completed!"
-            pm2 status
-            
-            # Show recent logs
-            echo "📋 Recent logs:"
-            pm2 logs thai-music --lines 10 --nostream
-            
-      - name: Deployment Status
-        if: success()
+      - name: Trigger Webhook
         run: |
-          echo "✅ Deployment successful!"
-          echo "🌐 Application URL: http://164.115.41.34"
-        
-      - name: Deployment Failed
-        if: failure()
+          echo "🚀 Triggering deployment webhook..."
+          echo "📍 Server: 164.115.41.34 (dcpschool100.net)"
+          echo "🌿 Branch: ${{ github.ref }}"
+          echo "👤 Pushed by: ${{ github.actor }}"
+          
+          # Note: The actual deployment is handled by the webhook server on the server
+          # GitHub automatically sends webhook notifications when code is pushed
+          # This workflow just confirms the push was successful
+          
+          echo ""
+          echo "✅ Code pushed successfully!"
+          echo "🎣 Webhook server will receive notification and deploy automatically"
+          echo ""
+          echo "📋 Monitor deployment:"
+          echo "   SSH to server: ssh root@164.115.41.34"
+          echo "   Check logs: pm2 logs webhook-deploy"
+          echo "   Check status: pm2 status"
+          echo ""
+          echo "🌐 Application URL: https://dcpschool100.net/"
+            
+      - name: Deployment Info
         run: |
-          echo "❌ Deployment failed!"
-          echo "Please check the logs above for errors"
+          echo "ℹ️  Deployment Method: GitHub Webhook"
+          echo ""
+          echo "How it works:"
+          echo "1. You push code to GitHub"
+          echo "2. GitHub sends webhook notification to https://dcpschool100.net/webhook"
+          echo "3. Webhook server on 164.115.41.34 receives notification"
+          echo "4. Server automatically pulls code, builds, and restarts application"
+          echo ""
+          echo "To verify webhook is configured:"
+          echo "https://github.com/${{ github.repository }}/settings/hooks"

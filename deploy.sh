@@ -15,7 +15,7 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 # Project directory
-PROJECT_DIR="/home/ubuntu/thai-music-platform"
+PROJECT_DIR="/var/www/thai-music-platform"
 
 # Navigate to project
 cd $PROJECT_DIR
@@ -38,7 +38,7 @@ npm run build
 
 # Restart PM2
 echo -e "${YELLOW}🔄 Restarting application...${NC}"
-pm2 restart thai-music || pm2 start npm --name thai-music -- start
+pm2 restart thai-music-platform || pm2 start npm --name thai-music-platform -- start
 pm2 save
 
 # Reload Nginx
@@ -51,7 +51,7 @@ pm2 status
 
 # Show logs
 echo -e "${YELLOW}📋 Recent logs:${NC}"
-pm2 logs thai-music --lines 20 --nostream
+pm2 logs thai-music-platform --lines 20 --nostream
 
 echo ""
 echo -e "${GREEN}🌐 Application URL: http://164.115.41.34${NC}"

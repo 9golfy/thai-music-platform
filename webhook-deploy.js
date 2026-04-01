@@ -4,7 +4,7 @@ const crypto = require('crypto');
 
 const PORT = 9000;
 const SECRET = process.env.WEBHOOK_SECRET || 'your-secret-key-change-this';
-const PROJECT_DIR = '/home/ubuntu/thai-music-platform';
+const PROJECT_DIR = '/var/www/thai-music-platform';
 
 const server = http.createServer((req, res) => {
   if (req.method === 'POST' && req.url === '/webhook') {
@@ -41,7 +41,7 @@ const server = http.createServer((req, res) => {
           console.log(`👤 Pushed by: ${payload.pusher?.name || 'unknown'}`);
           
           // Run deploy script
-          const deployCommand = `cd ${PROJECT_DIR} && git pull origin main || git pull origin master && npm ci --only=production && npm run build && pm2 restart thai-music && pm2 save`;
+          const deployCommand = `cd ${PROJECT_DIR} && git pull origin main || git pull origin master && npm ci --only=production && npm run build && pm2 restart thai-music-platform && pm2 save`;
           
           exec(deployCommand, (error, stdout, stderr) => {
             if (error) {
