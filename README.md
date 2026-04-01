@@ -573,3 +573,4 @@ This project is proprietary and confidential.
 - New: `app/(front)/regist-support/` และ `app/api/register-support/` (โรงเรียนสนับสนุนฯ)
 
 พัฒนาด้วย ❤️ สำหรับโครงการโรงเรียนดนตรีไทย 100%
+"# CI/CD Test" 
