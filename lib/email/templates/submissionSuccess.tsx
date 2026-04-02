@@ -322,11 +322,6 @@ export function generateSubmissionSuccessEmailHTML(props: SubmissionSuccessEmail
             <div class="credentials-title">🔑 ข้อมูลเข้าสู่ระบบของคุณ</div>
             
             <div class="credential-item">
-              <div class="credential-label">School ID</div>
-              <div class="credential-value">${schoolId}</div>
-            </div>
-            
-            <div class="credential-item">
               <div class="credential-label">อีเมล</div>
               <div class="credential-value">${email}</div>
             </div>
@@ -334,6 +329,11 @@ export function generateSubmissionSuccessEmailHTML(props: SubmissionSuccessEmail
             <div class="credential-item">
               <div class="credential-label">รหัสผ่านชั่วคราว</div>
               <div class="credential-value">${password}</div>
+            </div>
+            
+            <div class="credential-item">
+              <div class="credential-label">School ID</div>
+              <div class="credential-value">${schoolId}</div>
             </div>
           </div>
 
@@ -401,7 +401,7 @@ export function generateSubmissionSuccessEmailHTML(props: SubmissionSuccessEmail
         <div class="footer">
           <p><strong>Thai Music Platform</strong></p>
           <p>ส่งเสริมและสนับสนุนการศึกษาดนตรีไทยในโรงเรียนทั่วประเทศ</p>
-          <p style="margin-top: 15px;">© 2026 Thai Music Platform. All rights reserved.</p>
+          <p style="margin-top: 15px;">© 2026 Dcpschool100.net. All rights reserved.</p>
         </div>
       </div>
     </body>
