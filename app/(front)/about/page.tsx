@@ -46,47 +46,75 @@ const highlights = [
 ]
 
 const objectives = [
-  "เพื่อส่งเสริมและสนับสนุนการเรียนการสอนดนตรีไทยในสถานศึกษาให้ครอบคลุมเด็กนักเรียนทุกคน",
-  "เพื่อสืบสาน อนุรักษ์ และต่อยอดมรดกทางวัฒนธรรมด้านดนตรีไทยให้คงอยู่คู่สังคมไทย",
-  "เพื่อสร้างเครือข่ายสถานศึกษาที่มีความเข้มแข็งด้านดนตรีไทย ทั้งในระดับท้องถิ่นและระดับประเทศ",
-  "เพื่อเผยแพร่และประชาสัมพันธ์องค์ความรู้ด้านดนตรีไทยผ่านกิจกรรมและสื่อออนไลน์ให้เข้าถึงสาธารณชนอย่างกว้างขวาง",
-  "เพื่อพัฒนาระบบการรับสมัคร คัดเลือก และประเมินผลให้มีความโปร่งใส ตรวจสอบได้ และมีประสิทธิภาพ",
+  "เพื่อสืบสาน รักษา ต่อยอดวิชาดนตรีไทยให้คงอยู่คู่สังคมไทย",
+  "เพื่อขับเคลื่อนนโยบายกระทรวงวัฒนธรรม \"สืบสาน สร้างสรรค์ นำวัฒนธรรมไทย สู่อนาคตอย่างยั่งยืน\" สู่การปฏิบัติให้บังเกิดผลเป็นรูปธรรม",
+  "เพื่อส่งเสริม สนับสนุน สืบสานและถ่ายทอดดนตรีไทยได้อย่างถูกต้อง และแก้ไขปัญหาพื้นฐาน สำหรับการเรียนการสอนดนตรีไทยในทุกพื้นที่ทั่วประเทศ อันจะนำไปสู่การสืบสาน ต่อยอด เพื่อการอนุรักษ์มรดก ทางวัฒนธรรมด้านดนตรีไทย",
 ]
 
 const workScopes = [
   {
-    title: "การประชาสัมพันธ์กิจกรรม",
-    description:
-      "ดำเนินการจัดทำแผนประชาสัมพันธ์อย่างเป็นระบบ ครอบคลุมกลุ่มเป้าหมายทั่วประเทศ พร้อมทั้งจัดทำสื่อประชาสัมพันธ์ เช่น โปสเตอร์ อินโฟกราฟิก และสื่อดิจิทัล เพื่อสร้างการรับรู้และกระตุ้นให้สถานศึกษาเข้าร่วมกิจกรรม",
+    title: "ประเภทโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์",
+    description: "",
   },
   {
-    title: "การรับสมัครสถานศึกษา",
-    description:
-      "พัฒนาระบบรับสมัครในรูปแบบออนไลน์ รองรับการบันทึกข้อมูล ข้อความ ภาพ และลิงก์ โดยสามารถใช้งานได้บนทุกแพลตฟอร์ม และรองรับจำนวนผู้ใช้งานจำนวนมากได้อย่างมีประสิทธิภาพ",
-  },
-  {
-    title: "การประเมินและคัดเลือก",
-    description:
-      "ดำเนินการประเมินผลตามหลักเกณฑ์ที่กำหนด โดยแบ่งเป็นการประเมินข้อมูลเอกสาร และการประเมินสื่อผลงานและคลิปวิดีโอ พร้อมทั้งสามารถคำนวณคะแนนรวม และจัดระดับผลการคัดเลือกได้อย่างเป็นระบบ",
-  },
-  {
-    title: "การประกาศผลและเผยแพร่",
-    description:
-      "ประกาศผลการคัดเลือกผ่านช่องทางออนไลน์ พร้อมจัดทำใบประกาศเกียรติคุณให้สถานศึกษาที่ผ่านการคัดเลือก และสามารถดาวน์โหลดได้ด้วยตนเอง",
-  },
-  {
-    title: "การสรุปผลและจัดทำรายงาน",
-    description:
-      "รวบรวม วิเคราะห์ และจัดทำรายงานผลการดำเนินกิจกรรมทั้งในรูปแบบเอกสารและดิจิทัล เพื่อใช้เป็นฐานข้อมูลในการพัฒนากิจกรรมในอนาคต",
+    title: "ประเภทโรงเรียนสนับสนุนและส่งเสริมดนตรีไทย",
+    description: "ส่วนที่ 1",
   },
 ]
 
-const schoolGuidelines = [
-  "มีหลักสูตรหรือกิจกรรมที่ส่งเสริมการเรียนดนตรีไทย",
-  "มีครูผู้สอนหรือวิทยากรที่มีความรู้ความสามารถ",
-  "มีเครื่องดนตรีและอุปกรณ์เพียงพอ",
-  "มีการจัดกิจกรรมแสดงผลงานและเผยแพร่",
-  "มีการสนับสนุนจากหน่วยงานและชุมชน",
+const evaluationPart1 = [
+  { title: "ด้านหลักสูตร", score: 20 },
+  { title: "ด้านบุคลากร", score: 20 },
+  { title: "งบประมาณและวัสดุอุปกรณ์", score: 20 },
+  { title: "การได้รับรางวัลประเภทต่าง ๆ", score: 20 },
+  { title: "การเผยแพร่และการแลกเปลี่ยนเรียนรู้ด้านดนตรีไทย", score: 20 },
+]
+
+const evaluationPart2 = [
+  { 
+    title: "สื่อผลงานกิจกรรม/คลิปวิดีโอ", 
+    score: 50,
+    description: "ที่มีความชัดเจน และสื่อให้เห็นถึงกิจกรรมการแสดงดนตรีไทยของนักเรียนทั้งโรงเรียน ขนาดความยาวไม่เกิน 3 นาที โดยพิจารณาจากบรรยากาศการเรียนการสอนในชั้นเรียน (ทุกระดับชั้น)"
+  },
+  { 
+    title: "การแสดงผลงานด้านดนตรีไทยของนักเรียนทั้งโรงเรียน", 
+    score: 50 
+  },
+]
+
+const evaluationLevels = [
+  { level: "ดีเด่น", minScore: 160 },
+  { level: "ดีมาก", minScore: 140, maxScore: 159 },
+  { level: "ดี", minScore: 120, maxScore: 139 },
+  { level: "ชมเชย", minScore: 100, maxScore: 119 },
+  { level: "ต่ำกว่าเกณฑ์", maxScore: 99 },
+]
+
+const supportEvaluationPart1 = [
+  { title: "ด้านบุคลากร", score: 20 },
+  { title: "งบประมาณและวัสดุอุปกรณ์", score: 20 },
+  { title: "การได้รับรางวัลประเภทต่าง ๆ", score: 20 },
+  { title: "การเผยแพร่และการแลกเปลี่ยนเรียนรู้ด้านดนตรีไทย", score: 20 },
+]
+
+const supportEvaluationPart2 = [
+  { 
+    title: "สื่อผลงานกิจกรรม/คลิปวิดีโอ", 
+    score: 50,
+    description: "ที่มีความชัดเจน และสื่อให้เห็นถึงกิจกรรมการแสดงดนตรีไทยของนักเรียน ขนาดความยาวไม่เกิน 3 นาที โดยพิจารณาจากบรรยากาศการเรียนการสอนในชั้นเรียน และในสถานศึกษา"
+  },
+  { 
+    title: "การแสดงผลงานด้านดนตรีไทยของนักเรียน", 
+    score: 50 
+  },
+]
+
+const supportEvaluationLevels = [
+  { level: "ดีเด่น", minScore: 144 },
+  { level: "ดีมาก", minScore: 126, maxScore: 143 },
+  { level: "ดี", minScore: 108, maxScore: 125 },
+  { level: "ชมเชย", minScore: 90, maxScore: 107 },
+  { level: "ต่ำกว่าเกณฑ์", maxScore: 89 },
 ]
 
 const evaluationCriteria = [
@@ -112,10 +140,9 @@ const sections = [
     title: "สืบสานดนตรีไทยด้วยการเรียนรู้ที่เข้าถึงได้",
     tone: "dark" as const,
     content: [
-      "ดนตรีไทยถือเป็นมรดกทางวัฒนธรรมที่มีคุณค่าและสะท้อนถึงอัตลักษณ์ของชาติไทยมาอย่างยาวนาน ทั้งในรูปแบบดนตรีไทยแบบแผน ดนตรีพื้นบ้าน ตลอดจนการขับร้องเพลงไทย ซึ่งล้วนมีบทบาทสำคัญในการหล่อหลอมจิตใจ สร้างสุนทรียภาพ และพัฒนาศักยภาพของเยาวชนไทยในด้านสติปัญญา อารมณ์ สังคม และคุณธรรมจริยธรรม",
-      "กรมส่งเสริมวัฒนธรรม กระทรวงวัฒนธรรม จึงได้ดำเนิน “กิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์” อย่างต่อเนื่อง เพื่อส่งเสริมให้เด็กและเยาวชนไทยทุกคนสามารถเล่นดนตรีไทยได้อย่างน้อยคนละ 1 ชนิด อันเป็นการสร้างรากฐานในการอนุรักษ์ สืบสาน และต่อยอดองค์ความรู้ด้านดนตรีไทยให้คงอยู่คู่สังคมไทยอย่างยั่งยืน",
-      "จากการดำเนินกิจกรรมที่ผ่านมา พบว่าสถานศึกษาทั่วประเทศทั้งภาครัฐและเอกชนให้ความสนใจเข้าร่วมเพิ่มขึ้นอย่างต่อเนื่อง สะท้อนให้เห็นถึงความตระหนักถึงความสำคัญของดนตรีไทยในระบบการศึกษา รวมถึงบทบาทของดนตรีไทยในการพัฒนาผู้เรียนอย่างรอบด้าน ทั้งด้านความคิดสร้างสรรค์ ความมีวินัย และความภาคภูมิใจในวัฒนธรรมของตนเอง",
-      "ดังนั้น การดำเนินกิจกรรมในปีงบประมาณ พ.ศ. 2569 จึงมุ่งเน้นการขยายผลให้ครอบคลุมสถานศึกษาทั่วประเทศ เพิ่มประสิทธิภาพการบริหารจัดการข้อมูล การคัดเลือก และการเผยแพร่ผลงานในรูปแบบดิจิทัล เพื่อให้เข้าถึงได้ง่าย โปร่งใส และสามารถต่อยอดในอนาคตได้อย่างมีประสิทธิภาพ",
+      "ดนตรีไทยถือเป็นมรดกทางวัฒนธรรมที่มีคุณค่าและสะท้อนถึงอัตลักษณ์ของชาติไทยมาอย่างยาวนาน ทั้งในรูปแบบดนตรีไทยแบบแผน ดนตรีพื้นบ้าน ตลอดจนการขับร้องเพลงไทย ซึ่งล้วนมีบทบาทสำคัญในการหล่อหลอมจิตใจ สร้างสุนทรียภาพ และพัฒนาศักยภาพของเยาวชนไทยในด้านสติปัญญา อารมณ์ สังคมและคุณธรรมจริยธรรม",
+      "กรมส่งเสริมวัฒนธรรม กระทรวงวัฒนธรรม ในฐานะหน่วยงานที่ทำหน้าที่ส่งเสริม รักษาวัฒนธรรมตลอดจนการเสริมสร้างการมีส่วนร่วมจากหน่วยงานต่าง ๆ ทั้งภาครัฐ ภาคเอกชน และประชาชนให้มีส่วนร่วม ในการขับเคลื่อนและร่วมกันธำรงรักษามรดกวัฒนธรรมที่ดีงาม ได้ดำเนินกิจกรรมโรงเรียนดนตรีไทย100 เปอร์เซ็นต์ ตั้งแต่ปีงบประมาณ พ.ศ. 2561 เป็นต้นมา ",
+      "โดยมีสถานศึกษาทั่วประเทศทั้งภาครัฐ และเอกชนให้ความสนใจเข้าร่วมกิจกรรมเพิ่มขึ้นอย่างต่อเนื่อง โดยเริ่มแรกมีเครือข่ายนำร่องที่เข้าร่วมโครงการ 9 แห่ง และปัจจุบันมีสถานศึกษาเข้าร่วมกิจกรรม รวมทั้งสิ้น 1,276 แห่ง",
     ],
   },
   {
@@ -127,38 +154,27 @@ const sections = [
   },
   {
     number: "3",
-    eyebrow: "ลักษณะและขอบเขตของกิจกรรม",
-    title: "กิจกรรมที่ทำงานครบทั้งการส่งเสริม คัดเลือก และเผยแพร่",
+    eyebrow: "คุณสมบัติของผู้สมัคร",
+    title: "การตรวจสอบก่อนสมัครเข้าร่วมกิจกรรม",
     tone: "dark" as const,
-    intro:
-      "กิจกรรมนี้เป็นการดำเนินงานในลักษณะของการส่งเสริม สนับสนุน และคัดเลือกสถานศึกษาที่มีความพร้อมในการจัดการเรียนการสอนดนตรีไทย โดยแบ่งออกเป็น ๒ ประเภท ได้แก่ ประเภทโรงเรียนดนตรีไทย ๑๐๐ เปอร์เซ็นต์ และประเภทโรงเรียนสนับสนุนและส่งเสริมดนตรีไทย",
+    intro: "สถานศึกษาสามารถสมัครเข้าร่วมเป็นโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์ ประจำปีงบประมาณ พ.ศ. 2569 ได้เพียงประเภทเดียวเท่านั้น โดยแบ่งเป็น 2 ประเภท ได้แก่",
     scopes: workScopes,
   },
   {
     number: "4",
-    eyebrow: "แนวทางการดำเนินงานของสถานศึกษา",
-    title: "องค์ประกอบสำคัญที่สถานศึกษาควรมี",
-    tone: "light" as const,
-    intro:
-      "สถานศึกษาที่เข้าร่วมกิจกรรมจะต้องมีการดำเนินงานด้านการเรียนการสอนดนตรีไทยอย่างเป็นระบบ ครอบคลุมทั้งในและนอกเวลาเรียน โดยมุ่งเน้นให้นักเรียนทุกคนสามารถปฏิบัติดนตรีไทยได้อย่างน้อย ๑ ชนิด รวมถึงมีองค์ประกอบสำคัญดังต่อไปนี้",
-    list: schoolGuidelines,
+    eyebrow: "รางวัลที่ได้รับ",
+    title: "รางวัลเกียรติยศโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์",
+    tone: "dark" as const,
+    intro: "รางวัลเกียรติยศโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์ ประจำปีงบประมาณ พ.ศ. 2569",
   },
   {
     number: "5",
-    eyebrow: "หลักเกณฑ์การประเมินผล",
-    title: "ประเมินรอบด้านด้วยเกณฑ์ที่ชัดเจน",
-    tone: "dark" as const,
-    intro:
-      "การประเมินผลจะพิจารณาจากองค์ประกอบหลักที่สะท้อนความพร้อมและคุณภาพของสถานศึกษาอย่างครบถ้วน โดยมีการกำหนดคะแนนรวม ๑๐๐ คะแนน และแบ่งระดับผลการประเมินเป็นระดับต่าง ๆ เช่น ดีเด่น ดีมาก ดี และชมเชย",
-    list: evaluationCriteria,
-  },
-  {
-    number: "6",
-    eyebrow: "ผลที่คาดว่าจะได้รับ",
-    title: "ผลลัพธ์ที่ต่อยอดได้จริงในระดับผู้เรียนและสถานศึกษา",
+    eyebrow: "เกณฑ์การประเมินและตัวชี้วัด",
+    title: "เกณฑ์การประเมินทั้ง 2 ประเภท",
     tone: "light" as const,
-    list: expectedOutcomes,
+    isEvaluationBoth: true,
   },
+  
 ]
 
 function SectionCard({
@@ -171,6 +187,9 @@ function SectionCard({
   list,
   scopes,
   image,
+  isEvaluation,
+  evaluationType,
+  isEvaluationBoth,
 }: {
   number: string
   eyebrow: string
@@ -181,8 +200,19 @@ function SectionCard({
   list?: string[]
   scopes?: { title: string; description: string }[]
   image?: string
+  isEvaluation?: boolean
+  evaluationType?: "100percent" | "support"
+  isEvaluationBoth?: boolean
 }) {
   const isDark = tone === "dark"
+  
+  // Select the appropriate evaluation data based on type
+  const evalPart1 = evaluationType === "support" ? supportEvaluationPart1 : evaluationPart1
+  const evalPart2 = evaluationType === "support" ? supportEvaluationPart2 : evaluationPart2
+  const evalLevels = evaluationType === "support" ? supportEvaluationLevels : evaluationLevels
+  const totalScore = evaluationType === "support" ? 180 : 200
+  const part1Score = evaluationType === "support" ? 80 : 100
+  const part2Score = evaluationType === "support" ? 100 : 100
 
   return (
     <motion.article
@@ -266,6 +296,465 @@ function SectionCard({
               </div>
             </div>
           ))}
+        </div>
+      ) : null}
+
+      {isEvaluationBoth ? (
+        <div className="mt-8 space-y-10">
+          {/* 5.1 ประเภทโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์ */}
+          <div className={`rounded-[2rem] border p-6 ${
+            isDark ? "border-[#f0c969]/20 bg-white/[0.03]" : "border-[#0f6b44]/20 bg-white/50"
+          }`}>
+            <div className="mb-6 flex items-center gap-3">
+              <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-base font-bold ${
+                isDark ? "bg-[#f0c969]/14 text-[#f0d48d]" : "bg-[#0f6b44]/10 text-[#0f6b44]"
+              }`}>
+                5.1
+              </div>
+              <h3 className={`text-xl font-bold ${isDark ? "text-white" : "text-[#173629]"}`}>
+                ประเภทโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์
+              </h3>
+            </div>
+
+            <div className="space-y-6">
+              {/* ส่วนที่ 1 */}
+              <div className={`rounded-[1.5rem] p-5 ${
+                isDark ? "bg-white/[0.05] ring-1 ring-white/8" : "bg-white/86 ring-1 ring-[#e8d6aa] shadow-[0_10px_25px_rgba(87,65,18,0.06)]"
+              }`}>
+                <div className="mb-4 flex items-center gap-3">
+                  <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-sm font-bold ${
+                    isDark ? "bg-[#f0c969]/14 text-[#f0d48d]" : "bg-[#0f6b44]/10 text-[#0f6b44]"
+                  }`}>
+                    1
+                  </div>
+                  <h4 className={`text-lg font-semibold ${isDark ? "text-white" : "text-[#173629]"}`}>
+                    ส่วนที่ 1
+                  </h4>
+                </div>
+                <div className="space-y-2">
+                  {evaluationPart1.map((item, index) => (
+                    <div key={index} className={`flex items-center justify-between rounded-lg p-3 ${
+                      isDark ? "bg-white/[0.03]" : "bg-white/60"
+                    }`}>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-sm font-medium ${isDark ? "text-white/60" : "text-[#173629]/60"}`}>
+                          {index + 1}.
+                        </span>
+                        <span className={`text-sm ${isDark ? "text-white/90" : "text-[#173629]"}`}>
+                          {item.title}
+                        </span>
+                      </div>
+                      <span className={`rounded-lg px-2.5 py-1 text-xs font-semibold ${
+                        isDark ? "bg-[#f0c969]/14 text-[#f0d48d]" : "bg-[#0f6b44]/10 text-[#0f6b44]"
+                      }`}>
+                        {item.score} คะแนน
+                      </span>
+                    </div>
+                  ))}
+                  <div className={`mt-3 rounded-lg p-3 text-center ${
+                    isDark ? "bg-[#f0c969]/8" : "bg-[#0f6b44]/8"
+                  }`}>
+                    <span className={`text-base font-bold ${isDark ? "text-[#f0d48d]" : "text-[#0f6b44]"}`}>
+                      รวม 100 คะแนน
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* ส่วนที่ 2 */}
+              <div className={`rounded-[1.5rem] p-5 ${
+                isDark ? "bg-white/[0.05] ring-1 ring-white/8" : "bg-white/86 ring-1 ring-[#e8d6aa] shadow-[0_10px_25px_rgba(87,65,18,0.06)]"
+              }`}>
+                <div className="mb-4 flex items-center gap-3">
+                  <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-sm font-bold ${
+                    isDark ? "bg-[#f0c969]/14 text-[#f0d48d]" : "bg-[#0f6b44]/10 text-[#0f6b44]"
+                  }`}>
+                    2
+                  </div>
+                  <h4 className={`text-lg font-semibold ${isDark ? "text-white" : "text-[#173629]"}`}>
+                    ส่วนที่ 2
+                  </h4>
+                </div>
+                <div className="space-y-2">
+                  {evaluationPart2.map((item, index) => (
+                    <div key={index} className={`rounded-lg p-3 ${
+                      isDark ? "bg-white/[0.03]" : "bg-white/60"
+                    }`}>
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className={`text-sm font-medium ${isDark ? "text-white/60" : "text-[#173629]/60"}`}>
+                              {index + 1}.
+                            </span>
+                            <span className={`text-sm font-medium ${isDark ? "text-white/90" : "text-[#173629]"}`}>
+                              {item.title}
+                            </span>
+                          </div>
+                          {item.description && (
+                            <p className={`mt-1.5 ml-6 text-xs leading-5 ${isDark ? "text-white/70" : "text-[#173629]/70"}`}>
+                              {item.description}
+                            </p>
+                          )}
+                        </div>
+                        <span className={`shrink-0 rounded-lg px-2.5 py-1 text-xs font-semibold ${
+                          isDark ? "bg-[#f0c969]/14 text-[#f0d48d]" : "bg-[#0f6b44]/10 text-[#0f6b44]"
+                        }`}>
+                          {item.score} คะแนน
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                  <div className={`mt-3 rounded-lg p-3 text-center ${
+                    isDark ? "bg-[#f0c969]/8" : "bg-[#0f6b44]/8"
+                  }`}>
+                    <span className={`text-base font-bold ${isDark ? "text-[#f0d48d]" : "text-[#0f6b44]"}`}>
+                      รวม 100 คะแนน
+                    </span>
+                  </div>
+                </div>
+              </div>
+                            {/* หมายเหตุ การประเมินผล */}
+              <div className={`rounded-[1.5rem] p-5 ${
+                isDark ? "bg-white/[0.05] ring-1 ring-white/8" : "bg-white/86 ring-1 ring-[#e8d6aa] shadow-[0_10px_25px_rgba(87,65,18,0.06)]"
+              }`}>
+                <h5 className={`mb-3 text-base font-semibold ${isDark ? "text-white" : "text-[#173629]"}`}>
+                  หมายเหตุ การประเมินผลการคัดเลือกตามระดับคะแนน
+                </h5>
+                <div className="space-y-1.5">
+                  {evaluationLevels.map((level, index) => (
+                    <div key={index} className={`flex items-center justify-between rounded-lg p-2.5 ${
+                      isDark ? "bg-white/[0.03]" : "bg-white/60"
+                    }`}>
+                      <span className={`text-sm font-medium ${isDark ? "text-white/90" : "text-[#173629]"}`}>
+                        {level.level}
+                      </span>
+                      <span className={`text-xs ${isDark ? "text-white/70" : "text-[#173629]/70"}`}>
+                        {level.minScore && level.maxScore 
+                          ? `คะแนน ${level.minScore} - ${level.maxScore}`
+                          : level.minScore 
+                          ? `คะแนน ${level.minScore} ขึ้นไป`
+                          : `คะแนนต่ำกว่า ${(level.maxScore || 0) + 1}`
+                        }
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* รวม 2 ส่วน */}
+              <div className={`rounded-[1.5rem] p-4 text-center ${
+                isDark ? "bg-gradient-to-br from-[#f0c969]/12 to-[#f0c969]/6 ring-1 ring-[#f0c969]/20" : "bg-gradient-to-br from-[#0f6b44]/12 to-[#0f6b44]/6 ring-1 ring-[#0f6b44]/20"
+              }`}>
+                <p className={`text-sm font-medium ${isDark ? "text-white/70" : "text-[#173629]/70"}`}>
+                  
+                  ประเภทโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์รวม 2 ส่วน
+                </p>
+                <p className={`mt-1 text-2xl font-bold ${isDark ? "text-[#f0d48d]" : "text-[#0f6b44]"}`}>
+                  200 คะแนน
+                </p>
+              </div>
+
+
+            </div>
+          </div>
+
+          {/* 5.2 ประเภทโรงเรียนสนับสนุนและส่งเสริมดนตรีไทย */}
+          <div className={`rounded-[2rem] border p-6 ${
+            isDark ? "border-[#f0c969]/20 bg-white/[0.03]" : "border-[#0f6b44]/20 bg-white/50"
+          }`}>
+            <div className="mb-6 flex items-center gap-3">
+              <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-base font-bold ${
+                isDark ? "bg-[#f0c969]/14 text-[#f0d48d]" : "bg-[#0f6b44]/10 text-[#0f6b44]"
+              }`}>
+                5.2
+              </div>
+              <h3 className={`text-xl font-bold ${isDark ? "text-white" : "text-[#173629]"}`}>
+                ประเภทโรงเรียนสนับสนุนและส่งเสริมดนตรีไทย
+              </h3>
+            </div>
+
+            <div className="space-y-6">
+              {/* ส่วนที่ 1 */}
+              <div className={`rounded-[1.5rem] p-5 ${
+                isDark ? "bg-white/[0.05] ring-1 ring-white/8" : "bg-white/86 ring-1 ring-[#e8d6aa] shadow-[0_10px_25px_rgba(87,65,18,0.06)]"
+              }`}>
+                <div className="mb-4 flex items-center gap-3">
+                  <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-sm font-bold ${
+                    isDark ? "bg-[#f0c969]/14 text-[#f0d48d]" : "bg-[#0f6b44]/10 text-[#0f6b44]"
+                  }`}>
+                    1
+                  </div>
+                  <h4 className={`text-lg font-semibold ${isDark ? "text-white" : "text-[#173629]"}`}>
+                    ส่วนที่ 1
+                  </h4>
+                </div>
+                <div className="space-y-2">
+                  {supportEvaluationPart1.map((item, index) => (
+                    <div key={index} className={`flex items-center justify-between rounded-lg p-3 ${
+                      isDark ? "bg-white/[0.03]" : "bg-white/60"
+                    }`}>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-sm font-medium ${isDark ? "text-white/60" : "text-[#173629]/60"}`}>
+                          {index + 1}.
+                        </span>
+                        <span className={`text-sm ${isDark ? "text-white/90" : "text-[#173629]"}`}>
+                          {item.title}
+                        </span>
+                      </div>
+                      <span className={`rounded-lg px-2.5 py-1 text-xs font-semibold ${
+                        isDark ? "bg-[#f0c969]/14 text-[#f0d48d]" : "bg-[#0f6b44]/10 text-[#0f6b44]"
+                      }`}>
+                        {item.score} คะแนน
+                      </span>
+                    </div>
+                  ))}
+                  <div className={`mt-3 rounded-lg p-3 text-center ${
+                    isDark ? "bg-[#f0c969]/8" : "bg-[#0f6b44]/8"
+                  }`}>
+                    <span className={`text-base font-bold ${isDark ? "text-[#f0d48d]" : "text-[#0f6b44]"}`}>
+                      รวม 80 คะแนน
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* ส่วนที่ 2 */}
+              <div className={`rounded-[1.5rem] p-5 ${
+                isDark ? "bg-white/[0.05] ring-1 ring-white/8" : "bg-white/86 ring-1 ring-[#e8d6aa] shadow-[0_10px_25px_rgba(87,65,18,0.06)]"
+              }`}>
+                <div className="mb-4 flex items-center gap-3">
+                  <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-sm font-bold ${
+                    isDark ? "bg-[#f0c969]/14 text-[#f0d48d]" : "bg-[#0f6b44]/10 text-[#0f6b44]"
+                  }`}>
+                    2
+                  </div>
+                  <h4 className={`text-lg font-semibold ${isDark ? "text-white" : "text-[#173629]"}`}>
+                    ส่วนที่ 2
+                  </h4>
+                </div>
+                <div className="space-y-2">
+                  {supportEvaluationPart2.map((item, index) => (
+                    <div key={index} className={`rounded-lg p-3 ${
+                      isDark ? "bg-white/[0.03]" : "bg-white/60"
+                    }`}>
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className={`text-sm font-medium ${isDark ? "text-white/60" : "text-[#173629]/60"}`}>
+                              {index + 1}.
+                            </span>
+                            <span className={`text-sm font-medium ${isDark ? "text-white/90" : "text-[#173629]"}`}>
+                              {item.title}
+                            </span>
+                          </div>
+                          {item.description && (
+                            <p className={`mt-1.5 ml-6 text-xs leading-5 ${isDark ? "text-white/70" : "text-[#173629]/70"}`}>
+                              {item.description}
+                            </p>
+                          )}
+                        </div>
+                        <span className={`shrink-0 rounded-lg px-2.5 py-1 text-xs font-semibold ${
+                          isDark ? "bg-[#f0c969]/14 text-[#f0d48d]" : "bg-[#0f6b44]/10 text-[#0f6b44]"
+                        }`}>
+                          {item.score} คะแนน
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                  <div className={`mt-3 rounded-lg p-3 text-center ${
+                    isDark ? "bg-[#f0c969]/8" : "bg-[#0f6b44]/8"
+                  }`}>
+                    <span className={`text-base font-bold ${isDark ? "text-[#f0d48d]" : "text-[#0f6b44]"}`}>
+                      รวม 100 คะแนน
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+
+              {/* หมายเหตุ การประเมินผล */}
+              <div className={`rounded-[1.5rem] p-5 ${
+                isDark ? "bg-white/[0.05] ring-1 ring-white/8" : "bg-white/86 ring-1 ring-[#e8d6aa] shadow-[0_10px_25px_rgba(87,65,18,0.06)]"
+              }`}>
+                <h5 className={`mb-3 text-base font-semibold ${isDark ? "text-white" : "text-[#173629]"}`}>
+                  หมายเหตุ การประเมินผลการคัดเลือกตามระดับคะแนน
+                </h5>
+                <div className="space-y-1.5">
+                  {supportEvaluationLevels.map((level, index) => (
+                    <div key={index} className={`flex items-center justify-between rounded-lg p-2.5 ${
+                      isDark ? "bg-white/[0.03]" : "bg-white/60"
+                    }`}>
+                      <span className={`text-sm font-medium ${isDark ? "text-white/90" : "text-[#173629]"}`}>
+                        {level.level}
+                      </span>
+                      <span className={`text-xs ${isDark ? "text-white/70" : "text-[#173629]/70"}`}>
+                        {level.minScore && level.maxScore 
+                          ? `คะแนน ${level.minScore} - ${level.maxScore}`
+                          : level.minScore 
+                          ? `คะแนน ${level.minScore} ขึ้นไป`
+                          : `คะแนนต่ำกว่า ${(level.maxScore || 0) + 1}`
+                        }
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* รวม 2 ส่วน */}
+              <div className={`rounded-[1.5rem] p-4 text-center ${
+                isDark ? "bg-gradient-to-br from-[#f0c969]/12 to-[#f0c969]/6 ring-1 ring-[#f0c969]/20" : "bg-gradient-to-br from-[#0f6b44]/12 to-[#0f6b44]/6 ring-1 ring-[#0f6b44]/20"
+              }`}>
+                <p className={`text-sm font-medium ${isDark ? "text-white/70" : "text-[#173629]/70"}`}>
+                  ประเภทโรงเรียนสนับสนุนและส่งเสริมดนตรีไทย รวม 2 ส่วน
+                </p>
+                <p className={`mt-1 text-2xl font-bold ${isDark ? "text-[#f0d48d]" : "text-[#0f6b44]"}`}>
+                  180 คะแนน
+                </p>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {isEvaluation ? (
+        <div className="mt-8 space-y-8">
+          {/* ส่วนที่ 1 */}
+          <div className={`rounded-[1.75rem] p-6 ${
+            isDark ? "bg-white/[0.05] ring-1 ring-white/8" : "bg-white/86 ring-1 ring-[#e8d6aa] shadow-[0_10px_25px_rgba(87,65,18,0.06)]"
+          }`}>
+            <div className="mb-5 flex items-center gap-3">
+              <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-base font-bold ${
+                isDark ? "bg-[#f0c969]/14 text-[#f0d48d]" : "bg-[#0f6b44]/10 text-[#0f6b44]"
+              }`}>
+                1
+              </div>
+              <h3 className={`text-xl font-semibold ${isDark ? "text-white" : "text-[#173629]"}`}>
+                ส่วนที่ 1
+              </h3>
+            </div>
+            <div className="space-y-3">
+              {evalPart1.map((item, index) => (
+                <div key={index} className={`flex items-center justify-between rounded-xl p-4 ${
+                  isDark ? "bg-white/[0.03]" : "bg-white/60"
+                }`}>
+                  <div className="flex items-center gap-3">
+                    <span className={`text-sm font-medium ${isDark ? "text-white/60" : "text-[#173629]/60"}`}>
+                      {index + 1}.
+                    </span>
+                    <span className={`${isDark ? "text-white/90" : "text-[#173629]"}`}>
+                      {item.title}
+                    </span>
+                  </div>
+                  <span className={`rounded-lg px-3 py-1 text-sm font-semibold ${
+                    isDark ? "bg-[#f0c969]/14 text-[#f0d48d]" : "bg-[#0f6b44]/10 text-[#0f6b44]"
+                  }`}>
+                    {item.score} คะแนน
+                  </span>
+                </div>
+              ))}
+              <div className={`mt-4 rounded-xl p-4 text-center ${
+                isDark ? "bg-[#f0c969]/8" : "bg-[#0f6b44]/8"
+              }`}>
+                <span className={`text-lg font-bold ${isDark ? "text-[#f0d48d]" : "text-[#0f6b44]"}`}>
+                  รวม {part1Score} คะแนน
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* ส่วนที่ 2 */}
+          <div className={`rounded-[1.75rem] p-6 ${
+            isDark ? "bg-white/[0.05] ring-1 ring-white/8" : "bg-white/86 ring-1 ring-[#e8d6aa] shadow-[0_10px_25px_rgba(87,65,18,0.06)]"
+          }`}>
+            <div className="mb-5 flex items-center gap-3">
+              <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-base font-bold ${
+                isDark ? "bg-[#f0c969]/14 text-[#f0d48d]" : "bg-[#0f6b44]/10 text-[#0f6b44]"
+              }`}>
+                2
+              </div>
+              <h3 className={`text-xl font-semibold ${isDark ? "text-white" : "text-[#173629]"}`}>
+                ส่วนที่ 2
+              </h3>
+            </div>
+            <div className="space-y-3">
+              {evalPart2.map((item, index) => (
+                <div key={index} className={`rounded-xl p-4 ${
+                  isDark ? "bg-white/[0.03]" : "bg-white/60"
+                }`}>
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3">
+                        <span className={`text-sm font-medium ${isDark ? "text-white/60" : "text-[#173629]/60"}`}>
+                          {index + 1}.
+                        </span>
+                        <span className={`font-medium ${isDark ? "text-white/90" : "text-[#173629]"}`}>
+                          {item.title}
+                        </span>
+                      </div>
+                      {item.description && (
+                        <p className={`mt-2 ml-7 text-sm leading-6 ${isDark ? "text-white/70" : "text-[#173629]/70"}`}>
+                          {item.description}
+                        </p>
+                      )}
+                    </div>
+                    <span className={`shrink-0 rounded-lg px-3 py-1 text-sm font-semibold ${
+                      isDark ? "bg-[#f0c969]/14 text-[#f0d48d]" : "bg-[#0f6b44]/10 text-[#0f6b44]"
+                    }`}>
+                      {item.score} คะแนน
+                    </span>
+                  </div>
+                </div>
+              ))}
+              <div className={`mt-4 rounded-xl p-4 text-center ${
+                isDark ? "bg-[#f0c969]/8" : "bg-[#0f6b44]/8"
+              }`}>
+                <span className={`text-lg font-bold ${isDark ? "text-[#f0d48d]" : "text-[#0f6b44]"}`}>
+                  รวม {part2Score} คะแนน
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* รวม 2 ส่วน */}
+          <div className={`rounded-[1.75rem] p-6 text-center ${
+            isDark ? "bg-gradient-to-br from-[#f0c969]/12 to-[#f0c969]/6 ring-1 ring-[#f0c969]/20" : "bg-gradient-to-br from-[#0f6b44]/12 to-[#0f6b44]/6 ring-1 ring-[#0f6b44]/20"
+          }`}>
+            <p className={`text-sm font-medium ${isDark ? "text-white/70" : "text-[#173629]/70"}`}>
+              ประเภทโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์ รวม 2 ส่วน
+            </p>
+            <p className={`mt-2 text-3xl font-bold ${isDark ? "text-[#f0d48d]" : "text-[#0f6b44]"}`}>
+              {totalScore} คะแนน
+            </p>
+          </div>
+
+          {/* หมายเหตุ การประเมินผล */}
+          <div className={`rounded-[1.75rem] p-6 ${
+            isDark ? "bg-white/[0.05] ring-1 ring-white/8" : "bg-white/86 ring-1 ring-[#e8d6aa] shadow-[0_10px_25px_rgba(87,65,18,0.06)]"
+          }`}>
+            <h4 className={`mb-4 text-lg font-semibold ${isDark ? "text-white" : "text-[#173629]"}`}>
+              หมายเหตุ การประเมินผลการคัดเลือกตามระดับคะแนน
+            </h4>
+            <div className="space-y-2">
+              {evalLevels.map((level, index) => (
+                <div key={index} className={`flex items-center justify-between rounded-lg p-3 ${
+                  isDark ? "bg-white/[0.03]" : "bg-white/60"
+                }`}>
+                  <span className={`font-medium ${isDark ? "text-white/90" : "text-[#173629]"}`}>
+                    {level.level}
+                  </span>
+                  <span className={`text-sm ${isDark ? "text-white/70" : "text-[#173629]/70"}`}>
+                    {level.minScore && level.maxScore 
+                      ? `คะแนน ${level.minScore} - ${level.maxScore}`
+                      : level.minScore 
+                      ? `คะแนน ${level.minScore} ขึ้นไป`
+                      : `คะแนนต่ำกว่า ${(level.maxScore || 0) + 1}`
+                    }
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       ) : null}
     </motion.article>
@@ -390,48 +879,6 @@ export default function AboutPage() {
             {sections.map((section) => (
               <SectionCard key={section.number} {...section} />
             ))}
-
-            <motion.article
-              variants={fadeUp}
-              transition={{ duration: 0.75, ease: "easeOut" }}
-              className="rounded-[2rem] border border-[#d2bb80]/18 bg-[linear-gradient(135deg,rgba(209,169,76,0.16),rgba(10,35,26,0.98))] p-8 shadow-[0_20px_60px_rgba(0,0,0,0.2)] sm:p-10"
-            >
-              <div className="flex items-start gap-4">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#f0c969]/14 text-lg font-semibold text-[#f5da94]">
-                  7
-                </div>
-                <div>
-                  <p className="text-sm uppercase tracking-[0.28em] text-[#cfb26a]">สรุปภาพรวมกิจกรรม</p>
-                  <h2 className="mt-3 text-2xl font-semibold leading-tight text-[#fff1c4] sm:text-[2rem]">
-                    กิจกรรมที่เชื่อมผู้เรียน ครู ชุมชน และวัฒนธรรมไทยเข้าหากัน
-                  </h2>
-                </div>
-              </div>
-
-              <div className="mt-8 space-y-5 text-base leading-8 text-white/84">
-                <p>
-                  กิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์ เป็นกลไกสำคัญในการขับเคลื่อนการอนุรักษ์และพัฒนาดนตรีไทยผ่านระบบการศึกษา โดยเน้นการมีส่วนร่วมของทุกภาคส่วน ทั้งสถานศึกษา ครู ผู้เรียน ชุมชน และหน่วยงานที่เกี่ยวข้อง
-                </p>
-                <p>
-                  เป้าหมายสำคัญคือการสร้างความยั่งยืนให้กับมรดกทางวัฒนธรรมของชาติ พร้อมยกระดับคุณภาพการเรียนรู้ของเยาวชนไทยในอนาคต ผ่านระบบที่ทันสมัย โปร่งใส และสามารถต่อยอดได้จริงในระดับประเทศ
-                </p>
-              </div>
-
-              <div className="mt-8 flex flex-wrap gap-3">
-                <span className="rounded-full border border-[#f3d37d]/28 bg-[#f3d37d]/10 px-4 py-2 text-sm text-[#f6dfa0]">
-                  วัฒนธรรมไทย
-                </span>
-                <span className="rounded-full border border-[#f3d37d]/28 bg-[#f3d37d]/10 px-4 py-2 text-sm text-[#f6dfa0]">
-                  การศึกษา
-                </span>
-                <span className="rounded-full border border-[#f3d37d]/28 bg-[#f3d37d]/10 px-4 py-2 text-sm text-[#f6dfa0]">
-                  ระบบดิจิทัล
-                </span>
-                <span className="rounded-full border border-[#f3d37d]/28 bg-[#f3d37d]/10 px-4 py-2 text-sm text-[#f6dfa0]">
-                  เครือข่ายสถานศึกษา
-                </span>
-              </div>
-            </motion.article>
           </motion.div>
         </section>
       </main>
