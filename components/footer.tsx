@@ -98,19 +98,19 @@ export default function Footer() {
               <li className="flex items-start gap-3">
                 <MapPin className="h-4 w-4 text-white/50 mt-0.5 shrink-0" />
                 <span className="text-sm text-white/60 leading-relaxed text-left">
-                  {"กระทรวงวัฒนธรรม เลขที่ 666 ถนนบรมราชชนนี แขวงบางบำหรุ เขตบางพลัด กรุงเทพฯ 10700"}
+                  {"กรมส่งเสริมวัฒนธรรม กระทรวงวัฒนธรรม 14 ถนนเทียมร่วมมิตร เขตห้วยขวาง กรุงเทพฯ 10310"}
                 </span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="h-4 w-4 text-white/50 shrink-0" />
                 <span className="text-sm text-white/60">
-                  {"02-422-8888"}
+                  {"โทรศัพท์ 02-247-0013 ต่อ 1409 , 1410"}
                 </span>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="h-4 w-4 text-white/50 shrink-0" />
                 <span className="text-sm text-white/60">
-                  {"contact@m-culture.go.th"}
+                  {"edu.dcpcult@gmail.com"}
                 </span>
               </li>
             </ul>
