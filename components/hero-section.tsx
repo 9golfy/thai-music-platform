@@ -69,9 +69,27 @@ export default function HeroSection() {
             {"เพื่อสืบสาน รักษา ต่อยอดวิชาดนตรีไทยให้คงอยู่คู่สังคมไทย"}
           </motion.p>
 
+          {/* Registration Period */}
+          <motion.div
+            className="mt-[245px] mb-2"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.7 }}
+          >
+            <div className="inline-flex items-center gap-2 px-4 py-2">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-[#f0d48d]">
+                <path d="M8 2v3M16 2v3M3.5 9.09h17M21 8.5V17c0 3-1.5 5-5 5H8c-3.5 0-5-2-5-5V8.5c0-3 1.5-5 5-5h8c3.5 0 5 2 5 5z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M15.695 13.7h.009M15.695 16.7h.009M11.995 13.7h.01M11.995 16.7h.01M8.294 13.7h.01M8.294 16.7h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span className="text-[#f0d48d] font-semibold text-sm sm:text-base">
+                รับสมัครตั้งแต่วันนี้ - 31 พฤษภาคม 2569
+              </span>
+            </div>
+          </motion.div>
+
           {/* CTA Buttons - Luxury 4 💎 Emerald 🤍 Ivory Style */}
           <motion.div
-            className="flex flex-col sm:flex-row gap-4 mt-[300px]"
+            className="flex flex-col sm:flex-row gap-4"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.8 }}

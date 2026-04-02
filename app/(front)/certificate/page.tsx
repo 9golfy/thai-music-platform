@@ -289,6 +289,25 @@ export default function CertificatePage() {
           </div>
         </section>
 
+        {/* Coming Soon Section */}
+        <section className="px-4 py-32 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-5xl text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="rounded-[2rem] border border-[#d2bb80]/20 bg-[linear-gradient(180deg,rgba(17,53,40,0.92),rgba(9,28,21,0.98))] p-16 shadow-[0_20px_60px_rgba(0,0,0,0.3)]"
+            >
+              <h2 className="text-4xl font-bold text-[#f0d48d] sm:text-5xl">
+                โปรดติดตามเร็วๆนี้
+              </h2>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Commented out content - will be enabled later */}
+        {/*
         <section className="px-4 pb-24 sm:px-6 lg:px-8">
           <motion.div
             variants={stagger}
@@ -356,6 +375,7 @@ export default function CertificatePage() {
             </motion.article>
           </motion.div>
         </section>
+        */}
       </main>
       <Footer />
     </>
