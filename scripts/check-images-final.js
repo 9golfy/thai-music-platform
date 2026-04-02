@@ -4,7 +4,7 @@ const path = require('path');
 async function checkImagesFromAPI() {
   try {
     const submissionId = '69ad7476fcaa2809454bab85';
-    const response = await fetch(`http://localhost:3000/api/register-support/${submissionId}`);
+    const response = await fetch(`https://dcpschool100.net/api/register-support/${submissionId}`);
     const data = await response.json();
     const submission = data.submission;
     
@@ -16,7 +16,7 @@ async function checkImagesFromAPI() {
     console.log('\n📸 รูปผู้บริหาร:');
     if (submission.mgtImage) {
       console.log('✅ มี path ในฐานข้อมูล:', submission.mgtImage);
-      console.log('🌐 URL:', `http://localhost:3000${submission.mgtImage}`);
+      console.log('🌐 URL:', `https://dcpschool100.net${submission.mgtImage}`);
       
       const fullPath = path.join(process.cwd(), 'public', submission.mgtImage);
       const exists = fs.existsSync(fullPath);
@@ -42,7 +42,7 @@ async function checkImagesFromAPI() {
         if (teacher.teacherImage) {
           hasAnyTeacherImage = true;
           console.log('  ✅ มี path ในฐานข้อมูล:', teacher.teacherImage);
-          console.log('  🌐 URL:', `http://localhost:3000${teacher.teacherImage}`);
+          console.log('  🌐 URL:', `https://dcpschool100.net${teacher.teacherImage}`);
           
           const fullPath = path.join(process.cwd(), 'public', teacher.teacherImage);
           const exists = fs.existsSync(fullPath);

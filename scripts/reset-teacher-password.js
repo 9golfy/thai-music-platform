@@ -49,7 +49,7 @@ async function resetTeacherPassword() {
       console.log('   Email: thaimusicplatform@gmail.com');
       console.log('   Password: 123456');
       console.log('   School ID: ' + teacher.schoolId);
-      console.log('🔗 Login URL: http://localhost:3000/teacher-login');
+      console.log('🔗 Login URL: https://dcpschool100.net/teacher-login');
     } else {
       console.log('❌ Failed to reset password');
     }
