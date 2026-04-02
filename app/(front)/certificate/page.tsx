@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import { motion } from "framer-motion"
-import { Award, CheckCircle2, Medal, ShieldCheck, Star, Trophy } from "lucide-react"
+import { Award, CheckCircle2 } from "lucide-react"
 
 import Footer from "@/components/footer"
 import HeroMusicOverlay from "@/components/hero-music-overlay"
@@ -21,29 +21,6 @@ const stagger = {
     },
   },
 }
-
-const highlights = [
-  {
-    icon: ShieldCheck,
-    title: "โปร่งใสตรวจสอบได้",
-    description: "ใช้หลักเกณฑ์และตัวชี้วัดที่ชัดเจน ครอบคลุมทั้งด้านการเรียนรู้ บุคลากร และผลลัพธ์",
-  },
-  {
-    icon: Medal,
-    title: "ประเมินแบบองค์รวม",
-    description: "พิจารณาทั้งเอกสาร ข้อมูลเชิงประจักษ์ และสื่อผลงานที่สะท้อนการดำเนินงานจริง",
-  },
-  {
-    icon: Trophy,
-    title: "มีระดับผลประเมิน",
-    description: "จัดระดับคุณภาพตั้งแต่ดีเด่นจนถึงต่ำกว่าเกณฑ์ เพื่อสะท้อนมาตรฐานอย่างชัดเจน",
-  },
-  {
-    icon: Star,
-    title: "เชิดชูเกียรติ",
-    description: "สถานศึกษาที่ผ่านเกณฑ์จะได้รับใบประกาศนียบัตรเป็นเกียรติประวัติและแรงบันดาลใจ",
-  },
-]
 
 const documentCriteria = [
   {
@@ -312,31 +289,6 @@ export default function CertificatePage() {
           </div>
         </section>
 
-        <section className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-          <motion.div
-            variants={stagger}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.15 }}
-            className="grid gap-5 md:grid-cols-2 xl:grid-cols-4"
-          >
-            {highlights.map(({ icon: Icon, title, description }) => (
-              <motion.div
-                key={title}
-                variants={fadeUp}
-                transition={{ duration: 0.65, ease: "easeOut" }}
-                className="group rounded-[1.75rem] border border-[#d2bb80]/20 bg-[linear-gradient(180deg,rgba(17,53,40,0.92),rgba(9,28,21,0.98))] p-6 shadow-[0_16px_40px_rgba(0,0,0,0.2)] transition-transform duration-500 hover:-translate-y-1"
-              >
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#f0c969]/15 text-[#f0d48d] transition-transform duration-500 group-hover:scale-110">
-                  <Icon className="h-6 w-6" />
-                </div>
-                <h2 className="text-xl font-semibold text-[#fff1c4]">{title}</h2>
-                <p className="mt-3 text-sm leading-7 text-white/75">{description}</p>
-              </motion.div>
-            ))}
-          </motion.div>
-        </section>
-
         <section className="px-4 pb-24 sm:px-6 lg:px-8">
           <motion.div
             variants={stagger}
@@ -348,7 +300,7 @@ export default function CertificatePage() {
             <motion.article
               variants={fadeUp}
               transition={{ duration: 0.75, ease: "easeOut" }}
-              className="overflow-hidden rounded-[2rem] border border-[#d2bb80]/18 bg-[linear-gradient(180deg,rgba(12,40,31,0.98),rgba(7,25,19,0.98))] p-8 shadow-[0_22px_60px_rgba(0,0,0,0.14)] sm:p-10"
+              className="mt-[100px] overflow-hidden rounded-[2rem] border border-[#d2bb80]/18 bg-[linear-gradient(180deg,rgba(12,40,31,0.98),rgba(7,25,19,0.98))] p-8 shadow-[0_22px_60px_rgba(0,0,0,0.14)] sm:p-10"
             >
               <div className="flex items-start gap-4">
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#f0c969]/14 text-[#f5da94]">
