@@ -165,7 +165,7 @@ export function generateSubmissionSuccessEmailHTML(props: SubmissionSuccessEmail
         }
         .button { 
           display: inline-block;
-          background: #16a34a; 
+          background: #3b82f6; 
           color: white !important; 
           padding: 16px 40px; 
           text-decoration: none; 
@@ -176,7 +176,7 @@ export function generateSubmissionSuccessEmailHTML(props: SubmissionSuccessEmail
           box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         .button:hover {
-          background: #15803d;
+          background: #2563eb;
         }
         .info-box { 
           background: #f9fafb; 
