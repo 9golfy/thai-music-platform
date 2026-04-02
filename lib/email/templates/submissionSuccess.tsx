@@ -345,7 +345,7 @@ export function generateSubmissionSuccessEmailHTML(props: SubmissionSuccessEmail
           </div>
 
           <div class="button-container">
-            <a href="${loginUrl}" class="button">
+            <a href="https://dcpschool100.net/teacher-login" class="button">
               🚀 เข้าสู่ระบบเลย
             </a>
           </div>
