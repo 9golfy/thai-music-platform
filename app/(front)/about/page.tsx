@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import { motion } from "framer-motion"
-import { CheckCircle2, Globe2, GraduationCap, ShieldCheck, Trophy } from "lucide-react"
+import { CheckCircle2 } from "lucide-react"
 
 import Footer from "@/components/footer"
 import HeroMusicOverlay from "@/components/hero-music-overlay"
@@ -22,29 +22,6 @@ const stagger = {
   },
 }
 
-const highlights = [
-  {
-    icon: GraduationCap,
-    title: "เรียนได้จริง",
-    description: "มุ่งให้นักเรียนทุกคนสามารถปฏิบัติดนตรีไทยได้อย่างน้อย 1 ชนิด",
-  },
-  {
-    icon: Globe2,
-    title: "ขยายผลทั่วประเทศ",
-    description: "ครอบคลุมสถานศึกษาทั้งภาครัฐและเอกชน พร้อมเครือข่ายการเรียนรู้ร่วมกัน",
-  },
-  {
-    icon: ShieldCheck,
-    title: "โปร่งใสตรวจสอบได้",
-    description: "ใช้ระบบดิจิทัลในการรับสมัคร ประเมินผล และประกาศผลอย่างเป็นระบบ",
-  },
-  {
-    icon: Trophy,
-    title: "ต่อยอดเชิงคุณภาพ",
-    description: "สร้างฐานข้อมูล ผลงาน และต้นแบบที่นำไปพัฒนากิจกรรมระยะยาวได้",
-  },
-]
-
 const objectives = [
   "เพื่อสืบสาน รักษา ต่อยอดวิชาดนตรีไทยให้คงอยู่คู่สังคมไทย",
   "เพื่อขับเคลื่อนนโยบายกระทรวงวัฒนธรรม \"สืบสาน สร้างสรรค์ นำวัฒนธรรมไทย สู่อนาคตอย่างยั่งยืน\" สู่การปฏิบัติให้บังเกิดผลเป็นรูปธรรม",
@@ -58,7 +35,7 @@ const workScopes = [
   },
   {
     title: "ประเภทโรงเรียนสนับสนุนและส่งเสริมดนตรีไทย",
-    description: "ส่วนที่ 1",
+    description: "",
   },
 ]
 
@@ -841,31 +818,6 @@ export default function AboutPage() {
               </motion.div>
             </motion.div>
           </div>
-        </section>
-
-        <section className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-          <motion.div
-            variants={stagger}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.15 }}
-            className="grid gap-5 md:grid-cols-2 xl:grid-cols-4"
-          >
-            {highlights.map(({ icon: Icon, title, description }) => (
-              <motion.div
-                key={title}
-                variants={fadeUp}
-                transition={{ duration: 0.65, ease: "easeOut" }}
-                className="group rounded-[1.75rem] border border-[#d2bb80]/20 bg-[linear-gradient(180deg,rgba(17,53,40,0.92),rgba(9,28,21,0.98))] p-6 shadow-[0_16px_40px_rgba(0,0,0,0.2)] transition-transform duration-500 hover:-translate-y-1"
-              >
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#f0c969]/15 text-[#f0d48d] transition-transform duration-500 group-hover:scale-110">
-                  <Icon className="h-6 w-6" />
-                </div>
-                <h2 className="text-xl font-semibold text-[#fff1c4]">{title}</h2>
-                <p className="mt-3 text-sm leading-7 text-white/75">{description}</p>
-              </motion.div>
-            ))}
-          </motion.div>
         </section>
 
         <section className="px-4 pb-24 sm:px-6 lg:px-8">

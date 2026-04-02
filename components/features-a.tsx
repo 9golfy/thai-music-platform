@@ -16,11 +16,11 @@ export default function FeaturesA() {
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
             <div className="relative overflow-hidden shadow-xl" style={{ borderRadius: "20px", border: "2px solid #F9E295", boxShadow: "0 0 24px rgba(249,226,149,0.20), 0 0 48px rgba(249,226,149,0.08)" }}>
-              {/* Landscape executive photo */}
-              <div className="relative w-full" style={{ height: "420px" }}>
+              {/* Portrait executive photo */}
+              <div className="relative w-full" style={{ height: "600px" }}>
                 <img
-                  src="/images/project-director.png"
-                  alt="นางยุถิกา อิศรางกูร ณ อยุธยา"
+                  src="/executive_image.jpg"
+                  alt="นางยุภิกา อิศรางกูร ณ อยุธยา"
                   className="w-full h-full object-cover object-top"
                   draggable={false}
                 />
@@ -40,7 +40,7 @@ export default function FeaturesA() {
                     className="font-bold text-base leading-snug"
                     style={{ color: "#F9E295", textShadow: "0 1px 6px rgba(0,0,0,0.8)" }}
                   >
-                    {"นางยุถิกา อิศรางกูร ณ อยุธยา"}
+                    {"นางยุภิกา อิศรางกูร ณ อยุธยา"}
                   </p>
                   <p className="text-sm text-white/80 mt-1" style={{ textShadow: "0 1px 4px rgba(0,0,0,0.8)" }}>
                     {"อธิบดีกรมส่งเสริมวัฒนธรรม"}

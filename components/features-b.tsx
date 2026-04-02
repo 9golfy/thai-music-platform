@@ -23,9 +23,9 @@ type Card = {
 const CARDS: Card[] = [
   {
     image: "/images/klui-boy-500.png",
-    title: "ข้อมูลโครงการฯ",
+    title: "ข้อมูลกิจกรรมฯ",
     subtitle:
-      "เรียนรู้รายละเอียดโครงการคัดเลือกสถานศึกษา เรียนรู้รายละเอียดโครงการคัดเลือกสถานศึกษา",
+      "เรียนรู้รายละเอียดกิจกรรมคัดเลือกสถานศึกษา เรียนรู้รายละเอียดกิจกรรมคัดเลือกสถานศึกษา",
     bg: "#0B7A3A",
     href: "#about",
     imgAlt: "นักเรียนเป่าปี่",
@@ -47,7 +47,7 @@ const CARDS: Card[] = [
     image: "/images/saw-girl-500.png",
     title: "ดาวน์โหลดเอกสาร",
     subtitle:
-      "รับเอกสารและสื่อประชาสัมพันธ์โครงการ รับเอกสารและสื่อประชาสัมพันธ์โครงการ",
+      "รับเอกสารและสื่อประชาสัมพันธ์กิจกรรม รับเอกสารและสื่อประชาสัมพันธ์กิจกรรม",
     bg: "#7A1B4A",
     href: "#download",
     imgAlt: "นักเรียนสีซอด้วง",
@@ -322,11 +322,11 @@ export default function FeaturesB() {
           transition={{ duration: 0.7 }}
         >
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#BE8C13] mb-4">
-            {"จุดเด่นของโครงการ"}
+            {"จุดเด่นของกิจกรรม"}
           </h2>
           <div className="mx-auto h-0.5 w-16 bg-gradient-to-r from-transparent via-[#BE8C13] to-transparent mb-4" />
           <p className="max-w-xl mx-auto text-white/70 leading-relaxed">
-            {"โครงการที่ครอบคลุมทุกมิติของการส่งเสริมดนตรีไทยในสถานศึกษา "}
+            {"กิจกรรมที่ครอบคลุมทุกมิติของการส่งเสริมดนตรีไทยในสถานศึกษา "}
           </p>
         </motion.div>
 
