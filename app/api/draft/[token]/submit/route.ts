@@ -225,7 +225,7 @@ export async function POST(
     );
 
     // Send submission success email with login credentials (Property 14: Submission Credentials Email)
-    const loginUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/teacher-login`;
+    const loginUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://dcpschool100.net'}/teacher-login`;
     
     const emailHTML = generateSubmissionSuccessEmailHTML({
       email: draft.email,
