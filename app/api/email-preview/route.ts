@@ -8,7 +8,7 @@ export async function GET() {
     password: '123456',
     schoolName: 'โรงเรียนทดสอบ',
     submissionType: 'register100',
-    loginUrl: 'http://localhost:3000/teacher-login', // This parameter is not used anymore
+    loginUrl: 'https://dcpschool100.net/teacher-login', // This parameter is not used anymore
     submissionId: 'test-submission-id',
   });
 
