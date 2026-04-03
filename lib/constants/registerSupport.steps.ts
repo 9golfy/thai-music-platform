@@ -3,7 +3,7 @@ export const STEP_TITLES = [
   { number: 2, title: 'ผู้บริหาร' },
   { number: 3, title: 'สภาวการณ์' },
   { number: 4, title: 'ผู้สอนดนตรีไทย' },
-  { number: 5, title: 'หลักสูตร' },
+  { number: 5, title: 'สถานที่' },
   { number: 6, title: 'การสนับสนุน' },
   { number: 7, title: 'ผลงาน' },
   { number: 8, title: 'การเผยแพร่' },
