@@ -1180,8 +1180,8 @@ export default function RegisterSupportDetailView({ id, hideScores = false, read
           </div>
         </StepSection>
 
-        {/* Step 5: หลักสูตร */}
-        <StepSection title="หลักสูตร" stepNumber={5}>
+        {/* Step 5: สถานที่ */}
+        <StepSection title="สถานที่" stepNumber={5}>
           <Field label="สถานที่สอน" value={displayData?.teachingLocation} fullWidth isEditMode={isEditMode} onChange={(val) => handleFieldChange('teachingLocation', val)} fieldName="teachingLocation" />
         </StepSection>
 

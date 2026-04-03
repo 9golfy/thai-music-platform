@@ -40,14 +40,15 @@ export default function Step3({ form }: Step3Props) {
       {/* สภาวการณ์การเรียนการสอนดนตรีไทย */}
       <div className="bg-white rounded-lg shadow-sm border border-neutral-border overflow-hidden">
         <div className="bg-green-50 px-6 py-3 border-b border-neutral-border">
-          <h3 className="font-semibold text-gray-900">สภาวการณ์การเรียนการสอนดนตรีไทยของสถานศึกษาในปัจจุบันเล่นดนตรีได้ 1 ชนิด</h3>
-          <p className="text-sm text-gray-600 mt-1">กรุณาเพิ่มอย่างน้อย 1 รายการ</p>
+          <h3 className="font-semibold text-gray-900">สภาวการณ์การเรียนการสอนดนตรีไทยของสถานศึกษาในปัจจุบัน</h3>
+          <p className="text-sm text-gray-600 mt-1">ระบุรายละเอียดแผนการจัดการ
+    เรียนรู้ในแต่ละระดับชั้นของสถานศึกษา และระบุให้ชัดเจนว่าเด็กนักเรียนทุกคนสามารถเล่นดนตรีได้ 1 ชนิด</p>
         </div>
         <div className="p-6 space-y-4">
           {musicFields.map((field, index) => (
             <div key={field.id} className="border border-neutral-border rounded-lg p-4 space-y-3">
               <div className="flex justify-between items-center">
-                <h4 className="font-medium text-gray-900 text-sm">ข้อมูลชุดที่ {index + 1}</h4>
+                <h4 className="font-medium text-gray-900 text-sm">ระดับชั้นที่ {index + 1}</h4>
                 {index > 0 && (
                   <button
                     type="button"
@@ -63,9 +64,9 @@ export default function Step3({ form }: Step3Props) {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-900 mb-1">
+                {/* <label className="block text-sm font-medium text-gray-900 mb-1">
                   ระดับชั้น
-                </label>
+                </label> */}
                 <input
                   {...register(`reg100_currentMusicTypes.${index}.grade`)}
                   type="text"
