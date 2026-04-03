@@ -37,7 +37,7 @@ const faqItems = [
   {
     question: "ขั้นตอนการสมัครเข้าร่วมกิจกรรมมีอย่างไร?",
     answer:
-      "1. ลงทะเบียนผ่านระบบออนไลน์ 2. กรอกข้อมูลสถานศึกษาและแนบเอกสารประกอบ 3. ส่งผลงานดนตรีไทยที่ดำเนินกิจกรรม 4. รอผลการพิจารณาจากคณะกรรมการ",
+      "1. ลงทะเบียนผ่านระบบออนไลน์\n2. กรอกข้อมูลสถานศึกษาและแนบเอกสารประกอบ\n3. ส่งผลงานดนตรีไทยที่ดำเนินกิจกรรม\n4. รอผลการพิจารณาจากคณะกรรมการ",
   },
   {
     question: "ประเภทการสมัครมีกี่ประเภท?",
@@ -271,7 +271,7 @@ export default function AccordionSection() {
                       <AccordionTrigger className="text-left text-[#1a1a1a] hover:text-[#0A3625] transition-colors duration-300 text-sm py-4 [&[data-state=open]]:text-[#0A3625]">
                         {item.question}
                       </AccordionTrigger>
-                      <AccordionContent className="text-[#6b6b6b] text-sm leading-relaxed pb-4">
+                      <AccordionContent className="text-[#6b6b6b] text-sm leading-relaxed pb-4 whitespace-pre-line">
                         {item.answer}
                       </AccordionContent>
                     </AccordionItem>

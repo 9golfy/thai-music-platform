@@ -27,7 +27,7 @@ const CARDS: Card[] = [
     subtitle:
       "เรียนรู้รายละเอียดกิจกรรมคัดเลือกสถานศึกษา เรียนรู้รายละเอียดกิจกรรมคัดเลือกสถานศึกษา",
     bg: "#0B7A3A",
-    href: "#about",
+    href: "/about",
     imgAlt: "นักเรียนเป่าปี่",
     imgHeight: "220px",
     imgOffsetY: -68,
@@ -38,7 +38,7 @@ const CARDS: Card[] = [
     subtitle:
       "ตรวจสอบและดาวน์โหลดประกาศนียบัตรออนไลน์ ตรวจสอบและดาวน์โหลดประกาศนียบัตรออนไลน์",
     bg: "#A07810",
-    href: "#certificate",
+    href: "/certificate",
     imgAlt: "นักเรียนตีระนาด",
     imgHeight: "250px",
     imgOffsetY: -65,
@@ -49,7 +49,7 @@ const CARDS: Card[] = [
     subtitle:
       "รับเอกสารและสื่อประชาสัมพันธ์กิจกรรม รับเอกสารและสื่อประชาสัมพันธ์กิจกรรม",
     bg: "#7A1B4A",
-    href: "#download",
+    href: "/download",
     imgAlt: "นักเรียนสีซอด้วง",
     imgHeight: "230px",
     imgOffsetY: -65,
