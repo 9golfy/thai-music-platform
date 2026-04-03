@@ -55,7 +55,7 @@ export async function sendTeacherLoginInfoEmail(
   submissionType: 'register100' | 'register_support',
   submissionId: string
 ): Promise<boolean> {
-  const loginUrl = `http://localhost:3000/teacher-login`;
+  const loginUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://dcpschool100.net'}/teacher-login`;
   
   const { 
     generateTeacherLoginInfoEmailHTML, 
