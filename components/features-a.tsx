@@ -81,16 +81,16 @@ export default function FeaturesA() {
 
             <div className="flex flex-wrap gap-4">
               <div className="rounded-xl border border-white/15 bg-white/10 px-6 py-4 text-center">
-                <p className="text-2xl font-bold text-[#BE8C13]">{"100%"}</p>
                 <p className="text-xs text-white/60 mt-1">{"โรงเรียนดนตรีไทย"}</p>
+                <p className="text-2xl font-bold text-[#BE8C13]">{"100%"}</p>
               </div>
               <div className="rounded-xl border border-white/15 bg-white/10 px-6 py-4 text-center">
-                <p className="text-2xl font-bold text-[#BE8C13]">{"พ.ศ. 2569"}</p>
                 <p className="text-xs text-white/60 mt-1">{"ปีงบประมาณ"}</p>
+                <p className="text-2xl font-bold text-[#BE8C13]">{"พ.ศ. 2569"}</p> 
               </div>
               <div className="rounded-xl border border-white/15 bg-white/10 px-6 py-4 text-center">
-                <p className="text-2xl font-bold text-[#BE8C13]">{"ทั่วประเทศ"}</p>
                 <p className="text-xs text-white/60 mt-1">{"สถานศึกษาที่เข้าร่วม"}</p>
+                <p className="text-2xl font-bold text-[#BE8C13]">{"ทั่วประเทศ"}</p>
               </div>
             </div>
           </motion.div>

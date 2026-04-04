@@ -78,7 +78,7 @@ export default function Footer() {
               />
             </div>
             <a
-              href="https://maps.app.goo.gl/1EfxTnFeijfMHfrAA"
+              href="https://maps.app.goo.gl/YLSnxEpYmwGAE8nQ8"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 mt-3 text-sm text-white/60 hover:text-white transition-colors duration-300"
