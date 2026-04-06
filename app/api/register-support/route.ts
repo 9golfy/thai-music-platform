@@ -79,6 +79,25 @@ export async function POST(request: NextRequest) {
       }
     });
 
+    // Map support type fields to ensure consistency
+    const supportTypeFieldMap = [
+      ['supportType', 'regsup_supportType'],
+      ['supportTypeSchoolName', 'regsup_supportTypeSchoolName'],
+      ['supportTypeClubName', 'regsup_supportTypeClubName'],
+      ['supportTypeAssociationName', 'regsup_supportTypeAssociationName'],
+      ['supportTypeGroupName', 'regsup_supportTypeGroupName'],
+      ['supportTypeBandName', 'regsup_supportTypeBandName'],
+      ['supportTypeMemberCount', 'regsup_supportTypeMemberCount'],
+    ];
+
+    supportTypeFieldMap.forEach(([shortName, longName]) => {
+      if (data[longName] !== undefined && data[shortName] === undefined) {
+        data[shortName] = data[longName];
+      } else if (data[shortName] !== undefined && data[longName] === undefined) {
+        data[longName] = data[shortName];
+      }
+    });
+
     // Handle file uploads
     const uploadDir = path.join(process.cwd(), 'public', 'uploads');
     

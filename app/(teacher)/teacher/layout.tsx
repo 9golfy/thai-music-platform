@@ -89,15 +89,13 @@ export default function TeacherDashboardLayout({
       >
         {/* Logo */}
         <div className="flex items-center gap-3 p-4 border-b border-white/10">
-          <div className="h-10 w-10 flex-shrink-0 bg-white rounded-full flex items-center justify-center">
-            <Image src="/Logo.png" alt="Logo" width={32} height={32} className="object-contain" />
-          </div>
+          <img src="/Logo.png" alt="Logo" className="h-10 w-10 flex-shrink-0" />
           <div className="flex-1 min-w-0">
             <div className="text-white text-sm font-medium leading-tight">
               กิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์
             </div>
             <div className="text-white/75 text-xs leading-tight">
-              กิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์
+              ประจำปีงบประมาณ พ.ศ. 2569
             </div>
           </div>
         </div>

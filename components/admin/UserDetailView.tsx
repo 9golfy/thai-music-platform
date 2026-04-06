@@ -40,6 +40,13 @@ export default function UserDetailView({ id, session }: { id: string; session: S
   const [newProfileImage, setNewProfileImage] = useState<string | null>(null);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
 
+  // Debug: Log session info
+  console.log('Session info:', {
+    role: session.role,
+    email: session.email,
+    userId: session.userId
+  });
+
   useEffect(() => {
     fetchUser();
     
@@ -56,6 +63,12 @@ export default function UserDetailView({ id, session }: { id: string; session: S
       const data = await response.json();
       if (data.success) {
         setUser(data.user);
+        // Debug: Log user info
+        console.log('User info:', {
+          email: data.user.email,
+          role: data.user.role,
+          _id: data.user._id
+        });
         // If edit mode is requested, set editedData
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('mode') === 'edit') {
@@ -209,9 +222,9 @@ export default function UserDetailView({ id, session }: { id: string; session: S
     
     setIsSaving(true);
     try {
-      // Prepare data to send - filter out role if user is not root
+      // Prepare data to send - filter out role if user is not root/super_admin
       let dataToSend;
-      if (session.role !== 'root') {
+      if (session.role !== 'root' && session.role !== 'super_admin') {
         const { role, ...dataWithoutRole } = editedData;
         dataToSend = dataWithoutRole;
       } else {
@@ -248,6 +261,32 @@ export default function UserDetailView({ id, session }: { id: string; session: S
   };
 
   const displayData = isEditMode ? editedData : user;
+
+  // Permission checks - Root/Super Admin can do everything except to themselves, Admin can only manage teachers
+  const isSelf = user?.email === session.email;
+  const isRootOrSuperAdmin = session.role === 'root' || session.role === 'super_admin';
+  const isAdmin = session.role === 'admin';
+  const targetIsRoot = user?.role === 'root' || user?.role === 'super_admin';
+  const targetIsTeacher = user?.role === 'teacher';
+  
+  const canEdit = isRootOrSuperAdmin ? !isSelf : (isAdmin && !targetIsRoot);
+  const canResetPassword = isRootOrSuperAdmin ? !isSelf : (isAdmin && targetIsTeacher);
+  const canDelete = isRootOrSuperAdmin ? !isSelf : (isAdmin && targetIsTeacher);
+  
+  console.log('Permissions check:', {
+    isSelf,
+    isRootOrSuperAdmin,
+    isAdmin,
+    targetIsRoot,
+    targetIsTeacher,
+    canEdit,
+    canResetPassword,
+    canDelete,
+    sessionRole: session.role,
+    sessionEmail: session.email,
+    userEmail: user?.email,
+    userRole: user?.role
+  });
 
   if (loading) {
     return (
@@ -377,8 +416,8 @@ export default function UserDetailView({ id, session }: { id: string; session: S
         <div className="flex gap-3 mb-6 justify-end">
           {!isEditMode ? (
             <>
-              {/* Only allow editing if user is root, or if user is admin and target is not root */}
-              {(session.role === 'root' || (session.role === 'admin' && user.role !== 'root')) ? (
+              {/* Root can edit anyone except themselves, Admin can edit non-root users */}
+              {canEdit ? (
                 <button
                   onClick={handleEdit}
                   className="px-6 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg hover:from-blue-600 hover:to-cyan-600 transition-all flex items-center gap-2 shadow-md"
@@ -396,7 +435,8 @@ export default function UserDetailView({ id, session }: { id: string; session: S
                   ไม่มีสิทธิ์แก้ไข
                 </div>
               )}
-              {((session.role === 'root' && user.role !== 'root') || (session.role === 'admin' && user.role === 'teacher')) && (
+              {/* Root can delete anyone except themselves, Admin can delete teachers only */}
+              {canDelete && (
                 <button
                   onClick={() => setShowDeleteModal(true)}
                   className="px-6 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg hover:from-red-600 hover:to-pink-600 transition-all flex items-center gap-2 shadow-md"
@@ -491,7 +531,8 @@ export default function UserDetailView({ id, session }: { id: string; session: S
                 <div className="flex-1 text-gray-900 bg-gray-50 p-3 rounded-lg font-mono">
                   ••••••
                 </div>
-                {!isEditMode && (session.role === 'root' || (session.role === 'admin' && user.role === 'teacher')) && (
+                {/* Root can reset anyone except themselves, Admin can reset teachers only */}
+                {!isEditMode && canResetPassword && (
                   <button
                     onClick={handleResetPassword}
                     disabled={isResettingPassword}
@@ -527,7 +568,7 @@ export default function UserDetailView({ id, session }: { id: string; session: S
             {/* Role */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">บทบาท</label>
-              {isEditMode && session.role === 'root' ? (
+              {isEditMode && (session.role === 'root' || session.role === 'super_admin') ? (
                 <select
                   value={displayData?.role || 'teacher'}
                   onChange={(e) => handleFieldChange('role', e.target.value)}
