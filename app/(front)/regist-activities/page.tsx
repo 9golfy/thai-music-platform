@@ -79,6 +79,66 @@ export default function RegistActivitiesPage() {
           </div>
         </section>
 
+        {/* YouTube Video Section */}
+        <section className="relative bg-black px-4 py-12 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="mx-auto max-w-5xl"
+          >
+            <div className="overflow-hidden rounded-2xl border border-[#d2bb80]/20 bg-[linear-gradient(180deg,rgba(12,40,31,0.98),rgba(7,25,19,0.98))] p-4 shadow-[0_20px_60px_rgba(0,0,0,0.3)]">
+              <div className="relative aspect-video w-full overflow-hidden rounded-xl">
+                <iframe
+                  src="https://www.youtube.com/embed/dwfCiZWcXdc"
+                  title="วิดีโอแนะนำกิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="absolute inset-0 h-full w-full"
+                />
+              </div>
+              <div className="mt-4 space-y-3">
+                <p className="text-center text-sm text-white/70">
+                  วิดีโอแนะนำกิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์
+                </p>
+                <div className="flex items-center justify-center gap-3">
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText('https://youtu.be/dwfCiZWcXdc?si=J0TyIeU7eZMRjMlv');
+                      const btn = document.getElementById('copy-link-btn');
+                      if (btn) {
+                        btn.textContent = '✓ คัดลอกแล้ว';
+                        setTimeout(() => {
+                          btn.textContent = 'คัดลอกลิงก์';
+                        }, 2000);
+                      }
+                    }}
+                    id="copy-link-btn"
+                    className="inline-flex items-center gap-2 rounded-lg bg-[#f0d48d]/10 px-4 py-2 text-sm font-medium text-[#f0d48d] transition-colors hover:bg-[#f0d48d]/20"
+                  >
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    คัดลอกลิงก์
+                  </button>
+                  <a
+                    href="https://youtu.be/dwfCiZWcXdc?si=J0TyIeU7eZMRjMlv"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-lg bg-red-600/10 px-4 py-2 text-sm font-medium text-red-400 transition-colors hover:bg-red-600/20"
+                  >
+                    <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                    </svg>
+                    ดูใน YouTube
+                  </a>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </section>
+
         {/* Registration Cards Section */}
         <section className="relative bg-black px-4 pb-24 sm:px-6 lg:px-8">
           <motion.div
