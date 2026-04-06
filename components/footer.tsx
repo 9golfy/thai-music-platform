@@ -67,7 +67,7 @@ export default function Footer() {
             </h3>
             <div className="w-full h-48 rounded-lg overflow-hidden border border-white/20">
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3874.2449087891847!2d100.48445931483!3d13.789847990331!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30e29c4e8e0e8e8f%3A0x8e0e8e8e8e8e8e8e!2z4LiB4Lij4Liw4LiX4Lij4Lin4LiH4Lin4Lix4LiS4LiZ4LiY4Lij4Lij4Lih!5e0!3m2!1sth!2sth!4v1234567890123!5m2!1sth!2sth"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3875.212857414695!2d100.57084187516341!3d13.766033496963697!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30e29e87fdd70611%3A0x65105b57b0c3de16!2z4LiB4Lij4Lih4Liq4LmI4LiH4LmA4Liq4Lij4Li04Lih4Lin4Lix4LiS4LiZ4LiY4Lij4Lij4Lih!5e0!3m2!1sth!2sth!4v1775448708517!5m2!1sth!2sth"
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}
