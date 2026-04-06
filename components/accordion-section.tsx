@@ -12,19 +12,19 @@ import {
 
 const posterImages = [
   {
-    src: "/images/poster-1.png",
-    alt: "โปสเตอร์ประชาสัมพันธ์กิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์",
-    downloadUrl: "/downloads/poster-1.pdf",
+    src: "/imgposters/poster01.png",
+    alt: "โปสเตอร์กิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์",
+    filename: "poster01.png",
   },
   {
-    src: "/images/poster-2.png",
-    alt: "โปสเตอร์ประชาสัมพันธ์กิจกรรม ภาพที่ 2",
-    downloadUrl: "/downloads/poster-2.pdf",
+    src: "/imgposters/poster02-reg100.png",
+    alt: "โปสเตอร์โรงเรียนดนตรีไทย 100%",
+    filename: "poster02-reg100.png",
   },
   {
-    src: "/images/poster-3.png",
-    alt: "โปสเตอร์ประชาสัมพันธ์กิจกรรม ภาพที่ 3",
-    downloadUrl: "/downloads/poster-3.pdf",
+    src: "/imgposters/poster03-regsupport.png",
+    alt: "โปสเตอร์โรงเรียนสนับสนุนและส่งเสริมดนตรีไทย",
+    filename: "poster03-regsupport.png",
   },
 ]
 
@@ -60,28 +60,72 @@ const faqItems = [
 
 const downloadItems = [
   {
-    qrImage: "/images/qr.png",
+    qrImage: "/qrcode/qr-regist-activities.png",
     title: "QR Code แบบฟอร์มการสมัคร",
     description: "เข้าร่วมกิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์ ผ่านระบบออนไลน์",
-    href: "/downloads/apply-form.pdf",
+    href: "/regist-activities",
+    filename: "qr-regist-activities.png",
   },
   {
-    qrImage: "/images/qr.png",
+    qrImage: "/qrcode/qr-policy-instructions.png",
     title: "QR Code หลักเกณฑ์การสมัคร",
     description: "เข้าร่วมกิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์",
-    href: "/downloads/criteria.pdf",
+    href: "/filedownload/file001_policy_evaluation.pdf",
+    filename: "qr-policy-instructions.png",
   },
   {
-    qrImage: "/images/qr.png",
+    qrImage: "/qrcode/qr-filedownload.png",
     title: "QR Code คู่มือสำหรับรับสมัคร",
     description: "เข้าร่วมกิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์",
-    href: "/downloads/manual.pdf",
+    href: "/download",
+    filename: "qr-filedownload.png",
   },
 ]
 
 export default function AccordionSection() {
   const [currentPosterIndex, setCurrentPosterIndex] = useState(0)
   const [direction, setDirection] = useState(0)
+
+  const handleDownloadPoster = async () => {
+    const poster = posterImages[currentPosterIndex]
+    try {
+      const response = await fetch(poster.src)
+      const blob = await response.blob()
+      const blobUrl = window.URL.createObjectURL(blob)
+      
+      const link = document.createElement('a')
+      link.href = blobUrl
+      link.download = poster.filename
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      
+      window.URL.revokeObjectURL(blobUrl)
+    } catch (error) {
+      console.error('Error downloading poster:', error)
+    }
+  }
+
+  const handleDownloadQR = async (qrImage: string, filename: string, e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    try {
+      const response = await fetch(qrImage)
+      const blob = await response.blob()
+      const blobUrl = window.URL.createObjectURL(blob)
+      
+      const link = document.createElement('a')
+      link.href = blobUrl
+      link.download = filename
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      
+      window.URL.revokeObjectURL(blobUrl)
+    } catch (error) {
+      console.error('Error downloading QR code:', error)
+    }
+  }
 
   const nextPoster = () => {
     setDirection(1)
@@ -188,14 +232,13 @@ export default function AccordionSection() {
               )}
 
               {/* Download Button */}
-              <a
-                href={posterImages[currentPosterIndex].downloadUrl}
-                download
+              <button
+                onClick={handleDownloadPoster}
                 className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#BE8C13] hover:bg-[#0A3625] text-white rounded-xl transition-colors duration-300 font-semibold"
               >
                 <Download className="w-5 h-5" />
                 ดาวน์โหลดโปสเตอร์
-              </a>
+              </button>
             </div>
           </motion.div>
 
@@ -237,9 +280,13 @@ export default function AccordionSection() {
                     </div>
 
                     <div className="flex-shrink-0">
-                      <div className="w-10 h-10 rounded-full bg-[#BE8C13]/10 flex items-center justify-center group-hover:bg-[#BE8C13] transition-colors">
-                        <Download className="w-5 h-5 text-[#BE8C13] group-hover:text-white transition-colors" />
-                      </div>
+                      <button
+                        onClick={(e) => handleDownloadQR(item.qrImage, item.filename, e)}
+                        className="w-10 h-10 rounded-full bg-[#BE8C13]/10 flex items-center justify-center hover:bg-[#BE8C13] transition-colors group/btn"
+                        aria-label="ดาวน์โหลด QR Code"
+                      >
+                        <Download className="w-5 h-5 text-[#BE8C13] group-hover/btn:text-white transition-colors" />
+                      </button>
                     </div>
                   </div>
                 </a>
