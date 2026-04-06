@@ -227,13 +227,15 @@ export default async function TeacherDashboardPage() {
           </p>
           <div className="flex gap-2">
             <a 
-              href="#" 
+              href="https://dcpschool100.net/download" 
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium text-center cursor-pointer"
             >
               คู่มือการใช้งาน
             </a>
             <a 
-              href="#" 
+              href="mailto:thaimusicplatform@gmail.com" 
               className="flex-1 px-4 py-2 bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition-colors text-sm font-medium text-center cursor-pointer"
             >
               ติดต่อเรา
