@@ -9,7 +9,7 @@ interface User {
   lastName: string;
   email: string;
   phone?: string;
-  role: 'root' | 'admin' | 'teacher';
+  role: 'root' | 'super_admin' | 'admin' | 'teacher';
   isActive: boolean;
   profileImage?: string;
   schoolId?: string;
