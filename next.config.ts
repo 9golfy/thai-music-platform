@@ -4,9 +4,6 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
   output: 'standalone',
   serverExternalPackages: ['mongodb'],
-  experimental: {
-    turbo: false
-  },
   images: {
     remotePatterns: [
       {
