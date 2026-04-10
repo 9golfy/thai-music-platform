@@ -482,7 +482,8 @@ export default function Register100DetailView({ id, hideScores = false, readOnly
                   <span className="text-sm font-bold text-green-700">
                     รวมคะแนนทั้ง 2 ส่วน {' '}
                     <span className="text-2xl">
-                      {(editedData?.teacher_qualification_score ?? submission.teacher_qualification_score ?? 0) + 
+                      {(editedData?.teaching_curriculum_score ?? submission.teaching_curriculum_score ?? 0) +
+                       (editedData?.teacher_qualification_score ?? submission.teacher_qualification_score ?? 0) + 
                        (editedData?.support_from_org_score ?? submission.support_from_org_score ?? 0) + 
                        (editedData?.support_from_external_score ?? submission.support_from_external_score ?? 0) + 
                        (editedData?.award_score ?? submission.award_score ?? 0) + 
