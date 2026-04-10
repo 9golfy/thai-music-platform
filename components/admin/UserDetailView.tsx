@@ -159,15 +159,44 @@ export default function UserDetailView({ id, session }: { id: string; session: S
         return;
       }
 
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        alert('ขนาดไฟล์ต้องไม่เกิน 5MB');
+      // Validate file size (max 2MB for better compression)
+      if (file.size > 2 * 1024 * 1024) {
+        alert('ขนาดไฟล์ต้องไม่เกิน 2MB');
         return;
       }
 
       const reader = new FileReader();
       reader.onloadend = () => {
-        setNewProfileImage(reader.result as string);
+        const img = new Image();
+        img.onload = () => {
+          // Resize image to max 800x800
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          const maxSize = 800;
+
+          if (width > height) {
+            if (width > maxSize) {
+              height = (height * maxSize) / width;
+              width = maxSize;
+            }
+          } else {
+            if (height > maxSize) {
+              width = (width * maxSize) / height;
+              height = maxSize;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+
+          // Convert to base64 with compression
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+          setNewProfileImage(compressedBase64);
+        };
+        img.src = reader.result as string;
       };
       reader.readAsDataURL(file);
     }
