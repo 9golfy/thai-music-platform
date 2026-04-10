@@ -101,11 +101,21 @@ export default async function UsersDataTable({ session }: UsersDataTableProps) {
                       >
                         <td className="py-3 px-4">
                           <div className="flex items-center space-x-3">
-                            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                              <span className="text-sm font-medium text-blue-600">
-                                {user.firstName?.charAt(0)}
-                              </span>
-                            </div>
+                            {user.profileImage ? (
+                              <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-blue-200">
+                                <img 
+                                  src={user.profileImage} 
+                                  alt={`${user.firstName} ${user.lastName}`}
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                            ) : (
+                              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                                <span className="text-sm font-medium text-blue-600">
+                                  {user.firstName?.charAt(0)}
+                                </span>
+                              </div>
+                            )}
                             <div>
                               <p className="text-sm font-medium text-gray-900">
                                 {user.firstName} {user.lastName}
@@ -212,11 +222,21 @@ export default async function UsersDataTable({ session }: UsersDataTableProps) {
                       >
                         <td className="py-3 px-4">
                           <div className="flex items-center space-x-3">
-                            <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                              <span className="text-sm font-medium text-green-600">
-                                {user.firstName?.charAt(0)}
-                              </span>
-                            </div>
+                            {user.profileImage ? (
+                              <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-green-200">
+                                <img 
+                                  src={user.profileImage} 
+                                  alt={`${user.firstName} ${user.lastName}`}
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                            ) : (
+                              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                                <span className="text-sm font-medium text-green-600">
+                                  {user.firstName?.charAt(0)}
+                                </span>
+                              </div>
+                            )}
                             <div>
                               <p className="text-sm font-medium text-gray-900">
                                 {user.firstName} {user.lastName}
