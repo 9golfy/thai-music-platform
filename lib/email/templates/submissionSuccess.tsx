@@ -302,7 +302,7 @@ export function generateSubmissionSuccessEmailHTML(props: SubmissionSuccessEmail
       <div class="container">
         <div class="header">
           <div class="header-icon">🎉</div>
-          <h1>ยินดีต้อนรับสู่ Thai Music Platform!</h1>
+          <h1>ยินดีต้อนรับสู่กิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์!</h1>
           <p>ส่งแบบฟอร์มสมัครสำเร็จแล้ว</p>
         </div>
         
@@ -388,7 +388,7 @@ export function generateSubmissionSuccessEmailHTML(props: SubmissionSuccessEmail
           </div>
 
           <p style="margin-top: 30px; color: #1f2937; font-size: 16px; text-align: center;">
-            <strong>ขอบคุณที่เข้าร่วมโครงการ Thai Music Platform!</strong><br>
+            <strong>ขอบคุณที่เข้าร่วมกิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์!</strong><br>
             เรายินดีที่จะสนับสนุนการศึกษาดนตรีไทยในโรงเรียนของคุณ
           </p>
 
@@ -399,7 +399,7 @@ export function generateSubmissionSuccessEmailHTML(props: SubmissionSuccessEmail
         </div>
         
         <div class="footer">
-          <p><strong>Thai Music Platform</strong></p>
+          <p><strong>กิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์</strong></p>
           <p>ส่งเสริมและสนับสนุนการศึกษาดนตรีไทยในโรงเรียนทั่วประเทศ</p>
           <p style="margin-top: 15px;">© 2026 Dcpschool100.net. All rights reserved.</p>
         </div>
@@ -418,7 +418,7 @@ export function generateSubmissionSuccessEmailText(props: SubmissionSuccessEmail
   const benefits = getProgramBenefits(submissionType);
 
   return `
-Thai Music Platform - ยินดีต้อนรับ! ส่งแบบฟอร์มสมัครสำเร็จแล้ว
+กิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์ - ยินดีต้อนรับ! ส่งแบบฟอร์มสมัครสำเร็จแล้ว
 
 ขอแสดงความยินดี!
 
@@ -455,16 +455,16 @@ ${benefits.map((benefit, index) => `${index + 1}. ${benefit}`).join('\n')}
 4. รอการติดต่อ - ทีมงานจะติดต่อคุณภายใน 3-5 วันทำการ
 5. เตรียมเอกสาร - เตรียมเอกสารเพิ่มเติมตามที่ทีมงานแจ้ง (ถ้ามี)
 
-ขอบคุณที่เข้าร่วมโครงการ Thai Music Platform!
+ขอบคุณที่เข้าร่วมกิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์!
 เรายินดีที่จะสนับสนุนการศึกษาดนตรีไทยในโรงเรียนของคุณ
 
 หากมีคำถามหรือต้องการความช่วยเหลือ
 กรุณาติดต่อผู้ดูแลระบบหรือตอบกลับอีเมลนี้
 
-Thai Music Platform
+กิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์
 ส่งเสริมและสนับสนุนการศึกษาดนตรีไทยในโรงเรียนทั่วประเทศ
 
-© 2026 Thai Music Platform. All rights reserved.
+© 2026 กิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์. All rights reserved.
   `.trim();
 }
 

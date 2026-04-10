@@ -357,7 +357,7 @@ export function generateExpiryReminderEmailHTML(props: ExpiryReminderEmailProps)
           <p>หากคุณไม่ต้องการทำแบบฟอร์มนี้ต่อ กรุณาเพิกเฉยอีเมลนี้</p>
           <p>แบบฟอร์มจะถูกลบออกจากระบบโดยอัตโนมัติเมื่อหมดอายุ</p>
           <p>หากมีคำถามหรือต้องการความช่วยเหลือ กรุณาติดต่อผู้ดูแลระบบ</p>
-          <p style="margin-top: 15px;">© 2026 Thai Music Platform. All rights reserved.</p>
+          <p style="margin-top: 15px;">© 2026 กิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์. All rights reserved.</p>
         </div>
       </div>
     </body>

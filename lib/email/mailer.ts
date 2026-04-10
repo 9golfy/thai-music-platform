@@ -29,7 +29,7 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
     const transporter = createTransporter();
     
     await transporter.sendMail({
-      from: `"Thai Music Platform" <${process.env.GMAIL_USER}>`,
+      from: `"กิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์" <${process.env.GMAIL_USER}>`,
       to: options.to,
       subject: options.subject,
       text: options.text,
@@ -112,13 +112,13 @@ export async function sendTeacherPasswordEmail(
     <body>
       <div class="container">
         <div class="header">
-          <h1>🎵 Thai Music Platform</h1>
+          <h1>🎵 กิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์</h1>
           <p>ข้อมูลการเข้าสู่ระบบ</p>
         </div>
         
         <div class="content">
           <h2>สวัสดีครับ/ค่ะ ${teacherName || ''}</h2>
-          <p>คุณได้ขอรหัสผ่านสำหรับเข้าสู่ระบบ Thai Music Platform</p>
+          <p>คุณได้ขอรหัสผ่านสำหรับเข้าสู่ระบบกิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์</p>
           
           <div class="credentials">
             <div class="credential-item">
@@ -164,7 +164,7 @@ export async function sendTeacherPasswordEmail(
         
         <div class="footer">
           <p>หากคุณไม่ได้ขอรหัสผ่านนี้ กรุณาติดต่อผู้ดูแลระบบ</p>
-          <p>© 2569 Thai Music Platform. สงวนลิขสิทธิ์.</p>
+          <p>© 2569 กิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์. สงวนลิขสิทธิ์.</p>
         </div>
       </div>
     </body>
@@ -172,11 +172,11 @@ export async function sendTeacherPasswordEmail(
   `;
 
   const text = `
-Thai Music Platform - ข้อมูลการเข้าสู่ระบบ
+กิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์ - ข้อมูลการเข้าสู่ระบบ
 
 สวัสดีครับ/ค่ะ ${teacherName || ''}
 
-คุณได้ขอรหัสผ่านสำหรับเข้าสู่ระบบ Thai Music Platform
+คุณได้ขอรหัสผ่านสำหรับเข้าสู่ระบบกิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์
 
 ข้อมูลการเข้าสู่ระบบ:
 - โรงเรียน: ${schoolName}
@@ -199,7 +199,7 @@ ${phone ? `- เบอร์โทรศัพท์: ${phone}` : ''}
 
   return sendEmail({
     to: email,
-    subject: 'ข้อมูลการเข้าสู่ระบบ - Thai Music Platform',
+    subject: 'ข้อมูลการเข้าสู่ระบบ - กิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์',
     html,
     text,
   });
