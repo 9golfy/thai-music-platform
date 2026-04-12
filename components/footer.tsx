@@ -120,7 +120,7 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="border-t border-white/20 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-white/40">
-            {"© 2026 Thai Music Platform. Some images are AI-generated using Google Gemini."}
+            {"© 2026 DCPSchool100.net, This website includes AI-generated visuals and audio (Google Gemini) for educational purposes."}
           </p>
           <div className="flex items-center gap-3">
             {socialLinks.map((link) => {
