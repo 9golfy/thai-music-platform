@@ -91,7 +91,7 @@ export default function RegistActivitiesPage() {
             <div className="overflow-hidden rounded-2xl border border-[#d2bb80]/20 bg-[linear-gradient(180deg,rgba(12,40,31,0.98),rgba(7,25,19,0.98))] p-4 shadow-[0_20px_60px_rgba(0,0,0,0.3)]">
               <div className="relative aspect-video w-full overflow-hidden rounded-xl">
                 <iframe
-                  src="https://www.youtube.com/embed/dwfCiZWcXdc"
+                  src="https://www.youtube.com/embed/75qa-3r9fLU"
                   title="วิดีโอแนะนำกิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
@@ -105,7 +105,7 @@ export default function RegistActivitiesPage() {
                 <div className="flex items-center justify-center gap-3">
                   <button
                     onClick={() => {
-                      navigator.clipboard.writeText('https://youtu.be/dwfCiZWcXdc?si=J0TyIeU7eZMRjMlv');
+                      navigator.clipboard.writeText('https://youtu.be/75qa-3r9fLU?si=wY48A0nEY_ekatAH');
                       const btn = document.getElementById('copy-link-btn');
                       if (btn) {
                         btn.textContent = '✓ คัดลอกแล้ว';
@@ -123,7 +123,7 @@ export default function RegistActivitiesPage() {
                     คัดลอกลิงก์
                   </button>
                   <a
-                    href="https://youtu.be/dwfCiZWcXdc?si=J0TyIeU7eZMRjMlv"
+                    href="https://youtu.be/75qa-3r9fLU?si=wY48A0nEY_ekatAH"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 rounded-lg bg-red-600/10 px-4 py-2 text-sm font-medium text-red-400 transition-colors hover:bg-red-600/20"
