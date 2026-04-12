@@ -28,7 +28,7 @@ const downloadFiles = [
   {
     title: 'หลักเกณฑ์การประเมินและตัวชี้วัด',
     description: 'เอกสารหลักเกณฑ์และคุณสมบัติการสมัครเข้าร่วมกิจกรรม',
-    url: '/filedownload/file001_policy_evaluation.pdf',
+    url: '/filedownload/file001_v2_policy_evaluation.pdf',
     type: 'pdf'
   },  
 ]
