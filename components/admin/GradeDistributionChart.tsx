@@ -13,33 +13,39 @@ interface GradeDistributionChartProps {
   title: string;
   data: GradeData[];
   loading?: boolean;
+  type: 'register100' | 'register-support'; // Add type to determine which legend to show
 }
 
-export function GradeDistributionChart({ title, data, loading = false }: GradeDistributionChartProps) {
+export function GradeDistributionChart({ title, data, loading = false, type }: GradeDistributionChartProps) {
   const maxCount = Math.max(...data.map(d => d.count), 1);
+  
+  // Define legends based on type
+  const legends = type === 'register100' ? [
+    { color: 'bg-green-500', label: 'A: 160-200 คะแนน' },
+    { color: 'bg-blue-500', label: 'B: 150-159 คะแนน' },
+    { color: 'bg-orange-500', label: 'C: 120-149 คะแนน' },
+    { color: 'bg-yellow-500', label: 'D: 100-119 คะแนน' },
+    { color: 'bg-red-500', label: 'F: 0-99 คะแนน' },
+  ] : [
+    { color: 'bg-green-500', label: 'A: 145-180 คะแนน' },
+    { color: 'bg-blue-500', label: 'B: 126-144 คะแนน' },
+    { color: 'bg-orange-500', label: 'C: 109-125 คะแนน' },
+    { color: 'bg-yellow-500', label: 'D: 90-108 คะแนน' },
+    { color: 'bg-red-500', label: 'F: 0-89 คะแนน' },
+  ];
   
   if (loading) {
     return (
       <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-2 text-center">{title}</h3>
         {/* Grade Legend */}
-        <div className="flex justify-center items-center gap-4 mb-4 text-xs">
-          <div className="flex items-center gap-1">
-            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-            <span>90-100 คะแนน</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-            <span>70-89 คะแนน</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
-            <span>50-69 คะแนน</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-            <span>0-49 คะแนน</span>
-          </div>
+        <div className="flex justify-center items-center gap-4 mb-4 text-xs flex-wrap">
+          {legends.map((legend, index) => (
+            <div key={index} className="flex items-center gap-1">
+              <div className={`w-3 h-3 ${legend.color} rounded-full`}></div>
+              <span>{legend.label}</span>
+            </div>
+          ))}
         </div>
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
@@ -53,23 +59,13 @@ export function GradeDistributionChart({ title, data, loading = false }: GradeDi
       <h3 className="text-lg font-semibold text-gray-900 mb-2 text-center">{title}</h3>
       
       {/* Grade Legend */}
-      <div className="flex justify-center items-center gap-4 mb-6 text-xs">
-        <div className="flex items-center gap-1">
-          <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-          <span>90-100 คะแนน</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-          <span>70-89 คะแนน</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
-          <span>50-69 คะแนน</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-          <span>0-49 คะแนน</span>
-        </div>
+      <div className="flex justify-center items-center gap-4 mb-6 text-xs flex-wrap">
+        {legends.map((legend, index) => (
+          <div key={index} className="flex items-center gap-1">
+            <div className={`w-3 h-3 ${legend.color} rounded-full`}></div>
+            <span>{legend.label}</span>
+          </div>
+        ))}
       </div>
       
       {/* Chart Container */}
@@ -146,12 +142,12 @@ export function useGradeDistribution() {
       
       // Process Register 100 grades
       const register100Data = data100.success ? data100.submissions : [];
-      const register100GradeCounts = processGradeData(register100Data);
+      const register100GradeCounts = processGradeData(register100Data, 'register100');
       setRegister100Grades(register100GradeCounts);
       
       // Process Register Support grades
       const registerSupportData = dataSupport.success ? dataSupport.submissions : [];
-      const registerSupportGradeCounts = processGradeData(registerSupportData);
+      const registerSupportGradeCounts = processGradeData(registerSupportData, 'register-support');
       setRegisterSupportGrades(registerSupportGradeCounts);
       
     } catch (error) {
@@ -161,23 +157,34 @@ export function useGradeDistribution() {
     }
   };
 
-  const processGradeData = (submissions: any[]): GradeData[] => {
-    const gradeCounts = { A: 0, B: 0, C: 0, F: 0 };
+  const processGradeData = (submissions: any[], type: 'register100' | 'register-support'): GradeData[] => {
+    const gradeCounts = { A: 0, B: 0, C: 0, D: 0, F: 0 };
     
     submissions.forEach(submission => {
       const score = submission.total_score || 0;
       
-      // New grade ranges based on score ranges
-      if (score >= 90) gradeCounts.A++;        // 90-100 คะแนน
-      else if (score >= 70) gradeCounts.B++;   // 70-89 คะแนน  
-      else if (score >= 50) gradeCounts.C++;   // 50-69 คะแนน
-      else gradeCounts.F++;                    // 0-49 คะแนน
+      if (type === 'register100') {
+        // โรงเรียนดนตรีไทย 100%
+        if (score >= 160) gradeCounts.A++;           // A: 160-200 คะแนน
+        else if (score >= 150) gradeCounts.B++;      // B: 150-159 คะแนน
+        else if (score >= 120) gradeCounts.C++;      // C: 120-149 คะแนน
+        else if (score >= 100) gradeCounts.D++;      // D: 100-119 คะแนน
+        else gradeCounts.F++;                        // F: 0-99 คะแนน
+      } else {
+        // โรงเรียนสนับสนุนและส่งเสริม
+        if (score >= 145) gradeCounts.A++;           // A: 145-180 คะแนน
+        else if (score >= 126) gradeCounts.B++;      // B: 126-144 คะแนน
+        else if (score >= 109) gradeCounts.C++;      // C: 109-125 คะแนน
+        else if (score >= 90) gradeCounts.D++;       // D: 90-108 คะแนน
+        else gradeCounts.F++;                        // F: 0-89 คะแนน
+      }
     });
 
     return [
       { grade: 'A', count: gradeCounts.A, color: 'bg-green-500' },
       { grade: 'B', count: gradeCounts.B, color: 'bg-blue-500' },
       { grade: 'C', count: gradeCounts.C, color: 'bg-orange-500' },
+      { grade: 'D', count: gradeCounts.D, color: 'bg-yellow-500' },
       { grade: 'F', count: gradeCounts.F, color: 'bg-red-500' },
     ];
   };

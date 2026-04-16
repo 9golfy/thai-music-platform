@@ -146,11 +146,13 @@ export default function DashboardPage() {
           title="โรงเรียนดนตรีไทย 100%"
           data={register100Grades}
           loading={gradesLoading}
+          type="register100"
         />
         <GradeDistributionChart
           title="โรงเรียนสนับสนุนและส่งเสริม"
           data={registerSupportGrades}
           loading={gradesLoading}
+          type="register-support"
         />
       </div>
 
