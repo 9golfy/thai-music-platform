@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
-import clientPromise from '@/lib/mongodb';
+import { connectToDatabase } from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
 import { sendEmail } from '@/lib/email/mailer';
 import { 
@@ -41,8 +41,7 @@ export async function POST(
       );
     }
 
-    const client = await clientPromise;
-    const db = client.db('thai-music-platform');
+    const { db } = await connectToDatabase();
 
     // Get user details
     const user = await db.collection('users').findOne({ _id: new ObjectId(id) });
@@ -54,8 +53,42 @@ export async function POST(
       );
     }
 
-    // Get school information
-    const school = await db.collection('schools').findOne({ schoolId: user.schoolId });
+    if (!user.schoolId) {
+      return NextResponse.json(
+        { success: false, message: 'User does not have a school ID' },
+        { status: 400 }
+      );
+    }
+
+    // Generate new password
+    const { generateTeacherPassword } = await import('@/lib/auth/password');
+    const { hashPassword } = await import('@/lib/auth/password');
+    
+    const newPassword = generateTeacherPassword();
+    const hashedPassword = await hashPassword(newPassword);
+
+    // Update user password in database
+    await db.collection('users').updateOne(
+      { _id: new ObjectId(id) },
+      { 
+        $set: { 
+          password: hashedPassword,
+          plainPassword: newPassword,
+          updatedAt: new Date()
+        } 
+      }
+    );
+
+    console.log('✅ Password reset successfully for user:', user.email);
+
+    // Try to find school information in register100_submissions or register_support_submissions
+    let school = await db.collection('register100_submissions').findOne({ schoolId: user.schoolId });
+    let submissionType: 'register100' | 'register_support' = 'register100';
+
+    if (!school) {
+      school = await db.collection('register_support_submissions').findOne({ schoolId: user.schoolId });
+      submissionType = 'register_support';
+    }
 
     if (!school) {
       return NextResponse.json(
@@ -64,20 +97,19 @@ export async function POST(
       );
     }
 
-    // Get the plain text password from user record (if stored)
-    // Note: In production, you might want to generate a new password instead
-    const password = user.plainPassword || '******';
+    // Get the new password that was just generated
+    const password = newPassword;
 
     // Prepare email data
     const emailData = {
       teacherEmail: user.email,
-      teacherPhone: user.phone || school.phone || '',
-      schoolName: school.schoolName || '',
+      teacherPhone: user.phone || school.phone || school.reg100_phone || school.regsup_phone || '',
+      schoolName: school.schoolName || school.reg100_schoolName || school.regsup_schoolName || '',
       schoolId: user.schoolId,
       password: password,
       loginUrl: `${process.env.NEXT_PUBLIC_APP_URL}/teacher-login`,
-      submissionType: school.submissionType || 'register_support',
-      submissionId: school.submissionId || ''
+      submissionType: submissionType,
+      submissionId: school._id.toString()
     };
 
     // Send email
