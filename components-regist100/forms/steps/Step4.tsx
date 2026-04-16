@@ -173,14 +173,8 @@ export default function Step4({ form, teacherImageFiles, setTeacherImageFiles, m
     
     devLog.log('Step4 mounted, current teachers count:', fields.length);
     
-    // Force cleanup: if there are more than 1 teacher, remove extras
-    if (fields.length > 1) {
-      const extraCount = fields.length - 1;
-      for (let i = 0; i < extraCount; i++) {
-        remove(1); // Always remove index 1 (second teacher)
-      }
-    } else if (fields.length === 0) {
-      // Ensure we have exactly 1 teacher
+    // Initialize with one teacher if empty
+    if (fields.length === 0) {
       append({
         teacherQualification: '',
         teacherFullName: '',
