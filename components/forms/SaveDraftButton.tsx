@@ -12,7 +12,32 @@ interface SaveDraftButtonProps {
   onSaveSuccess: (token: string) => void;
   onSaveError: (error: string) => void;
   getFormData?: () => Record<string, any>; // Function to get current form data
+  mgtImageFile?: File | null; // Manager image file
+  teacherImageFiles?: { [key: number]: File }; // Teacher image files
 }
+
+// Helper function to convert File to base64
+const fileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = error => reject(error);
+  });
+};
+
+// Helper function to convert base64 to File
+const base64ToFile = (base64: string, filename: string): File => {
+  const arr = base64.split(',');
+  const mime = arr[0].match(/:(.*?);/)?.[1] || 'image/jpeg';
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new File([u8arr], filename, { type: mime });
+};
 
 export default function SaveDraftButton({
   formData,
@@ -21,6 +46,8 @@ export default function SaveDraftButton({
   onSaveSuccess,
   onSaveError,
   getFormData,
+  mgtImageFile,
+  teacherImageFiles,
 }: SaveDraftButtonProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -33,6 +60,63 @@ export default function SaveDraftButton({
     try {
       // Get current form data (either from getFormData function or fallback to prop)
       const currentFormData = getFormData ? getFormData() : formData;
+      
+      // Generate temporary token for image uploads
+      const tempToken = `temp-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+      
+      // Upload images if they exist
+      const imageUrls: { [key: string]: string } = {};
+      
+      // Upload manager image
+      if (mgtImageFile) {
+        try {
+          const formData = new FormData();
+          formData.append('file', mgtImageFile);
+          formData.append('draftToken', tempToken);
+          formData.append('imageType', 'manager');
+          
+          const response = await fetch('/api/draft/upload-image', {
+            method: 'POST',
+            body: formData,
+          });
+          
+          const result = await response.json();
+          if (result.success) {
+            imageUrls['mgtImage'] = result.url;
+            console.log('✅ Manager image uploaded:', result.url);
+          }
+        } catch (error) {
+          console.error('Error uploading manager image:', error);
+        }
+      }
+      
+      // Upload teacher images
+      if (teacherImageFiles) {
+        for (const [index, file] of Object.entries(teacherImageFiles)) {
+          try {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('draftToken', tempToken);
+            formData.append('imageType', `teacher-${index}`);
+            
+            const response = await fetch('/api/draft/upload-image', {
+              method: 'POST',
+              body: formData,
+            });
+            
+            const result = await response.json();
+            if (result.success) {
+              imageUrls[`teacherImage-${index}`] = result.url;
+              console.log(`✅ Teacher ${index} image uploaded:`, result.url);
+            }
+          } catch (error) {
+            console.error(`Error uploading teacher ${index} image:`, error);
+          }
+        }
+      }
+      
+      // Add image URLs to form data
+      currentFormData._draftImages = imageUrls;
       
       // SPECIAL HANDLING for register-support: Get support type fields from DOM
       if (submissionType === 'register-support') {

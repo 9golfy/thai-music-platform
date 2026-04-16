@@ -1,0 +1,4 @@
+# Ignore all draft images
+*
+# But keep this .gitignore file
+!.gitignore

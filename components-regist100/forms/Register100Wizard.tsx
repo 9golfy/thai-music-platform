@@ -173,6 +173,47 @@ export default function Register100Wizard() {
                 // Force trigger
                 form.trigger();
                 
+                // Restore images from URLs
+                if (result.formData._draftImages) {
+                  console.log('🖼️ Restoring images from URLs...');
+                  const imageUrls = result.formData._draftImages;
+                  
+                  // Restore manager image
+                  if (imageUrls.mgtImage) {
+                    try {
+                      const response = await fetch(imageUrls.mgtImage);
+                      const blob = await response.blob();
+                      const fileName = imageUrls.mgtImage.split('/').pop() || 'manager.jpg';
+                      const file = new File([blob], fileName, { type: blob.type });
+                      setMgtImageFile(file);
+                      console.log('✅ Manager image restored');
+                    } catch (error) {
+                      console.error('Error restoring manager image:', error);
+                    }
+                  }
+                  
+                  // Restore teacher images
+                  const restoredTeacherImages: { [key: number]: File } = {};
+                  for (const [key, url] of Object.entries(imageUrls)) {
+                    if (key.startsWith('teacherImage-')) {
+                      const index = parseInt(key.replace('teacherImage-', ''));
+                      try {
+                        const response = await fetch(url as string);
+                        const blob = await response.blob();
+                        const fileName = (url as string).split('/').pop() || `teacher-${index}.jpg`;
+                        const file = new File([blob], fileName, { type: blob.type });
+                        restoredTeacherImages[index] = file;
+                        console.log(`✅ Teacher ${index} image restored`);
+                      } catch (error) {
+                        console.error(`Error restoring teacher ${index} image:`, error);
+                      }
+                    }
+                  }
+                  if (Object.keys(restoredTeacherImages).length > 0) {
+                    setTeacherImageFiles(restoredTeacherImages);
+                  }
+                }
+                
                 // Restore current step
                 if (result.currentStep) {
                   console.log('📍 Restoring step from API:', result.currentStep);
@@ -842,6 +883,8 @@ export default function Register100Wizard() {
                 onSaveSuccess={handleSaveDraftSuccess}
                 onSaveError={handleSaveDraftError}
                 getFormData={() => form.getValues()}
+                mgtImageFile={mgtImageFile}
+                teacherImageFiles={teacherImageFiles}
               />
               
               {currentStep < 9 ? (
