@@ -40,7 +40,7 @@ export default function FeaturesA() {
                     className="font-bold text-base leading-snug"
                     style={{ color: "#F9E295", textShadow: "0 1px 6px rgba(0,0,0,0.8)" }}
                   >
-                    {"นางยุภิกา อิศรางกูร ณ อยุธยา"}
+                    {"นางยุถิกา อิศรางกูร ณ อยุธยา"}
                   </p>
                   <p className="text-sm text-white/80 mt-1" style={{ textShadow: "0 1px 4px rgba(0,0,0,0.8)" }}>
                     {"อธิบดีกรมส่งเสริมวัฒนธรรม"}
