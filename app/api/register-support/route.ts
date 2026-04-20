@@ -330,7 +330,25 @@ export async function POST(request: NextRequest) {
 
     // Calculate and add scores to data
     const calculatedScores = calculateScores(data);
-    Object.assign(data, calculatedScores);
+    
+    // Use frontend scores if available (with regsup_ prefix), otherwise use calculated scores
+    // This ensures that scores calculated on frontend (which are more accurate) take precedence
+    const finalScores = {
+      teacher_training_score: data.regsup_teacher_training_score ?? calculatedScores.teacher_training_score,
+      teacher_qualification_score: data.regsup_teacher_qualification_score ?? calculatedScores.teacher_qualification_score,
+      support_from_org_score: data.regsup_support_from_org_score ?? calculatedScores.support_from_org_score,
+      support_from_external_score: data.regsup_support_from_external_score ?? calculatedScores.support_from_external_score,
+      award_score: data.regsup_award_score ?? calculatedScores.award_score,
+      activity_within_province_internal_score: data.regsup_activity_within_province_internal_score ?? calculatedScores.activity_within_province_internal_score,
+      activity_within_province_external_score: data.regsup_activity_within_province_external_score ?? calculatedScores.activity_within_province_external_score,
+      activity_outside_province_score: data.regsup_activity_outside_province_score ?? calculatedScores.activity_outside_province_score,
+      pr_activity_score: data.regsup_pr_activity_score ?? calculatedScores.pr_activity_score,
+      total_score: data.regsup_total_score ?? calculatedScores.total_score
+    };
+
+    Object.assign(data, finalScores);
+
+    console.log('📊 Final scores saved to DB:', finalScores);
 
     // Add metadata
     data.createdAt = new Date().toISOString();

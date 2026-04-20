@@ -255,9 +255,25 @@ export async function POST(request: NextRequest) {
 
     // Calculate and add scores to data
     const calculatedScores = calculateRegister100Scores(data);
-    Object.assign(data, calculatedScores);
     
-    console.log('✅ Calculated scores:', calculatedScores);
+    // Use frontend scores if available (with reg100_ prefix), otherwise use calculated scores
+    // This ensures that scores calculated on frontend (which are more accurate) take precedence
+    const finalScores = {
+      teaching_curriculum_score: data.reg100_teaching_curriculum_score ?? calculatedScores.teaching_curriculum_score,
+      teacher_qualification_score: data.reg100_teacher_qualification_score ?? calculatedScores.teacher_qualification_score,
+      support_from_org_score: data.reg100_support_from_org_score ?? calculatedScores.support_from_org_score,
+      support_from_external_score: data.reg100_support_from_external_score ?? calculatedScores.support_from_external_score,
+      award_score: data.reg100_award_score ?? calculatedScores.award_score,
+      activity_within_province_internal_score: data.reg100_activity_within_province_internal_score ?? calculatedScores.activity_within_province_internal_score,
+      activity_within_province_external_score: data.reg100_activity_within_province_external_score ?? calculatedScores.activity_within_province_external_score,
+      activity_outside_province_score: data.reg100_activity_outside_province_score ?? calculatedScores.activity_outside_province_score,
+      pr_activity_score: data.reg100_pr_activity_score ?? calculatedScores.pr_activity_score,
+      total_score: data.reg100_total_score ?? calculatedScores.total_score
+    };
+
+    Object.assign(data, finalScores);
+    
+    console.log('✅ Final scores saved to DB:', finalScores);
 
     // Connect to MongoDB
     client = new MongoClient(MONGODB_URI);
