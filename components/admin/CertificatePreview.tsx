@@ -5,6 +5,7 @@ import { getTemplateById } from '@/lib/config/certificateTemplates';
 
 interface CertificatePreviewProps {
   schoolName: string;
+  province?: string | null;
   certificateNumber: string;
   issueDate: string;
   templateName?: string;
@@ -14,6 +15,7 @@ interface CertificatePreviewProps {
 
 export default function CertificatePreview({
   schoolName,
+  province = null,
   certificateNumber,
   issueDate,
   templateName,
@@ -28,42 +30,6 @@ export default function CertificatePreview({
   // Default dimensions (3:2 ratio)
   const width = 1200;
   const height = 800;
-
-  const handleDownloadPDF = async () => {
-    if (!certificateRef.current) return;
-
-    try {
-      // Dynamically import html2pdf
-      const html2pdf = (await import('html2pdf.js')).default;
-
-      const element = certificateRef.current;
-      const opt = {
-        margin: 0,
-        filename: `certificate-${certificateNumber}.pdf`,
-        image: { type: 'jpeg' as const, quality: 1.0 },
-        html2canvas: { 
-          scale: 3,
-          useCORS: true,
-          allowTaint: true,
-          logging: false,
-          backgroundColor: '#ffffff',
-          width: width,
-          height: height,
-        },
-        jsPDF: { 
-          unit: 'px', 
-          format: [width, height] as [number, number], 
-          orientation: 'landscape' as const,
-          compress: false
-        },
-      };
-
-      await html2pdf().set(opt).from(element).save();
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      alert('เกิดข้อผิดพลาดในการสร้าง PDF');
-    }
-  };
 
   const handlePrint = () => {
     window.print();
@@ -126,33 +92,59 @@ export default function CertificatePreview({
           </div>
         )}
 
-        {/* School Name Overlay - Centered */}
+        {/* School Name Overlay - On dotted line after "โรงเรียน" */}
         <div
           className="absolute"
           style={{
-            top: '50%',
+            top: '38.5%',
             left: '50%',
-            transform: 'translate(-50%, -50%)',
-            fontSize: '32px',
+            transform: 'translateX(-50%)',
+            fontSize: '20px',
             fontFamily: 'Sarabun, sans-serif',
             color: '#1a1a1a',
             textAlign: 'center',
-            fontWeight: '700',
-            maxWidth: '85%',
-            lineHeight: '1.4',
-            width: '100%',
-            padding: '12px 16px',
+            fontWeight: '600',
+            maxWidth: '500px',
+            lineHeight: '1.2',
+            width: 'auto',
+            padding: '0 8px',
             whiteSpace: 'nowrap',
             overflow: 'visible',
-            minHeight: '50px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            textShadow: '1px 1px 2px rgba(0,0,0,0.1)',
           }}
         >
           {schoolName}
         </div>
+
+        {/* Province Overlay - On dotted line after "จังหวัด" */}
+        {province && (
+          <div
+            className="absolute"
+            style={{
+              top: '43%',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              fontSize: '18px',
+              fontFamily: 'Sarabun, sans-serif',
+              color: '#1a1a1a',
+              textAlign: 'center',
+              fontWeight: '600',
+              maxWidth: '400px',
+              lineHeight: '1.2',
+              width: 'auto',
+              padding: '0 8px',
+              whiteSpace: 'nowrap',
+              overflow: 'visible',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            {province}
+          </div>
+        )}
 
         {/* Certificate Number - Bottom Left */}
         <div
@@ -193,22 +185,8 @@ export default function CertificatePreview({
       {showDownloadButton && (
         <div className="flex justify-center gap-3">
           <button
-            onClick={handleDownloadPDF}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center gap-2"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              />
-            </svg>
-            ดาวน์โหลด PDF
-          </button>
-          <button
             onClick={handlePrint}
-            className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium flex items-center gap-2"
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center gap-2"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
@@ -218,7 +196,7 @@ export default function CertificatePreview({
                 d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
               />
             </svg>
-            พิมพ์
+            พิมพ์ / บันทึกเป็น PDF
           </button>
         </div>
       )}
@@ -237,8 +215,8 @@ export default function CertificatePreview({
             position: absolute !important;
             left: 0 !important;
             top: 0 !important;
-            width: 100vw !important;
-            height: 100vh !important;
+            width: 1200px !important;
+            height: 800px !important;
             max-width: none !important;
             margin: 0 !important;
             padding: 0 !important;
@@ -253,6 +231,11 @@ export default function CertificatePreview({
             print-color-adjust: exact !important;
           }
           
+          /* Ensure text positioning is preserved */
+          #certificate-preview div[style*="position: absolute"] {
+            position: absolute !important;
+          }
+          
           /* Hide action buttons when printing */
           button {
             display: none !important;
@@ -261,6 +244,7 @@ export default function CertificatePreview({
           /* Ensure certificate fills the page */
           @page {
             margin: 0;
+            size: 1200px 800px;
             size: landscape;
           }
         }

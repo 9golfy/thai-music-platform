@@ -45,13 +45,25 @@ export async function GET(
       
       return teachers.map((teacher, index) => `
         <tr><th colspan="2" style="background-color: #e9ecef; text-align: center;">ครูคนที่ ${index + 1}</th></tr>
-        ${teacher.teacherImage ? `<tr><th>รูปภาพ</th><td><img src="${teacher.teacherImage}" alt="ครูคนที่ ${index + 1}" style="max-width: 200px; max-height: 200px; object-fit: cover; border-radius: 8px;" /></td></tr>` : ''}
-        <tr><th>คุณลักษณะ</th><td>${teacher.teacherQualification || '-'}</td></tr>
+        <tr><th>บทบาท/หน้าที่ผู้สอน *</th><td>${teacher.teacherQualification || '-'}</td></tr>
         <tr><th>ชื่อ-นามสกุล</th><td>${teacher.teacherFullName || teacher.teacherName || '-'}</td></tr>
-        <tr><th>ตำแหน่ง</th><td>${teacher.teacherPosition || '-'}</td></tr>
-        <tr><th>วุฒิการศึกษา</th><td>${teacher.teacherEducation || '-'}</td></tr>
-        <tr><th>โทรศัพท์</th><td>${teacher.teacherPhone || '-'}</td></tr>
-        <tr><th>อีเมล</th><td>${teacher.teacherEmail || '-'}</td></tr>
+        <tr><th>ตำแหน่ง *</th><td>${teacher.teacherPosition || '-'}</td></tr>
+        <tr><th>อีเมล *</th><td>${teacher.teacherEmail || '-'}</td></tr>
+        <tr><th>เบอร์โทรศัพท์ *</th><td>${teacher.teacherPhone || '-'}</td></tr>
+        <tr><th>ทักษะ ความรู้ ความสามารถ ในการสอนภาคปฏิบัติดนตรีไทย *</th><td>${teacher.teacherAbility || '-'}</td></tr>
+        <tr><th colspan="2" style="background-color: #d1ecf1; padding: 8px;"><strong>สำเร็จการศึกษาด้านดนตรีไทย *</strong></th></tr>
+        ${teacher.musicInstituteEducation?.length > 0 ? teacher.musicInstituteEducation.map((edu: any) => `
+          <tr><th>วุฒิการศึกษา/ประกาศนียบัตร *</th><td>${edu.graduationYear || '-'}</td></tr>
+          <tr><th>สาขา/หลักสูตร *</th><td>${edu.major || '-'}</td></tr>
+          <tr><th>ปีที่สำเร็จการศึกษา / ได้รับประกาศนียบัตร *</th><td>${edu.completionYear || '-'}</td></tr>
+        `).join('') : '<tr><td colspan="2">ไม่มีข้อมูลการศึกษาด้านดนตรีไทย</td></tr>'}
+        <tr><th colspan="2" style="background-color: #d4edda; padding: 8px;"><strong>สำเร็จการศึกษาด้านอื่น (แต่สามารถสอนดนตรีไทยได้ เนื่องจากผ่านการเรียน/อบรมด้านดนตรีไทย) *</strong></th></tr>
+        ${teacher.otherEducation?.length > 0 ? teacher.otherEducation.map((edu: any) => `
+          <tr><th>วุฒิการศึกษา/ประกาศนียบัตร *</th><td>${edu.graduationYear || '-'}</td></tr>
+          <tr><th>สาขา/หลักสูตร *</th><td>${edu.major || '-'}</td></tr>
+          <tr><th>ปีที่สำเร็จการศึกษา / ได้รับประกาศนียบัตร *</th><td>${edu.completionYear || '-'}</td></tr>
+        `).join('') : '<tr><td colspan="2">ไม่มีข้อมูลการศึกษาด้านอื่น</td></tr>'}
+        ${teacher.teacherImage ? `<tr><th>รูปภาพครู</th><td><img src="${teacher.teacherImage}" alt="ครูคนที่ ${index + 1}" style="max-width: 200px; max-height: 200px; object-fit: cover; border-radius: 8px;" /></td></tr>` : ''}
         ${index < teachers.length - 1 ? '<tr><td colspan="2" style="border: none; padding: 10px;"></td></tr>' : ''}
       `).join('');
     };
@@ -256,39 +268,138 @@ export async function GET(
         </table>
         ` : '<p>ไม่มีข้อมูลครู</p>'}
 
-        <h3>การเรียนการสอน</h3>
-        <div class="checkbox-list">
-            <div class="checkbox-item">✓ วิชาบังคับ: ${getFieldValue('teachingCompulsory') ? 'มี' : 'ไม่มี'}</div>
-            <div class="checkbox-item">✓ สอนหลังเลิกเรียน: ${getFieldValue('teachingAfterSchool') ? 'มี' : 'ไม่มี'}</div>
-            <div class="checkbox-item">✓ วิชาเลือก: ${getFieldValue('teachingElective') ? 'มี' : 'ไม่มี'}</div>
-            <div class="checkbox-item">✓ หลักสูตรท้องถิ่น: ${getFieldValue('teachingLocalCurriculum') ? 'มี' : 'ไม่มี'}</div>
-        </div>
-
+        <h3>ระยะเวลาการเรียนการสอนในเวลาราชการ</h3>
+        <p style="font-size: 12px; color: #666; margin-bottom: 10px;">(ระบุช่วงระยะเวลาสำหรับการเรียนการสอนดนตรีไทยของแต่ละระดับชั้นในแต่ละภาคการศึกษา มีกี่ชั่วโมงในเสาร์นี้)</p>
+        ${(submission.reg100_compulsoryCurriculum || []).length > 0 ? `
         <table class="info-table">
-            <tr><th>สถานที่สอน</th><td>${getFieldValue('teachingLocation')}</td></tr>
+            <tr><th>ระดับชั้น</th><th>เรียนดนตรีไทยจำนวน (คน)</th><th>ชั่วโมง/ภาคการศึกษา</th><th>ชั่วโมง/ปีการศึกษา</th></tr>
+            ${submission.reg100_compulsoryCurriculum.map((item: any) => `
+                <tr>
+                    <td>${item.gradeLevel || '-'}</td>
+                    <td>${item.studentCount || '-'}</td>
+                    <td>${item.hoursPerSemester || '-'}</td>
+                    <td>${item.hoursPerYear || '-'}</td>
+                </tr>
+            `).join('')}
         </table>
+        ` : '<p>ไม่มีข้อมูล</p>'}
+
+        <h3>ระยะเวลาการเรียนการสอนนอกเวลาราชการ</h3>
+        <p style="font-size: 12px; color: #666; margin-bottom: 10px;">(ระบุช่วงเวลาสำหรับการเรียนการสอนดนตรีไทยของนอกเวลาราชการว่ามีในช่วงใดบ้างและใช้สถานที่ใดในการสอน)</p>
+        ${(submission.reg100_afterSchoolSchedule || []).length > 0 ? `
+        <table class="info-table">
+            <tr><th>วัน</th><th>เวลา</th><th>ถึง</th><th>สถานที่</th></tr>
+            ${submission.reg100_afterSchoolSchedule.map((item: any) => `
+                <tr>
+                    <td>${item.day || '-'}</td>
+                    <td>${item.timeFrom || '-'}</td>
+                    <td>${item.timeTo || '-'}</td>
+                    <td>${item.location || '-'}</td>
+                </tr>
+            `).join('')}
+        </table>
+        ` : '<p>ไม่มีข้อมูล</p>'}
     </div>
 
     <!-- Step 5: หลักสูตร -->
     <div class="section">
         <h2>5. หลักสูตร</h2>
         
+        <h3>เป็นวิชาบังคับในชั้นเรียน</h3>
+        <p>${getFieldValue('isCompulsorySubject') ? 'มี' : 'ไม่มี'}</p>
+        ${(submission.reg100_compulsoryCurriculum || []).length > 0 ? `
         <table class="info-table">
-            <tr><th>กรอบหลักสูตร</th><td>${getFieldValue('curriculumFramework')}</td></tr>
-            <tr><th>ผลการเรียนรู้</th><td>${getFieldValue('learningOutcomes')}</td></tr>
-            <tr><th>บริบทการจัดการ</th><td>${getFieldValue('managementContext')}</td></tr>
+            <tr><th>ระดับชั้น</th><th>จำนวนนักเรียน (คน)</th><th>ชั่วโมง/ภาคการศึกษา</th><th>ชั่วโมง/ปีการศึกษา</th></tr>
+            ${submission.reg100_compulsoryCurriculum.map((item: any) => `
+                <tr>
+                    <td>${item.gradeLevel || '-'}</td>
+                    <td>${item.studentCount || '-'}</td>
+                    <td>${item.hoursPerSemester || '-'}</td>
+                    <td>${item.hoursPerYear || '-'}</td>
+                </tr>
+            `).join('')}
         </table>
+        ` : ''}
+
+        <h3>มีวิชาเลือก/วิชาเรียนเพิ่มเติม/ชุมนุม</h3>
+        <p>${getFieldValue('hasElectiveSubject') ? 'มี' : 'ไม่มี'}</p>
+        ${(submission.reg100_electiveCurriculum || []).length > 0 ? `
+        <table class="info-table">
+            <tr><th>ระดับชั้น</th><th>จำนวนนักเรียน (คน)</th><th>ชั่วโมง/ภาคการศึกษา</th><th>ชั่วโมง/ปีการศึกษา</th></tr>
+            ${submission.reg100_electiveCurriculum.map((item: any) => `
+                <tr>
+                    <td>${item.gradeLevel || '-'}</td>
+                    <td>${item.studentCount || '-'}</td>
+                    <td>${item.hoursPerSemester || '-'}</td>
+                    <td>${item.hoursPerYear || '-'}</td>
+                </tr>
+            `).join('')}
+        </table>
+        ` : ''}
+
+        <h3>มีหลักสูตรวิชาของท้องถิ่น</h3>
+        <p>${getFieldValue('hasLocalCurriculum') ? 'มี' : 'ไม่มี'}</p>
+        ${(submission.reg100_localCurriculum || []).length > 0 ? `
+        <table class="info-table">
+            <tr><th>ระดับชั้น</th><th>จำนวนนักเรียน (คน)</th><th>ชั่วโมง/ภาคการศึกษา</th><th>ชั่วโมง/ปีการศึกษา</th></tr>
+            ${submission.reg100_localCurriculum.map((item: any) => `
+                <tr>
+                    <td>${item.gradeLevel || '-'}</td>
+                    <td>${item.studentCount || '-'}</td>
+                    <td>${item.hoursPerSemester || '-'}</td>
+                    <td>${item.hoursPerYear || '-'}</td>
+                </tr>
+            `).join('')}
+        </table>
+        ` : ''}
+
+        <h3>นอกเวลาราชการ</h3>
+        <p>${getFieldValue('hasAfterSchoolTeaching') ? 'มี' : 'ไม่มี'}</p>
+        ${(submission.reg100_afterSchoolSchedule || []).length > 0 ? `
+        <table class="info-table">
+            <tr><th>วัน</th><th>เวลาเริ่ม</th><th>เวลาสิ้นสุด</th><th>สถานที่</th></tr>
+            ${submission.reg100_afterSchoolSchedule.map((item: any) => `
+                <tr>
+                    <td>${item.day || '-'}</td>
+                    <td>${item.timeFrom || '-'}</td>
+                    <td>${item.timeTo || '-'}</td>
+                    <td>${item.location || '-'}</td>
+                </tr>
+            `).join('')}
+        </table>
+        ` : ''}
+
+        <h3>สถานที่สอน</h3>
+        <p>${getFieldValue('teachingLocation') || '-'}</p>
     </div>
 
     <!-- Step 6: การสนับสนุน -->
     <div class="section">
         <h2>6. การสนับสนุน</h2>
         
-        <h3>การสนับสนุนจากองค์กร</h3>
-        ${getFieldValue('hasSupportFromOrg') ? `
-        ${submission.reg100_supportFromOrg && submission.reg100_supportFromOrg.length > 0 ? `
+        <h3>นโยบาย แนวทางการส่งเสริมดนตรีไทยในสถานศึกษา</h3>
+        <p style="font-size: 12px; color: #666; margin-bottom: 10px;">ผู้มีส่วนส่งเสริม สนับสนุนการเรียนการสอนดนตรีไทย (ระบุนโยบายการจัดการเรียนการสอนดนตรีไทยของโรงเรียน วิธีการใช้ความสนับสนุน)</p>
+        ${(submission.reg100_supportFactors || []).length > 0 ? `
         <table class="info-table">
-            <tr><th>องค์กร</th><th>รายละเอียด</th><th>ลิงก์หลักฐาน</th></tr>
+            <tr><th>ลำดับ</th><th>องค์กร/หน่วยงาน</th><th>รายละเอียด</th><th>วันที่</th></tr>
+            ${submission.reg100_supportFactors.map((item: any, index: number) => `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${item.sup_supportByAdmin || '-'}</td>
+                    <td>${item.sup_supportByDescription || '-'}</td>
+                    <td>-</td>
+                </tr>
+            `).join('')}
+        </table>
+        ` : '<p>ไม่มีข้อมูล</p>'}
+
+        <h3>การสนับสนุนวัสดุ อุปกรณ์ หรืองบประมาณ</h3>
+        
+        <h4>ได้รับการสนับสนุนจากต้นสังกัด (บุคคล/หน่วยงานภายใน)</h4>
+        <p>${getFieldValue('hasSupportFromOrg') ? 'มี' : 'ไม่มี'}</p>
+        ${getFieldValue('hasSupportFromOrg') && (submission.reg100_supportFromOrg || []).length > 0 ? `
+        <table class="info-table">
+            <tr><th>บุคคล/หน่วยงาน</th><th>รายละเอียด</th><th>ลิงก์หลักฐาน</th></tr>
             ${submission.reg100_supportFromOrg.map((support: any) => `
                 <tr>
                     <td>${support.organization || '-'}</td>
@@ -297,14 +408,13 @@ export async function GET(
                 </tr>
             `).join('')}
         </table>
-        ` : '<p>มีการสนับสนุนจากองค์กร แต่ไม่มีรายละเอียด</p>'}
-        ` : '<p>ไม่มีการสนับสนุนจากองค์กร</p>'}
+        ` : ''}
 
-        <h3>การสนับสนุนจากภายนอก</h3>
-        ${getFieldValue('hasSupportFromExternal') ? `
-        ${submission.reg100_supportFromExternal && submission.reg100_supportFromExternal.length > 0 ? `
+        <h4>ได้รับการสนับสนุนจากบุคคล/หน่วยงานภายนอก</h4>
+        <p>${getFieldValue('hasSupportFromExternal') ? 'มี' : 'ไม่มี'}</p>
+        ${getFieldValue('hasSupportFromExternal') && (submission.reg100_supportFromExternal || []).length > 0 ? `
         <table class="info-table">
-            <tr><th>องค์กร</th><th>รายละเอียด</th><th>ลิงก์หลักฐาน</th></tr>
+            <tr><th>บุคคล/หน่วยงาน</th><th>รายละเอียด</th><th>ลิงก์หลักฐาน</th></tr>
             ${submission.reg100_supportFromExternal.map((support: any) => `
                 <tr>
                     <td>${support.organization || '-'}</td>
@@ -313,15 +423,28 @@ export async function GET(
                 </tr>
             `).join('')}
         </table>
-        ` : '<p>มีการสนับสนุนจากภายนอก แต่ไม่มีรายละเอียด</p>'}
-        ` : '<p>ไม่มีการสนับสนุนจากภายนอก</p>'}
+        ` : ''}
+
+        <h3>ความพร้อมของเครื่องดนตรีกับนักเรียน</h3>
+        <table class="info-table">
+            <tr><th>เพียงพอ</th><td>${getFieldValue('instrumentReadiness_sufficient') || '-'}</td></tr>
+            <tr><th>ไม่เพียงพอ</th><td>${getFieldValue('instrumentReadiness_insufficient') || '-'}</td></tr>
+        </table>
+
+        <h3>กรอบการเรียนการสอน</h3>
+        <table class="info-table">
+            <tr><th>สถานศึกษามีกรอบการเรียนการสอนดนตรีไทย หรือสาระการเรียนรู้ที่มีนักเรียนสามารถปฏิบัติได้ (เช่น วิชาพื้นฐาน/วิชาเลือก/เพิ่มเติม ที่สเสริมให้นักเรียนปฏิบัติได้)</th><td>${getFieldValue('curriculumFramework') || '-'}</td></tr>
+            <tr><th>ผลลัพธ์ในการเรียนการสอนด้านดนตรีไทย</th><td>${getFieldValue('learningOutcomes') || '-'}</td></tr>
+            <tr><th>การบริหารจัดการสอนดนตรีไทยของสถานศึกษา โดยให้ระบุผลสะท้อนจากนักเรียน เช่น ดนตรีไทย/เพลงที่สามารถปฏิบัติให้นักเรียนปฏิบัติได้</th><td>${getFieldValue('managementContext') || '-'}</td></tr>
+        </table>
     </div>
 
     <!-- Step 7: ผลงาน -->
     <div class="section">
         <h2>7. ผลงาน</h2>
         
-        <h3>รางวัล</h3>
+        <h3>รางวัลและเกียรติคุณที่ได้รับในระยะเวลา ๑ ปี ย้อนหลัง</h3>
+        <p style="font-size: 12px; color: #666; margin-bottom: 10px;">อำเภอ 5 คะแนน / จังหวัด 10 คะแนน / ภาค 15 คะแนน / ประเทศ 20 คะแนน</p>
         ${submission.reg100_awards && submission.reg100_awards.length > 0 ? `
         <table class="info-table">
             <tr><th>ระดับรางวัล</th><th>ชื่อรางวัล</th><th>วันที่ได้รับ</th><th>ลิงก์หลักฐาน</th></tr>
@@ -336,10 +459,27 @@ export async function GET(
         </table>
         ` : '<p>ไม่มีข้อมูลรางวัล</p>'}
 
-        <table class="info-table">
-            <tr><th>ลิงก์แกลเลอรี่รูปภาพ</th><td>${getFieldValue('photoGalleryLink')}</td></tr>
-            <tr><th>ลิงก์วิดีโอ</th><td>${getFieldValue('videoLink')}</td></tr>
-        </table>
+        <h3>ภาพถ่ายผลงาน และคลิปวิดีโอที่มีความชัดเจน และสื่อให้เห็นถึงความเป็นโรงเรียนดนตรีไทย ๑๐๐ เปอร์เซ็นต์</h3>
+        
+        <h4 style="background-color: #d4edda; padding: 10px; border-radius: 5px; margin-top: 15px;">ภาพถ่ายผลงาน หรือกิจกรรมเด่น ตั้งแต่ปีการศึกษา 2567 - พฤษภาคม 2568 จำนวน 10 - 20 ภาพ เท่านั้น!!!</h4>
+        <p style="font-size: 12px; color: #666; margin-bottom: 5px;">Link/URL สำหรับ Share Drive (Google Drive, Dropbox, etc.)</p>
+        <p style="margin-bottom: 10px;">${getFieldValue('photoGalleryLink') || '-'}</p>
+        <p style="font-size: 11px; color: #999; margin-bottom: 15px;">กรุณาเปลี่ยนที่สามารถเข้าถึงได้ "ทุกคนในอินเทอร์เน็ต จะดูได้ทั้งหมดโดยไม่ต้องลงชื่อเข้าใช้"</p>
+
+        <h4 style="background-color: #cfe2ff; padding: 10px; border-radius: 5px; margin-top: 15px;">วิดีโอ/คลิป</h4>
+        <p style="font-size: 12px; color: #dc3545; font-weight: 500; margin-bottom: 10px;">กรุณาแชร์ลิงก์ที่สามารถเข้าถึงได้ "หากไม่สามารถเปิดได้ จะถือว่าสละสิทธิ์รับคะแนนส่วนนี้"</p>
+        
+        <div style="background-color: #f8f9fa; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
+            <p style="font-weight: 500; margin-bottom: 5px;">1. บรรยากาศการเรียนการสอนในชั้นเรียน (ทุกระดับชั้น)</p>
+            <p style="font-size: 12px; color: #666; margin-bottom: 5px;">Link/URL สำหรับ Share Drive (Google Drive, Dropbox, etc.)</p>
+            <p>${getFieldValue('videoLink') || '-'}</p>
+        </div>
+
+        <div style="background-color: #f8f9fa; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
+            <p style="font-weight: 500; margin-bottom: 5px;">2. การแสดงผลงานด้านดนตรีไทยของนักเรียนทั้งโรงเรียน</p>
+            <p style="font-size: 12px; color: #666; margin-bottom: 5px;">Link/URL สำหรับ Share Drive (Google Drive, Dropbox, etc.)</p>
+            <p>${getFieldValue('videoLink2') || '-'}</p>
+        </div>
     </div>
 
     <!-- Step 8: การเผยแพร่ -->
@@ -355,10 +495,10 @@ export async function GET(
     <div class="section">
         <h2>9. การประชาสัมพันธ์</h2>
 
-        <h3>ประชาสัมพันธ์</h3>
+        <h3>การประชาสัมพันธ์ผลงานของสถานศึกษา</h3>
         ${submission.reg100_prActivities && submission.reg100_prActivities.length > 0 ? `
         <table class="info-table">
-            <tr><th>ชื่อกิจกรรม</th><th>วันที่</th><th>ลิงก์หลักฐาน</th><th>แพลตฟอร์ม</th></tr>
+            <tr><th>ชื่อกิจกรรม</th><th>วันที่เผยแพร่</th><th>ลิงก์หลักฐาน</th><th>แพลตฟอร์ม</th></tr>
             ${submission.reg100_prActivities.map((activity: any) => `
                 <tr>
                     <td>${activity.activityName || '-'}</td>
@@ -370,32 +510,37 @@ export async function GET(
         </table>
         ` : '<p>ไม่มีข้อมูลกิจกรรมประชาสัมพันธ์</p>'}
 
-        <h3>ช่องทางการประชาสัมพันธ์</h3>
+        <h3>ได้รับข้อมูลการสมัครโรงเรียนดนตรีไทย ๑๐๐ เปอร์เซ็นต์จาก</h3>
         <div class="checkbox-list">
-            <div class="checkbox-item">☑ Facebook: ${getFieldValue('DCP_PR_Channel_FACEBOOK') ? 'ใช้' : 'ไม่ใช้'}</div>
-            <div class="checkbox-item">☑ YouTube: ${getFieldValue('DCP_PR_Channel_YOUTUBE') ? 'ใช้' : 'ไม่ใช้'}</div>
-            <div class="checkbox-item">☑ TikTok: ${getFieldValue('DCP_PR_Channel_Tiktok') ? 'ใช้' : 'ไม่ใช้'}</div>
+            <div class="checkbox-item">
+                ${getFieldValue('heardFromSchool') ? '☑' : '☐'} โรงเรียน: ${getFieldValue('heardFromSchool') ? `${getFieldValue('heardFromSchoolName')} อำเภอ ${getFieldValue('heardFromSchoolDistrict')} จังหวัด ${getFieldValue('heardFromSchoolProvince')}` : 'ไม่ได้เลือก'}
+            </div>
+            <div class="checkbox-item">
+                ${getFieldValue('heardFromCulturalOffice') ? '☑' : '☐'} สำนักงานวัฒนธรรมจังหวัด: ${getFieldValue('heardFromCulturalOffice') ? getFieldValue('heardFromCulturalOfficeName') : 'ไม่ได้เลือก'}
+            </div>
+            <div class="checkbox-item">
+                ${getFieldValue('heardFromEducationArea') ? '☑' : '☐'} สำนักงานเขตพื้นที่การศึกษา: ${getFieldValue('heardFromEducationArea') ? `${getFieldValue('heardFromEducationAreaName')} จังหวัด ${getFieldValue('heardFromEducationAreaProvince')}` : 'ไม่ได้เลือก'}
+            </div>
+            <div class="checkbox-item">
+                ${getFieldValue('heardFromOther') ? '☑' : '☐'} อื่น ๆ ระบุ: ${getFieldValue('heardFromOther') ? getFieldValue('heardFromOtherDetail') : 'ไม่ได้เลือก'}
+            </div>
         </div>
 
-        <h3>แหล่งที่มาของข้อมูล</h3>
-        <table class="info-table">
-            <tr><th>โรงเรียน</th><td>${getFieldValue('heardFromSchool') ? `มี (${getFieldValue('heardFromSchoolName')})` : 'ไม่มี'}</td></tr>
-            <tr><th>สำนักงานวัฒนธรรม</th><td>${getFieldValue('heardFromCulturalOffice') ? `มี (${getFieldValue('heardFromCulturalOfficeName')})` : 'ไม่มี'}</td></tr>
-            <tr><th>สำนักงานเขตพื้นที่</th><td>${getFieldValue('heardFromEducationArea') ? `มี (${getFieldValue('heardFromEducationAreaName')}, ${getFieldValue('heardFromEducationAreaProvince')})` : 'ไม่มี'}</td></tr>
-            <tr><th>อื่นๆ</th><td>${getFieldValue('heardFromOther') ? `มี (${getFieldValue('heardFromOtherDetail')})` : 'ไม่มี'}</td></tr>
-        </table>
+        <h3>ช่องทางการประชาสัมพันธ์ของกรมส่งเสริมวัฒนธรรม</h3>
+        <div class="checkbox-list">
+            <div class="checkbox-item">${getFieldValue('DCP_PR_Channel_FACEBOOK') ? '☑' : '☐'} เฟซบุ๊ก (Facebook)</div>
+            <div class="checkbox-item">${getFieldValue('DCP_PR_Channel_YOUTUBE') ? '☑' : '☐'} ยูทูบ (YouTube)</div>
+            <div class="checkbox-item">${getFieldValue('DCP_PR_Channel_Tiktok') ? '☑' : '☐'} ติ๊กต๊อก (TikTok)</div>
+        </div>
 
-        <h3>ปัญหาอุปสรรค</h3>
+        <h3>ปัญหาและอุปสรรคที่มีผลกระทบต่อการเรียนการสอนดนตรีไทย:</h3>
         <p>${getFieldValue('obstacles') || '-'}</p>
 
-        <h3>ข้อเสนอแนะ</h3>
+        <h3>ข้อเสนอแนะในการส่งเสริมดนตรีไทยในสถานศึกษา:</h3>
         <p>${getFieldValue('suggestions') || '-'}</p>
 
         <h3>รับรองความถูกต้อง</h3>
-        <p>${(getFieldValue('certifiedByAdmin') ?? getFieldValue('certifiedINFOByAdminName')) ? 'รับรอง' : 'ไม่รับรอง'}</p>
-
-        <h3>ข้าพเจ้าขอรับรองว่าข้อมูลที่กรอกในแบบฟอร์มนี้เป็นความจริงทุกประการ</h3>
-        <p>${(getFieldValue('certifiedByAdmin') || getFieldValue('reg100_certifiedByAdmin')) ? '☑ ยอมรับ' : '☐ ไม่ยอมรับ'}</p>
+        <p>${(getFieldValue('certifiedByAdmin') || getFieldValue('reg100_certifiedByAdmin')) ? '☑ ข้าพเจ้าขอรับรองว่าข้อมูลที่กรอกในแบบฟอร์มนี้เป็นความจริงทุกประการ' : '☐ ยังไม่ได้รับรอง'}</p>
     </div>
     
     <div class="footer">

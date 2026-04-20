@@ -13,6 +13,7 @@ interface User {
   isActive: boolean;
   profileImage?: string;
   schoolId?: string;
+  schoolName?: string;
   createdAt: string;
   updatedAt?: string;
 }
@@ -410,11 +411,14 @@ export default function UserDetailView({ id, session }: { id: string; session: S
           </button>
           
           <div className="flex items-start justify-between">
-            <div>
+            <div className="flex-1">
               <h1 className="text-3xl font-bold text-gray-900">
                 {user.firstName} {user.lastName}
               </h1>
-              <p className="text-gray-600 mt-2">{user.email}</p>
+              {user.schoolName && (
+                <p className="text-xl text-gray-700 mt-1">{user.schoolName}</p>
+              )}
+              <p className="text-gray-600 mt-2">{user.phone || '-'}</p>
               
               <div className="flex items-center gap-3 mt-3">
                 <span className={`inline-block px-3 py-1 rounded-full text-sm font-semibold border ${getRoleBadgeColor(user.role)}`}>
@@ -641,6 +645,14 @@ export default function UserDetailView({ id, session }: { id: string; session: S
                 <div className="text-gray-900 bg-gray-50 p-3 rounded-lg">{displayData?.phone || '-'}</div>
               )}
             </div>
+
+            {/* School Name - Read only, fetched from submission */}
+            {displayData?.schoolName && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">โรงเรียน</label>
+                <div className="text-gray-900 bg-gray-50 p-3 rounded-lg">{displayData.schoolName}</div>
+              </div>
+            )}
 
             {/* Role */}
             <div>

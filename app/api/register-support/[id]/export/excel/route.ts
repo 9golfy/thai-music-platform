@@ -68,12 +68,20 @@ export async function GET(
       const teacherRows: any[][] = [];
       teachers.forEach((teacher, index) => {
         teacherRows.push([`ครูคนที่ ${index + 1}`]);
-        teacherRows.push(['คุณลักษณะ', teacher.teacherQualification || '-']);
+        teacherRows.push(['บทบาท/หน้าที่ผู้สอน *', teacher.teacherQualification || '-']);
         teacherRows.push(['ชื่อ-นามสกุล', teacher.teacherFullName || '-']);
-        teacherRows.push(['ตำแหน่ง', teacher.teacherPosition || '-']);
-        teacherRows.push(['วุฒิการศึกษา', teacher.teacherEducation || '-']);
-        teacherRows.push(['โทรศัพท์', teacher.teacherPhone || '-']);
-        teacherRows.push(['อีเมล', teacher.teacherEmail || '-']);
+        teacherRows.push(['ตำแหน่ง *', teacher.teacherPosition || '-']);
+        teacherRows.push(['อีเมล *', teacher.teacherEmail || '-']);
+        teacherRows.push(['เบอร์โทรศัพท์ *', teacher.teacherMobilePhone || teacher.teacherPhone || '-']);
+        teacherRows.push(['ทักษะ ความรู้ ความสามารถ ในการสอนภาคปฏิบัติดนตรีไทย *', teacher.teacherExpertise || '-']);
+        teacherRows.push(['=== สำเร็จการศึกษาด้านดนตรีไทย * ===']);
+        teacherRows.push(['วุฒิการศึกษา/ประกาศนียบัตร *', teacher.teacherEducation || '-']);
+        teacherRows.push(['สาขา/หลักสูตร *', teacher.teacherMajor || '-']);
+        teacherRows.push(['ปีที่สำเร็จการศึกษา / ได้รับประกาศนียบัตร *', teacher.teacherGraduationYear || '-']);
+        teacherRows.push(['=== สำเร็จการศึกษาด้านอื่น * ===']);
+        teacherRows.push(['วุฒิการศึกษา/ประกาศนียบัตร *', teacher.teacherOtherEducation || '-']);
+        teacherRows.push(['สาขา/หลักสูตร *', teacher.teacherOtherMajor || '-']);
+        teacherRows.push(['ปีที่สำเร็จการศึกษา / ได้รับประกาศนียบัตร *', teacher.teacherOtherGraduationYear || '-']);
         if (index < teachers.length - 1) teacherRows.push(['']);
       });
       return teacherRows;
@@ -208,42 +216,114 @@ export async function GET(
       
       // 4. ผู้สอนดนตรีไทย
       ['=== 4. ผู้สอนดนตรีไทย ==='],
-      ['การเรียนการสอน'],
-      ['วิชาบังคับ', getFieldValue('isCompulsorySubject') ? 'มี' : 'ไม่มี'],
-      ['สอนหลังเลิกเรียน', getFieldValue('hasAfterSchoolTeaching') ? 'มี' : 'ไม่มี'],
-      ['วิชาเลือก', getFieldValue('hasElectiveSubject') ? 'มี' : 'ไม่มี'],
-      ['หลักสูตรท้องถิ่น', getFieldValue('hasLocalCurriculum') ? 'มี' : 'ไม่มี'],
-      [''],
-      ['สถานที่สอน', getFieldValue('teachingLocation')],
-      [''],
       ['รายชื่อครู'],
       ...formatTeachersData(submission.regsup_thaiMusicTeachers || submission.thaiMusicTeachers),
       [''],
+      ['ระยะเวลาการเรียนการสอนในเวลาราชการ'],
+      ...(submission.regsup_teachingScheduleRegular || submission.teachingScheduleRegular || []).length > 0 
+        ? [
+            ['ระดับชั้น', 'เรียนดนตรีไทยจำนวน (คน)', 'ชั่วโมง/ภาคการศึกษา', 'ชั่วโมง/ปีการศึกษา'],
+            ...(submission.regsup_teachingScheduleRegular || submission.teachingScheduleRegular).map((item: any) => [
+              item.gradeLevel || '-',
+              item.studentCount || '-',
+              item.hoursPerSemester || '-',
+              item.hoursPerYear || '-'
+            ])
+          ]
+        : [['ไม่มีข้อมูล']],
+      [''],
+      ['ระยะเวลาการเรียนการสอนนอกเวลาราชการ'],
+      ...(submission.regsup_teachingScheduleAfterHours || submission.teachingScheduleAfterHours || []).length > 0
+        ? [
+            ['วัน', 'เวลา', 'ถึง', 'สถานที่'],
+            ...(submission.regsup_teachingScheduleAfterHours || submission.teachingScheduleAfterHours).map((item: any) => [
+              item.day || '-',
+              item.time || '-',
+              item.endTime || '-',
+              item.location || '-'
+            ])
+          ]
+        : [['ไม่มีข้อมูล']],
+      [''],
       
-      // 5. หลักสูตร
-      ['=== 5. หลักสูตร ==='],
-      ['กรอบการเรียนการสอน', getFieldValue('curriculumFramework')],
-      ['ผลสัมฤทธิ์ในการเรียนการสอน', getFieldValue('learningOutcomes')],
-      ['การบริหารจัดการ', getFieldValue('managementContext')],
+      // 5. สถานที่
+      ['=== 5. สถานที่ ==='],
+      ['สถานที่สอน', getFieldValue('teachingLocation')],
       [''],
       
       // 6. การสนับสนุน
       ['=== 6. การสนับสนุน ==='],
-      ['ปัจจัยที่เกี่ยวข้องโดยตรง'],
-      ...formatSupportFactorsData(submission.regsup_supportFactors || submission.supportFactors),
+      ['นโยบาย แนวทางการส่งเสริมดนตรีไทยในสถานศึกษา'],
+      ['ผู้มีส่วนส่งเสริม สนับสนุนการเรียนการสอนดนตรีไทย (ระบุนโยบายการจัดการเรียนการสอนดนตรีไทยของโรงเรียน วิธีการใช้ความสนับสนุน)'],
+      ...(submission.regsup_supportFactors || submission.supportFactors || []).length > 0
+        ? [
+            ['ลำดับ', 'องค์กร/หน่วยงาน/บุคคลที่ให้การส่งเสริม สนับสนุน', 'บรรยาย และอธิบายสนับสนุน'],
+            ...(submission.regsup_supportFactors || submission.supportFactors).map((factor: any, index: number) => [
+              index + 1,
+              factor.sup_supportByAdmin || factor.sup_supportBySchoolBoard || factor.sup_supportByOthers || '-',
+              factor.sup_supportByDescription || '-'
+            ])
+          ]
+        : [['ไม่มีข้อมูล']],
       [''],
-      ...formatSupportOrgsData(submission.regsup_supportFromOrg || submission.supportFromOrg, 'การสนับสนุนจากต้นสังกัด'),
+      ['ได้รับการสนับสนุนจากต้นสังกัด (บุคคล/หน่วยงานภายใน)'],
+      ...(submission.regsup_supportFromOrg || submission.supportFromOrg || []).length > 0
+        ? [
+            ['บุคคล/หน่วยงาน', 'รายละเอียด', 'หลักฐาน/ภาพถ่าย (Link/URL สำหรับ Share Drive)'],
+            ...(submission.regsup_supportFromOrg || submission.supportFromOrg).map((org: any) => [
+              org.organization || '-',
+              org.details || '-',
+              org.evidenceLink || '-'
+            ])
+          ]
+        : [['ไม่มีข้อมูล']],
       [''],
-      ...formatSupportOrgsData(submission.regsup_supportFromExternal || submission.supportFromExternal, 'การสนับสนุนจากภายนอก'),
+      ['ได้รับการสนับสนุนจากบุคคล/หน่วยงานภายนอก'],
+      ...(submission.regsup_supportFromExternal || submission.supportFromExternal || []).length > 0
+        ? [
+            ['บุคคล/หน่วยงาน', 'รายละเอียด', 'หลักฐาน/ภาพถ่าย (Link/URL สำหรับ Share Drive)'],
+            ...(submission.regsup_supportFromExternal || submission.supportFromExternal).map((org: any) => [
+              org.organization || '-',
+              org.details || '-',
+              org.evidenceLink || '-'
+            ])
+          ]
+        : [['ไม่มีข้อมูล']],
       [''],
       
       // 7. ผลงาน
       ['=== 7. ผลงาน ==='],
-      ['รางวัลและเกียรติคุณ'],
-      ...formatAwardsData(submission.regsup_awards || submission.awards),
+      ['รางวัล'],
+      ['อำเภอ 5 คะแนน / จังหวัด 10 คะแนน / ภาค 15 คะแนน / ประเทศ 20 คะแนน'],
+      ...(submission.regsup_awards || submission.awards || []).length > 0
+        ? [
+            ['ระดับรางวัล', 'ชื่อรางวัล', 'วันที่ได้รับรางวัล', 'ลิงก์หลักฐาน'],
+            ...(submission.regsup_awards || submission.awards).map((award: any) => [
+              award.awardLevel || '-',
+              award.awardName || '-',
+              award.awardDate || '-',
+              award.awardEvidenceLink || '-'
+            ])
+          ]
+        : [['ไม่มีข้อมูลรางวัล']],
       [''],
+      ['ภาพถ่ายผลงาน และคลิปวิดีโอที่มีความชัดเจน และสื่อให้เห็นถึงความเป็นโรงเรียนสนับสนุนและส่งเสริมดนตรีไทย ๑๐๐ เปอร์เซ็นต์'],
+      [''],
+      ['ภาพถ่ายผลงาน หรือกิจกรรมเด่น ตั้งแต่ปีการศึกษา 2567 - พฤษภาคม 2568 จำนวน 10 - 20 ภาพ เท่านั้น!!!'],
+      ['Link/URL สำหรับ Share Drive (Google Drive, Dropbox, etc.)'],
       ['ลิงก์แกลเลอรี่รูปภาพ', getFieldValue('photoGalleryLink')],
-      ['ลิงก์วิดีโอ', getFieldValue('videoLink')],
+      ['กรุณาเปลี่ยนที่สามารถเข้าถึงได้ "ทุกคนในอินเทอร์เน็ต จะดูได้ทั้งหมดโดยไม่ต้องลงชื่อเข้าใช้"'],
+      [''],
+      ['วิดีโอ/คลิป'],
+      ['กรุณาแชร์ลิงก์ที่สามารถเข้าถึงได้ "หากไม่สามารถเปิดได้ จะถือว่าสละสิทธิ์รับคะแนนส่วนนี้"'],
+      [''],
+      ['1 บรรยากาศการเรียนการสอนในชั้นเรียน และในสถานศึกษา ความยาวไม่เกิน 3 นาที'],
+      ['Link/URL สำหรับ Share Drive (Google Drive, Dropbox, etc.)'],
+      ['ลิงก์วิดีโอ 1', getFieldValue('videoLink')],
+      [''],
+      ['2 การแสดงผลงานด้านดนตรีของนักเรียน ความยาวไม่เกิน 3 นาที'],
+      ['Link/URL สำหรับ Share Drive (Google Drive, Dropbox, etc.)'],
+      ['ลิงก์วิดีโอ 2', getFieldValue('videoLink2')],
       [''],
       
       // 8. การเผยแพร่
@@ -257,16 +337,34 @@ export async function GET(
       
       // 9. การประชาสัมพันธ์
       ['=== 9. การประชาสัมพันธ์ ==='],
-      ...formatActivitiesData(submission.regsup_prActivities || submission.prActivities, 'กิจกรรมประชาสัมพันธ์'),
+      ['การประชาสัมพันธ์ผลงานของสถานศึกษา'],
+      ...(submission.regsup_prActivities || submission.prActivities || []).length > 0
+        ? [
+            ['ชื่อกิจกรรม/งาน', 'วันที่เผยแพร่', 'หลักฐานการเผยแพร่ (Link/URL)', 'แหล่งเผยแพร่/ประชาสัมพันธ์ในสื่อสังคมออนไลน์'],
+            ...(submission.regsup_prActivities || submission.prActivities).map((activity: any) => [
+              activity.activityName || '-',
+              activity.publishDate || '-',
+              activity.evidenceLink || '-',
+              activity.platform || '-'
+            ])
+          ]
+        : [['ไม่มีข้อมูลกิจกรรมประชาสัมพันธ์']],
       [''],
-      ['แหล่งที่มาของข้อมูล'],
-      ['โรงเรียน', getFieldValue('heardFromSchoolName')],
-      ['สำนักงานวัฒนธรรม', getFieldValue('heardFromCulturalOfficeName')],
-      ['สำนักงานเขตพื้นที่', getFieldValue('heardFromEducationAreaName')],
-      ['อื่นๆ', getFieldValue('heardFromOtherDetail')],
+      ['ได้รับข้อมูลการสมัครโรงเรียนสนับสนุนและส่งเสริมจาก'],
+      ['โรงเรียน', getFieldValue('heardFromSchool') ? `${getFieldValue('heardFromSchoolName')} อำเภอ ${getFieldValue('heardFromSchoolDistrict')} จังหวัด ${getFieldValue('heardFromSchoolProvince')}` : 'ไม่ได้เลือก'],
+      ['สำนักงานวัฒนธรรมจังหวัด', getFieldValue('heardFromCulturalOffice') ? getFieldValue('heardFromCulturalOfficeName') : 'ไม่ได้เลือก'],
+      ['สำนักงานเขตพื้นที่การศึกษา', getFieldValue('heardFromEducationArea') ? `${getFieldValue('heardFromEducationAreaName')} จังหวัด ${getFieldValue('heardFromEducationAreaProvince')}` : 'ไม่ได้เลือก'],
+      ['อื่น ๆ ระบุ', getFieldValue('heardFromOther') ? getFieldValue('heardFromOtherDetail') : 'ไม่ได้เลือก'],
       [''],
-      ['ปัญหาอุปสรรค', getFieldValue('obstacles')],
-      ['ข้อเสนอแนะ', getFieldValue('suggestions')],
+      ['ช่องทางการประชาสัมพันธ์ของกรมส่งเสริมวัฒนธรรม'],
+      ['เฟซบุ๊ก (Facebook)', getFieldValue('DCP_PR_Channel_FACEBOOK') ? 'ใช้' : 'ไม่ใช้'],
+      ['ยูทูบ (YouTube)', getFieldValue('DCP_PR_Channel_YOUTUBE') ? 'ใช้' : 'ไม่ใช้'],
+      ['ติ๊กต๊อก (TikTok)', getFieldValue('DCP_PR_Channel_Tiktok') ? 'ใช้' : 'ไม่ใช้'],
+      [''],
+      ['ปัญหาและอุปสรรคที่มีผลกระทบต่อการเรียนการสอนดนตรีไทย', getFieldValue('obstacles')],
+      ['ข้อเสนอแนะในการส่งเสริมดนตรีไทยในสถานศึกษา', getFieldValue('suggestions')],
+      [''],
+      ['รับรองความถูกต้อง'],
       ['ข้าพเจ้าขอรับรองว่าข้อมูลที่กรอกในแบบฟอร์มนี้เป็นความจริงทุกประการ', (getFieldValue('certifiedByAdmin') || getFieldValue('regsup_certifiedByAdmin')) ? 'ยอมรับ' : 'ไม่ยอมรับ'],
       [''],
       

@@ -15,6 +15,8 @@ async function getCertificate(id: string) {
     const database = client.db(dbName);
     const certificatesCollection = database.collection('certificates');
     const templatesCollection = database.collection('certificate_templates');
+    const register100Collection = database.collection('register100_submissions');
+    const registerSupportCollection = database.collection('register_support_submissions');
 
     const certificate = await certificatesCollection.findOne({
       _id: new ObjectId(id),
@@ -34,10 +36,29 @@ async function getCertificate(id: string) {
       templateImageUrl = template?.imageUrl || null;
     }
 
+    // Get province from submission
+    let province = null;
+    if (certificate.schoolId) {
+      if (certificate.certificateType === 'register100') {
+        const submission = await register100Collection.findOne(
+          { schoolId: certificate.schoolId },
+          { projection: { reg100_schoolProvince: 1 } }
+        );
+        province = submission?.reg100_schoolProvince || null;
+      } else {
+        const submission = await registerSupportCollection.findOne(
+          { schoolId: certificate.schoolId },
+          { projection: { regsup_schoolProvince: 1 } }
+        );
+        province = submission?.regsup_schoolProvince || null;
+      }
+    }
+
     return {
       ...certificate,
       _id: certificate._id.toString(),
       templateImageUrl,
+      province,
     };
   } catch (error) {
     console.error('Error fetching certificate:', error);
@@ -151,6 +172,7 @@ export default async function CertificateDetailPage({
         <h2 className="text-lg font-semibold text-gray-900 mb-4">ใบประกาศนียบัตร</h2>
         <CertificatePreview
           schoolName={(certificate as any).schoolName}
+          province={(certificate as any).province}
           certificateNumber={(certificate as any).certificateNumber}
           issueDate={(certificate as any).issueDate}
           templateName={(certificate as any).templateName}

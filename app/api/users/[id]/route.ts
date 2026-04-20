@@ -28,6 +28,8 @@ export async function GET(
     await client.connect();
     const database = client.db(dbName);
     const usersCollection = database.collection('users');
+    const register100Collection = database.collection('register100_submissions');
+    const registerSupportCollection = database.collection('register_support_submissions');
 
     const user = await usersCollection.findOne(
       { _id: new ObjectId(id) },
@@ -41,11 +43,33 @@ export async function GET(
       );
     }
 
+    // Fetch school name if user has schoolId
+    let schoolName = null;
+    if (user.schoolId) {
+      // Try to find school in register100
+      let school = await register100Collection.findOne(
+        { schoolId: user.schoolId },
+        { projection: { reg100_schoolName: 1 } }
+      );
+      
+      // If not found, try register-support
+      if (!school) {
+        school = await registerSupportCollection.findOne(
+          { schoolId: user.schoolId },
+          { projection: { regsup_schoolName: 1 } }
+        );
+        schoolName = school?.regsup_schoolName || null;
+      } else {
+        schoolName = school?.reg100_schoolName || null;
+      }
+    }
+
     return NextResponse.json({
       success: true,
       user: {
         ...user,
         _id: user._id.toString(),
+        schoolName,
       },
     });
   } catch (error) {

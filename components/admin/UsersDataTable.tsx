@@ -17,16 +17,46 @@ async function getUsers() {
     await client.connect();
     const database = client.db(dbName);
     const usersCollection = database.collection('users');
+    const register100Collection = database.collection('register100_submissions');
+    const registerSupportCollection = database.collection('register_support_submissions');
 
     const users = await usersCollection
       .find({}, { projection: { password: 0 } })
       .sort({ createdAt: -1 })
       .toArray();
 
-    return users.map((user) => ({
-      ...user,
-      _id: user._id.toString(),
-    }));
+    // Fetch school names for users with schoolId
+    const usersWithSchoolNames = await Promise.all(
+      users.map(async (user) => {
+        let schoolName = null;
+        if (user.schoolId) {
+          // Try to find school in register100
+          let school = await register100Collection.findOne(
+            { schoolId: user.schoolId },
+            { projection: { reg100_schoolName: 1 } }
+          );
+          
+          // If not found, try register-support
+          if (!school) {
+            school = await registerSupportCollection.findOne(
+              { schoolId: user.schoolId },
+              { projection: { regsup_schoolName: 1 } }
+            );
+            schoolName = school?.regsup_schoolName || null;
+          } else {
+            schoolName = school?.reg100_schoolName || null;
+          }
+        }
+        
+        return {
+          ...user,
+          _id: user._id.toString(),
+          schoolName,
+        };
+      })
+    );
+
+    return usersWithSchoolNames;
   } catch (error) {
     console.error('Error fetching users:', error);
     return [];
@@ -191,6 +221,9 @@ export default async function UsersDataTable({ session }: UsersDataTableProps) {
                       ชื่อ-นามสกุล
                     </th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">
+                      โรงเรียน
+                    </th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">
                       Email
                     </th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">
@@ -210,7 +243,7 @@ export default async function UsersDataTable({ session }: UsersDataTableProps) {
                 <tbody>
                   {teacherUsers.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="text-center py-8 text-gray-500">
+                      <td colSpan={7} className="text-center py-8 text-gray-500">
                         ไม่พบข้อมูล
                       </td>
                     </tr>
@@ -243,6 +276,9 @@ export default async function UsersDataTable({ session }: UsersDataTableProps) {
                               </p>
                             </div>
                           </div>
+                        </td>
+                        <td className="py-3 px-4 text-sm text-gray-600">
+                          {user.schoolName || '-'}
                         </td>
                         <td className="py-3 px-4 text-sm text-gray-600">
                           {user.email}

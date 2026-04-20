@@ -643,47 +643,94 @@ export default function Register100DetailView({ id, hideScores = false, readOnly
               onRemove={(i) => handleRemoveArrayItem('reg100_thaiMusicTeachers', i)}
               renderItem={(teacher, i) => (
                 <>
-                  <div className="mb-2"><h5 className="text-lg font-semibold text-gray-800">ครูคนที่ {i + 1}</h5></div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <Field label="ชื่อ-นามสกุล" value={teacher.teacherFullName} isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'teacherFullName', val)} fieldName="teacherFullName" />
+                  <div className="mb-3"><h5 className="text-sm font-semibold text-gray-700">ครูคนที่ {i + 1}</h5></div>
+                  <div className="space-y-4">
+                    {/* 1. บทบาท/หน้าที่ผู้สอน */}
                     <SelectField
-                      label="คุณลักษณะ"
+                      label="บทบาท/หน้าที่ผู้สอน *"
                       value={teacher.teacherQualification}
                       options={['ครูผู้สอนดนตรีไทยในโรงเรียนที่สำเร็จการศึกษาดนตรีไทย', 'ครูภูมิปัญญาในท้องถิ่น', 'ผู้ทรงคุณวุฒิ ด้านการสอนดนตรีไทย', 'วิทยากร/บุคคลภายนอก ที่มาร่วมสอนดนตรีไทยในโรงเรียน']}
                       isEditMode={isEditMode}
                       onChange={(val) => handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'teacherQualification', val)}
                       fieldName="teacherQualification"
+                      fullWidth
                       required
                     />
-                    <Field label="โทรศัพท์" value={teacher.teacherPhone} isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'teacherPhone', val)} fieldName="teacherPhone" />
-                    <Field label="ตำแหน่ง" value={teacher.teacherPosition} isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'teacherPosition', val)} fieldName="teacherPosition" />
-                    <Field label="ทักษะ ความรู้ ความสามารถ ในการสอนภาคปฏิบัติดนตรีไทย" value={teacher.teacherAbility} isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'teacherAbility', val)} fieldName="reg100_obstacles" />
-                    <Field label="อีเมล" value={teacher.teacherEmail} isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'teacherEmail', val)} fieldName="teacherEmail" />
-                    <div className="col-span-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">วุฒิการศึกษา</label>
-                      <div className="space-y-2">
-                        {teacher.musicInstituteEducation?.length > 0 && (
-                          <div>
-                            <h5 className="text-sm font-medium text-gray-800 mb-1">การศึกษาจากสถาบันดนตรี:</h5>
-                            {teacher.musicInstituteEducation.map((edu: any, ei: number) => (
-                              <div key={ei} className="text-sm text-gray-600 ml-2">• รุ่นจบ: {edu.graduationYear || '-'} | สาขา: {edu.major || '-'} | ปีที่สำเร็จ: {edu.completionYear || '-'}</div>
-                            ))}
-                          </div>
-                        )}
-                        {teacher.otherEducation?.length > 0 && (
-                          <div>
-                            <h5 className="text-sm font-medium text-gray-800 mb-1">การศึกษาจากแหล่งอื่น:</h5>
-                            {teacher.otherEducation.map((edu: any, ei: number) => (
-                              <div key={ei} className="text-sm text-gray-600 ml-2">• รุ่นจบ: {edu.graduationYear || '-'} | สาขา: {edu.major || '-'} | ปีที่สำเร็จ: {edu.completionYear || '-'}</div>
-                            ))}
-                          </div>
-                        )}
-                        {!teacher.musicInstituteEducation?.length && !teacher.otherEducation?.length && (
-                          <div className="text-sm text-gray-500">ไม่มีข้อมูลการศึกษา</div>
-                        )}
-                      </div>
+                    
+                    {/* 2-5. ข้อมูลพื้นฐาน */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <Field label="ชื่อ-นามสกุล" value={teacher.teacherFullName} isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'teacherFullName', val)} fieldName="teacherFullName" />
+                      <Field label="ตำแหน่ง *" value={teacher.teacherPosition} isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'teacherPosition', val)} fieldName="teacherPosition" />
+                      <Field label="อีเมล *" value={teacher.teacherEmail} isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'teacherEmail', val)} fieldName="teacherEmail" />
+                      <Field label="เบอร์โทรศัพท์ *" value={teacher.teacherPhone} isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'teacherPhone', val)} fieldName="teacherPhone" />
+                    </div>
+                    
+                    {/* 6. ทักษะ ความรู้ ความสามารถ */}
+                    <Field label="ทักษะ ความรู้ ความสามารถ ในการสอนภาคปฏิบัติดนตรีไทย *" value={teacher.teacherAbility} fullWidth isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'teacherAbility', val)} fieldName="teacherAbility" />
+                    
+                    {/* 7. สำเร็จการศึกษาด้านดนตรีไทย */}
+                    <div className="border-l-4 border-blue-500 pl-4">
+                      <h5 className="font-semibold text-gray-800 mb-3">สำเร็จการศึกษาด้านดนตรีไทย *</h5>
+                      {teacher.musicInstituteEducation?.length > 0 ? (
+                        <div className="space-y-3">
+                          {teacher.musicInstituteEducation.map((edu: any, ei: number) => (
+                            <div key={ei} className="grid grid-cols-2 gap-4 bg-blue-50 p-3 rounded">
+                              <Field label="วุฒิการศึกษา/ประกาศนียบัตร *" value={edu.graduationYear} isEditMode={isEditMode} onChange={(val) => {
+                                const updated = [...(teacher.musicInstituteEducation || [])];
+                                updated[ei] = { ...updated[ei], graduationYear: val };
+                                handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'musicInstituteEducation', updated);
+                              }} fieldName="graduationYear" />
+                              <Field label="สาขา/หลักสูตร *" value={edu.major} isEditMode={isEditMode} onChange={(val) => {
+                                const updated = [...(teacher.musicInstituteEducation || [])];
+                                updated[ei] = { ...updated[ei], major: val };
+                                handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'musicInstituteEducation', updated);
+                              }} fieldName="major" />
+                              <Field label="ปีที่สำเร็จการศึกษา / ได้รับประกาศนียบัตร *" value={edu.completionYear} isEditMode={isEditMode} onChange={(val) => {
+                                const updated = [...(teacher.musicInstituteEducation || [])];
+                                updated[ei] = { ...updated[ei], completionYear: val };
+                                handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'musicInstituteEducation', updated);
+                              }} fieldName="completionYear" />
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-sm text-gray-500">ไม่มีข้อมูลการศึกษาด้านดนตรีไทย</div>
+                      )}
+                    </div>
+                    
+                    {/* 8. สำเร็จการศึกษาด้านอื่น */}
+                    <div className="border-l-4 border-green-500 pl-4">
+                      <h5 className="font-semibold text-gray-800 mb-2">สำเร็จการศึกษาด้านอื่น</h5>
+                      <p className="text-xs text-gray-600 mb-3">(แต่สามารถสอนดนตรีไทยได้ เนื่องจากผ่านการเรียน/อบรมด้านดนตรีไทย) *</p>
+                      {teacher.otherEducation?.length > 0 ? (
+                        <div className="space-y-3">
+                          {teacher.otherEducation.map((edu: any, ei: number) => (
+                            <div key={ei} className="grid grid-cols-2 gap-4 bg-green-50 p-3 rounded">
+                              <Field label="วุฒิการศึกษา/ประกาศนียบัตร *" value={edu.graduationYear} isEditMode={isEditMode} onChange={(val) => {
+                                const updated = [...(teacher.otherEducation || [])];
+                                updated[ei] = { ...updated[ei], graduationYear: val };
+                                handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'otherEducation', updated);
+                              }} fieldName="graduationYear" />
+                              <Field label="สาขา/หลักสูตร *" value={edu.major} isEditMode={isEditMode} onChange={(val) => {
+                                const updated = [...(teacher.otherEducation || [])];
+                                updated[ei] = { ...updated[ei], major: val };
+                                handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'otherEducation', updated);
+                              }} fieldName="major" />
+                              <Field label="ปีที่สำเร็จการศึกษา / ได้รับประกาศนียบัตร *" value={edu.completionYear} isEditMode={isEditMode} onChange={(val) => {
+                                const updated = [...(teacher.otherEducation || [])];
+                                updated[ei] = { ...updated[ei], completionYear: val };
+                                handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'otherEducation', updated);
+                              }} fieldName="completionYear" />
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-sm text-gray-500">ไม่มีข้อมูลการศึกษาด้านอื่น</div>
+                      )}
                     </div>
                   </div>
+                  
+                  {/* 9. รูปภาพครู */}
                   <div className="mt-4">
                     {isEditMode ? (
                       <Field label="ลิงก์รูปภาพครู (URL)" value={teacher.teacherImage} fullWidth isEditMode onChange={(val) => handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'teacherImage', val)} fieldName="teacherImage" />
@@ -701,6 +748,88 @@ export default function Register100DetailView({ id, hideScores = false, readOnly
                 </>
               )}
             />
+
+            {/* 10. ระยะเวลาการเรียนการสอนในเวลาราชการ */}
+            <div>
+              <h4 className="font-semibold text-gray-900 mb-3">ระยะเวลาการเรียนการสอนในเวลาราชการ</h4>
+              <p className="text-sm text-gray-600 mb-3">(ระบุช่วงระยะเวลาสำหรับการเรียนการสอนดนตรีไทยของแต่ละระดับชั้นในแต่ละภาคการศึกษา มีกี่ชั่วโมงในเสาร์นี้)</p>
+              {displayData?.reg100_compulsoryCurriculum && displayData.reg100_compulsoryCurriculum.length > 0 ? (
+                displayData.reg100_compulsoryCurriculum.map((item: any, index: number) => (
+                  <div key={index} className="bg-gray-50 p-4 rounded-lg mb-3 relative">
+                    <div className="grid grid-cols-2 gap-4">
+                      <Field label="ระดับชั้น" value={item.gradeLevel} isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_compulsoryCurriculum', index, 'gradeLevel', val)} fieldName="gradeLevel" />
+                      <Field label="เรียนดนตรีไทยจำนวน (คน)" value={item.studentCount} isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_compulsoryCurriculum', index, 'studentCount', val)} fieldName="studentCount" />
+                      <Field label="ชั่วโมง/ภาคการศึกษา" value={item.hoursPerSemester} isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_compulsoryCurriculum', index, 'hoursPerSemester', val)} fieldName="hoursPerSemester" />
+                      <Field label="ชั่วโมง/ปีการศึกษา" value={item.hoursPerYear} isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_compulsoryCurriculum', index, 'hoursPerYear', val)} fieldName="hoursPerYear" />
+                    </div>
+                    {isEditMode && (
+                      <button
+                        onClick={() => handleRemoveArrayItem('reg100_compulsoryCurriculum', index)}
+                        className="absolute top-2 right-2 text-red-500 hover:text-red-700"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500">ไม่มีข้อมูล</p>
+              )}
+              {isEditMode && (
+                <button
+                  onClick={() => handleAddArrayItem('reg100_compulsoryCurriculum', { gradeLevel: '', studentCount: '', hoursPerSemester: '', hoursPerYear: '' })}
+                  className="mt-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg hover:from-blue-600 hover:to-cyan-600 transition-all flex items-center gap-2"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  เพิ่มข้อมูล
+                </button>
+              )}
+            </div>
+
+            {/* 11. ระยะเวลาการเรียนการสอนนอกเวลาราชการ */}
+            <div>
+              <h4 className="font-semibold text-gray-900 mb-3">ระยะเวลาการเรียนการสอนนอกเวลาราชการ</h4>
+              <p className="text-sm text-gray-600 mb-3">(ระบุช่วงเวลาสำหรับการเรียนการสอนดนตรีไทยของนอกเวลาราชการว่ามีในช่วงใดบ้างและใช้สถานที่ใดในการสอน)</p>
+              {displayData?.reg100_afterSchoolSchedule && displayData.reg100_afterSchoolSchedule.length > 0 ? (
+                displayData.reg100_afterSchoolSchedule.map((item: any, index: number) => (
+                  <div key={index} className="bg-gray-50 p-4 rounded-lg mb-3 relative">
+                    <div className="grid grid-cols-2 gap-4">
+                      <Field label="วัน" value={item.day} isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_afterSchoolSchedule', index, 'day', val)} fieldName="day" />
+                      <Field label="เวลา" value={item.timeFrom} isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_afterSchoolSchedule', index, 'timeFrom', val)} fieldName="timeFrom" />
+                      <Field label="ถึง" value={item.timeTo} isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_afterSchoolSchedule', index, 'timeTo', val)} fieldName="timeTo" />
+                      <Field label="สถานที่" value={item.location} isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_afterSchoolSchedule', index, 'location', val)} fieldName="location" />
+                    </div>
+                    {isEditMode && (
+                      <button
+                        onClick={() => handleRemoveArrayItem('reg100_afterSchoolSchedule', index)}
+                        className="absolute top-2 right-2 text-red-500 hover:text-red-700"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500">ไม่มีข้อมูล</p>
+              )}
+              {isEditMode && (
+                <button
+                  onClick={() => handleAddArrayItem('reg100_afterSchoolSchedule', { day: '', timeFrom: '', timeTo: '', location: '' })}
+                  className="mt-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg hover:from-blue-600 hover:to-cyan-600 transition-all flex items-center gap-2"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  เพิ่มข้อมูล
+                </button>
+              )}
+            </div>
           </div>
         </StepSection>
 
