@@ -83,6 +83,39 @@ export default function CreateCertificateForm() {
     }
   };
 
+  const handleDeleteTemplate = async (templateName: string) => {
+    const templateLabel = TEMPLATE_OPTIONS.find((t) => t.value === templateName)?.label || templateName;
+    const confirmDelete = window.confirm(
+      `ต้องการลบ Template "${templateLabel}" หรือไม่?\nการลบจะไม่สามารถกู้คืนได้`
+    );
+    if (!confirmDelete) return;
+
+    try {
+      const response = await fetch('/api/certificate-templates', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: templateName }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        await fetchSavedTemplates();
+        // Clear selection if deleted template was selected
+        if (selectedTemplateName === templateName) {
+          setSelectedTemplateName('');
+          setUploadedTemplateImage(null);
+        }
+        alert(`ลบ Template "${templateLabel}" สำเร็จ`);
+      } else {
+        alert(data.message || 'เกิดข้อผิดพลาดในการลบ');
+      }
+    } catch (err) {
+      console.error('Delete template error:', err);
+      alert('เกิดข้อผิดพลาดในการลบ Template');
+    }
+  };
+
   const handleSaveTemplate = async () => {
     if (!selectedTemplateName) {
       setError('กรุณาเลือกชื่อ Template');
@@ -306,12 +339,20 @@ export default function CreateCertificateForm() {
               <p className="text-sm font-medium text-gray-700 mb-2">Template ที่บันทึกไว้:</p>
               <div className="flex flex-wrap gap-2">
                 {savedTemplates.map((template) => (
-                  <span
+                  <div
                     key={template._id}
-                    className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium"
+                    className="flex items-center gap-1 px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium"
                   >
-                    ✓ {TEMPLATE_OPTIONS.find((t) => t.value === template.name)?.label || template.name}
-                  </span>
+                    <span>✓ {TEMPLATE_OPTIONS.find((t) => t.value === template.name)?.label || template.name}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteTemplate(template.name)}
+                      className="ml-1 text-red-500 hover:text-red-700 hover:bg-red-100 rounded-full w-4 h-4 flex items-center justify-center text-xs font-bold transition-colors"
+                      title={`ลบ Template ${TEMPLATE_OPTIONS.find((t) => t.value === template.name)?.label || template.name}`}
+                    >
+                      ×
+                    </button>
+                  </div>
                 ))}
               </div>
             </div>

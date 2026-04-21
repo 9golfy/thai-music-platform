@@ -1,6 +1,6 @@
 // Certificate Templates API - Manage template name to image mappings
 import { NextResponse } from 'next/server';
-import { MongoClient } from 'mongodb';
+import { MongoClient, ObjectId } from 'mongodb';
 import { getSession } from '@/lib/auth/session';
 
 const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017';
@@ -167,6 +167,83 @@ export async function POST(request: Request) {
     
     return NextResponse.json(
       { success: false, message: errorMessage, error: error.message },
+      { status: 500 }
+    );
+  } finally {
+    await client.close();
+  }
+}
+
+// DELETE - Delete template by name
+export async function DELETE(request: Request) {
+  const session = await getSession();
+
+  if (!session || !['root', 'admin', 'super_admin'].includes(session.role)) {
+    return NextResponse.json(
+      { success: false, message: 'Unauthorized' },
+      { status: 401 }
+    );
+  }
+
+  const client = new MongoClient(uri);
+
+  try {
+    const body = await request.json();
+    const { name } = body;
+
+    if (!name) {
+      return NextResponse.json(
+        { success: false, message: 'กรุณาระบุชื่อ Template' },
+        { status: 400 }
+      );
+    }
+
+    await client.connect();
+    const database = client.db(dbName);
+    const templatesCollection = database.collection('certificate_templates');
+
+    // Find template to get imageUrl before deleting
+    const template = await templatesCollection.findOne({ name, isActive: true });
+
+    if (!template) {
+      return NextResponse.json(
+        { success: false, message: 'ไม่พบ Template ที่ต้องการลบ' },
+        { status: 404 }
+      );
+    }
+
+    // Delete image file if exists
+    if (template.imageUrl && template.imageUrl.startsWith('/certificates/')) {
+      try {
+        const fs = require('fs').promises;
+        const filepath = `./public${template.imageUrl}`;
+        await fs.unlink(filepath);
+        console.log(`Deleted template file: ${filepath}`);
+      } catch (err) {
+        console.warn('Could not delete template file:', err);
+      }
+    }
+
+    // Soft delete - set isActive to false
+    await templatesCollection.updateOne(
+      { name, isActive: true },
+      {
+        $set: {
+          isActive: false,
+          deletedBy: session.userId,
+          deletedAt: new Date(),
+        },
+      }
+    );
+
+    return NextResponse.json({
+      success: true,
+      message: 'ลบ Template สำเร็จ',
+    });
+  } catch (error: any) {
+    console.error('Error deleting template:', error);
+    return NextResponse.json(
+      { success: false, message: 'เกิดข้อผิดพลาดในการลบ Template', error: error.message },
       { status: 500 }
     );
   } finally {
