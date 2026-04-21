@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Download, ChevronLeft, ChevronRight } from 'lucide-react';
 import DeleteSchoolButton from './DeleteSchoolButton';
-import { calculateGrade, calculateGradeRegister100 } from '@/lib/utils/gradeCalculator';
+import { calculateGrade, calculateGradeRegister100, getGradeNameThai } from '@/lib/utils/gradeCalculator';
 
 interface SchoolsDataTableProps {
   type: 'register100' | 'register-support';
@@ -237,19 +237,20 @@ export default function SchoolsDataTable({
     const grade = type === 'register100'
       ? calculateGradeRegister100(score)
       : calculateGrade(score, 180);
+    const gradeName = getGradeNameThai(grade);
     switch (grade) {
       case 'A':
-        return { grade: 'A', color: 'bg-green-100 text-green-800' };
+        return { grade: gradeName, color: 'bg-green-100 text-green-800' };
       case 'B':
-        return { grade: 'B', color: 'bg-blue-100 text-blue-800' };
+        return { grade: gradeName, color: 'bg-blue-100 text-blue-800' };
       case 'C':
-        return { grade: 'C', color: 'bg-orange-100 text-orange-800' };
+        return { grade: gradeName, color: 'bg-orange-100 text-orange-800' };
       case 'D':
-        return { grade: 'D', color: 'bg-yellow-100 text-yellow-800' };
+        return { grade: gradeName, color: 'bg-yellow-100 text-yellow-800' };
       case 'F':
-        return { grade: 'F', color: 'bg-red-100 text-red-800' };
+        return { grade: gradeName, color: 'bg-red-100 text-red-800' };
       default:
-        return { grade: 'F', color: 'bg-red-100 text-red-800' };
+        return { grade: gradeName, color: 'bg-red-100 text-red-800' };
     }
   };
 
@@ -401,10 +402,10 @@ export default function SchoolsDataTable({
             onChange={(e) => setGradeFilter(e.target.value)}
             className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <option value="">ทุก Grade</option>
+            <option value="">ทุกเกณฑ์</option>
             {uniqueGrades.map((grade) => (
               <option key={grade} value={grade}>
-                Grade {grade}
+                {getGradeNameThai(grade)}
               </option>
             ))}
           </select>
@@ -434,7 +435,7 @@ export default function SchoolsDataTable({
                   คะแนนรวม
                 </th>
                 <th className="text-center py-3 px-4 text-sm font-medium text-gray-600">
-                  Grade
+                  เกณฑ์
                 </th>
                 <th className="text-right py-3 px-4 text-sm font-medium text-gray-600">
                   การดำเนินการ
@@ -508,7 +509,7 @@ export default function SchoolsDataTable({
                         </span>
                       </td>
                       <td className="py-3 px-4 text-center">
-                        <span className={`inline-flex items-center justify-center w-10 h-10 rounded-full text-lg font-bold ${gradeInfo.color}`}>
+                        <span className={`inline-flex items-center justify-center px-3 py-2 rounded-full text-sm font-bold ${gradeInfo.color}`}>
                           {gradeInfo.grade}
                         </span>
                       </td>
