@@ -1,10 +1,18 @@
 // Certificate Templates API - Manage template name to image mappings
 import { NextResponse } from 'next/server';
-import { MongoClient, ObjectId } from 'mongodb';
+import { MongoClient } from 'mongodb';
 import { getSession } from '@/lib/auth/session';
+import fs from 'fs/promises';
+import path from 'path';
+
+// Increase body size limit for large image uploads
+export const maxDuration = 30;
 
 const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017';
 const dbName = 'thai_music_school';
+
+// Get absolute path to public directory
+const publicDir = path.join(process.cwd(), 'public');
 
 // GET - List all saved templates
 export async function GET() {
@@ -61,7 +69,16 @@ export async function POST(request: Request) {
   const client = new MongoClient(uri);
 
   try {
-    const body = await request.json();
+    let body;
+    try {
+      body = await request.json();
+    } catch (parseError: any) {
+      console.error('Failed to parse request body:', parseError);
+      return NextResponse.json(
+        { success: false, message: 'ไฟล์รูปภาพใหญ่เกินไป หรือข้อมูลไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง' },
+        { status: 413 }
+      );
+    }
     const { name, imageUrl } = body;
 
     if (!name || !imageUrl) {
@@ -81,13 +98,9 @@ export async function POST(request: Request) {
     
     // Create filename
     const filename = `${name}-${Date.now()}.${extension}`;
-    const filepath = `./public/certificates/templates/${filename}`;
+    const filepath = path.join(publicDir, 'certificates', 'templates', filename);
     const publicPath = `/certificates/templates/${filename}`;
 
-    // Save file to disk
-    const fs = require('fs').promises;
-    const path = require('path');
-    
     // Ensure directory exists
     const dir = path.dirname(filepath);
     await fs.mkdir(dir, { recursive: true });
@@ -108,7 +121,7 @@ export async function POST(request: Request) {
       // Delete old file if exists
       if (existingTemplate.imageUrl && existingTemplate.imageUrl.startsWith('/certificates/')) {
         try {
-          const oldFilepath = `./public${existingTemplate.imageUrl}`;
+          const oldFilepath = path.join(publicDir, existingTemplate.imageUrl);
           await fs.unlink(oldFilepath);
           console.log(`Deleted old template file: ${oldFilepath}`);
         } catch (err) {
@@ -215,8 +228,7 @@ export async function DELETE(request: Request) {
     // Delete image file if exists
     if (template.imageUrl && template.imageUrl.startsWith('/certificates/')) {
       try {
-        const fs = require('fs').promises;
-        const filepath = `./public${template.imageUrl}`;
+        const filepath = path.join(publicDir, template.imageUrl);
         await fs.unlink(filepath);
         console.log(`Deleted template file: ${filepath}`);
       } catch (err) {
