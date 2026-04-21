@@ -94,6 +94,15 @@ export default function CreateCertificateForm() {
       return;
     }
 
+    // Confirm if updating existing template
+    const existingTemplate = savedTemplates.find((t) => t.name === selectedTemplateName);
+    if (existingTemplate) {
+      const confirmUpdate = window.confirm(
+        `Template "${TEMPLATE_OPTIONS.find((t) => t.value === selectedTemplateName)?.label}" มีอยู่แล้ว\nต้องการอัพเดตรูปภาพใหม่หรือไม่?`
+      );
+      if (!confirmUpdate) return;
+    }
+
     setSavingTemplate(true);
     setError('');
 
@@ -113,7 +122,7 @@ export default function CreateCertificateForm() {
         await fetchSavedTemplates();
         setUploadedTemplateImage(null);
         setSelectedTemplateName('');
-        alert('บันทึก Template สำเร็จ');
+        alert(existingTemplate ? 'อัพเดต Template สำเร็จ' : 'บันทึก Template สำเร็จ');
       } else {
         setError(data.message || 'เกิดข้อผิดพลาด');
       }
@@ -125,7 +134,10 @@ export default function CreateCertificateForm() {
   };
 
   const getTemplateImageForPreview = () => {
+    // Prioritize uploaded image over saved template
     if (uploadedTemplateImage) return uploadedTemplateImage;
+    
+    // If no upload but template is selected, show saved template
     if (selectedTemplateName) {
       const template = savedTemplates.find((t) => t.name === selectedTemplateName);
       return template?.imageUrl || null;
@@ -182,7 +194,12 @@ export default function CreateCertificateForm() {
             <Label htmlFor="templateName">เลือกชื่อ Template</Label>
             <Select
               value={selectedTemplateName}
-              onValueChange={setSelectedTemplateName}
+              onValueChange={(value) => {
+                setSelectedTemplateName(value);
+                // Clear uploaded image when changing template to show saved template
+                setUploadedTemplateImage(null);
+                setError('');
+              }}
               disabled={savingTemplate}
             >
               <SelectTrigger>
@@ -192,10 +209,16 @@ export default function CreateCertificateForm() {
                 {TEMPLATE_OPTIONS.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
+                    {savedTemplates.find((t) => t.name === option.value) && ' ✓'}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
+            {selectedTemplateName && savedTemplates.find((t) => t.name === selectedTemplateName) && (
+              <p className="text-xs text-amber-600">
+                ⚠️ Template นี้มีอยู่แล้ว - การอัพโหลดใหม่จะแทนที่รูปเดิม
+              </p>
+            )}
           </div>
 
           {/* Upload Image */}
