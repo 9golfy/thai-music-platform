@@ -124,10 +124,13 @@ export default function CreateCertificateForm() {
         setSelectedTemplateName('');
         alert(existingTemplate ? 'อัพเดต Template สำเร็จ' : 'บันทึก Template สำเร็จ');
       } else {
+        // Show detailed error message from server
         setError(data.message || 'เกิดข้อผิดพลาด');
+        console.error('Server error:', data);
       }
-    } catch (err) {
-      setError('เกิดข้อผิดพลาดในการบันทึก Template');
+    } catch (err: any) {
+      console.error('Save template error:', err);
+      setError('เกิดข้อผิดพลาดในการบันทึก Template: ' + (err.message || 'Unknown error'));
     } finally {
       setSavingTemplate(false);
     }

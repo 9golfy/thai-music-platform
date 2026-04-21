@@ -53,7 +53,7 @@ export async function POST(request: Request) {
 
   if (!session || !['root', 'admin', 'super_admin'].includes(session.role)) {
     return NextResponse.json(
-      { success: false, message: 'Unauthorized' },
+      { success: false, message: 'Unauthorized - กรุณาเข้าสู่ระบบใหม่' },
       { status: 401 }
     );
   }
@@ -71,6 +71,32 @@ export async function POST(request: Request) {
       );
     }
 
+    // Extract base64 data
+    const base64Data = imageUrl.replace(/^data:image\/\w+;base64,/, '');
+    const buffer = Buffer.from(base64Data, 'base64');
+    
+    // Determine file extension from base64 header
+    const matches = imageUrl.match(/^data:image\/(\w+);base64,/);
+    const extension = matches ? matches[1] : 'png';
+    
+    // Create filename
+    const filename = `${name}-${Date.now()}.${extension}`;
+    const filepath = `./public/certificates/templates/${filename}`;
+    const publicPath = `/certificates/templates/${filename}`;
+
+    // Save file to disk
+    const fs = require('fs').promises;
+    const path = require('path');
+    
+    // Ensure directory exists
+    const dir = path.dirname(filepath);
+    await fs.mkdir(dir, { recursive: true });
+    
+    // Write file
+    await fs.writeFile(filepath, buffer);
+    
+    console.log(`Saved template image to: ${filepath}`);
+
     await client.connect();
     const database = client.db(dbName);
     const templatesCollection = database.collection('certificate_templates');
@@ -79,17 +105,30 @@ export async function POST(request: Request) {
     const existingTemplate = await templatesCollection.findOne({ name, isActive: true });
 
     if (existingTemplate) {
+      // Delete old file if exists
+      if (existingTemplate.imageUrl && existingTemplate.imageUrl.startsWith('/certificates/')) {
+        try {
+          const oldFilepath = `./public${existingTemplate.imageUrl}`;
+          await fs.unlink(oldFilepath);
+          console.log(`Deleted old template file: ${oldFilepath}`);
+        } catch (err) {
+          console.warn('Could not delete old file:', err);
+        }
+      }
+
       // Update existing template
-      await templatesCollection.updateOne(
+      const result = await templatesCollection.updateOne(
         { name, isActive: true },
         {
           $set: {
-            imageUrl,
+            imageUrl: publicPath,
             updatedBy: session.userId,
             updatedAt: new Date(),
           },
         }
       );
+
+      console.log(`Updated template "${name}":`, result);
 
       return NextResponse.json({
         success: true,
@@ -99,24 +138,35 @@ export async function POST(request: Request) {
       // Create new template
       const newTemplate = {
         name,
-        imageUrl,
+        imageUrl: publicPath,
         isActive: true,
         createdBy: session.userId,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
 
-      await templatesCollection.insertOne(newTemplate);
+      const result = await templatesCollection.insertOne(newTemplate);
+      console.log(`Created template "${name}":`, result);
 
       return NextResponse.json({
         success: true,
         message: 'บันทึก template สำเร็จ',
       });
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error saving template:', error);
+    
+    // More specific error messages
+    let errorMessage = 'เกิดข้อผิดพลาดในการบันทึก template';
+    
+    if (error.code === 'EACCES') {
+      errorMessage = 'ไม่มีสิทธิ์เขียนไฟล์ กรุณาติดต่อผู้ดูแลระบบ';
+    } else if (error.code === 'ENOSPC') {
+      errorMessage = 'พื้นที่เก็บข้อมูลเต็ม กรุณาติดต่อผู้ดูแลระบบ';
+    }
+    
     return NextResponse.json(
-      { success: false, message: 'เกิดข้อผิดพลาดในการบันทึก template' },
+      { success: false, message: errorMessage, error: error.message },
       { status: 500 }
     );
   } finally {
