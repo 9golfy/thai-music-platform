@@ -21,17 +21,17 @@ export function GradeDistributionChart({ title, data, loading = false, type }: G
   
   // Define legends based on type
   const legends = type === 'register100' ? [
-    { color: 'bg-green-500', label: 'A: 160-200 คะแนน' },
-    { color: 'bg-blue-500', label: 'B: 150-159 คะแนน' },
-    { color: 'bg-orange-500', label: 'C: 120-149 คะแนน' },
-    { color: 'bg-yellow-500', label: 'D: 100-119 คะแนน' },
-    { color: 'bg-red-500', label: 'F: 0-99 คะแนน' },
+    { color: 'bg-green-500', label: 'ระดับดีเด่น: 160 ขึ้นไป' },
+    { color: 'bg-blue-500', label: 'ระดับดีมาก: 140-159 คะแนน' },
+    { color: 'bg-orange-500', label: 'ระดับดี: 120-139 คะแนน' },
+    { color: 'bg-yellow-500', label: 'ระดับชมเชย: 100-119 คะแนน' },
+    { color: 'bg-red-500', label: 'ต่ำกว่าเกณฑ์: 0-99 คะแนน' },
   ] : [
-    { color: 'bg-green-500', label: 'A: 145-180 คะแนน' },
-    { color: 'bg-blue-500', label: 'B: 126-144 คะแนน' },
-    { color: 'bg-orange-500', label: 'C: 109-125 คะแนน' },
-    { color: 'bg-yellow-500', label: 'D: 90-108 คะแนน' },
-    { color: 'bg-red-500', label: 'F: 0-89 คะแนน' },
+    { color: 'bg-green-500', label: 'ระดับดีเด่น: 144 ขึ้นไป' },
+    { color: 'bg-blue-500', label: 'ระดับดีมาก: 126-143 คะแนน' },
+    { color: 'bg-orange-500', label: 'ระดับดี: 108-125 คะแนน' },
+    { color: 'bg-yellow-500', label: 'ระดับชมเชย: 90-107 คะแนน' },
+    { color: 'bg-red-500', label: 'ต่ำกว่าเกณฑ์: 0-89 คะแนน' },
   ];
   
   if (loading) {
@@ -165,18 +165,18 @@ export function useGradeDistribution() {
       
       if (type === 'register100') {
         // โรงเรียนดนตรีไทย 100%
-        if (score >= 160) gradeCounts.A++;           // A: 160-200 คะแนน
-        else if (score >= 150) gradeCounts.B++;      // B: 150-159 คะแนน
-        else if (score >= 120) gradeCounts.C++;      // C: 120-149 คะแนน
-        else if (score >= 100) gradeCounts.D++;      // D: 100-119 คะแนน
-        else gradeCounts.F++;                        // F: 0-99 คะแนน
+        if (score >= 160) gradeCounts.A++;           // ระดับดีเด่น: 160 ขึ้นไป
+        else if (score >= 140) gradeCounts.B++;      // ระดับดีมาก: 140-159 คะแนน
+        else if (score >= 120) gradeCounts.C++;      // ระดับดี: 120-139 คะแนน
+        else if (score >= 100) gradeCounts.D++;      // ระดับชมเชย: 100-119 คะแนน
+        else gradeCounts.F++;                        // ต่ำกว่าเกณฑ์: 0-99 คะแนน
       } else {
         // โรงเรียนสนับสนุนและส่งเสริม
-        if (score >= 145) gradeCounts.A++;           // A: 145-180 คะแนน
-        else if (score >= 126) gradeCounts.B++;      // B: 126-144 คะแนน
-        else if (score >= 109) gradeCounts.C++;      // C: 109-125 คะแนน
-        else if (score >= 90) gradeCounts.D++;       // D: 90-108 คะแนน
-        else gradeCounts.F++;                        // F: 0-89 คะแนน
+        if (score >= 144) gradeCounts.A++;           // ระดับดีเด่น: 144 ขึ้นไป
+        else if (score >= 126) gradeCounts.B++;      // ระดับดีมาก: 126-143 คะแนน
+        else if (score >= 108) gradeCounts.C++;      // ระดับดี: 108-125 คะแนน
+        else if (score >= 90) gradeCounts.D++;       // ระดับชมเชย: 90-107 คะแนน
+        else gradeCounts.F++;                        // ต่ำกว่าเกณฑ์: 0-89 คะแนน
       }
     });
 

@@ -297,59 +297,9 @@ export default function SchoolsDataTable({
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle>รายการโรงเรียน ({totalItems})</CardTitle>
-          <div className="flex items-center gap-6">
-            {/* Grade Legend */}
-            <div className="flex items-center gap-4">
-              {type === 'register100' ? (
-                <>
-                  <div className="flex items-center gap-2">
-                    <span className="inline-block w-3 h-3 rounded-full bg-green-500"></span>
-                    <span className="text-sm text-gray-600">A: 160-200 คะแนน</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="inline-block w-3 h-3 rounded-full bg-blue-500"></span>
-                    <span className="text-sm text-gray-600">B: 150-159 คะแนน</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="inline-block w-3 h-3 rounded-full bg-orange-500"></span>
-                    <span className="text-sm text-gray-600">C: 120-149 คะแนน</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="inline-block w-3 h-3 rounded-full bg-yellow-500"></span>
-                    <span className="text-sm text-gray-600">D: 100-119 คะแนน</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="inline-block w-3 h-3 rounded-full bg-red-500"></span>
-                    <span className="text-sm text-gray-600">F: 0-99 คะแนน</span>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="flex items-center gap-2">
-                    <span className="inline-block w-3 h-3 rounded-full bg-green-500"></span>
-                    <span className="text-sm text-gray-600">A: 145-180 คะแนน</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="inline-block w-3 h-3 rounded-full bg-blue-500"></span>
-                    <span className="text-sm text-gray-600">B: 126-144 คะแนน</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="inline-block w-3 h-3 rounded-full bg-orange-500"></span>
-                    <span className="text-sm text-gray-600">C: 109-125 คะแนน</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="inline-block w-3 h-3 rounded-full bg-yellow-500"></span>
-                    <span className="text-sm text-gray-600">D: 90-108 คะแนน</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="inline-block w-3 h-3 rounded-full bg-red-500"></span>
-                    <span className="text-sm text-gray-600">F: 0-89 คะแนน</span>
-                  </div>
-                </>
-              )}
-            </div>
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <CardTitle>รายการโรงเรียน ({totalItems})</CardTitle>
             <button 
               onClick={handleExportExcel}
               className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all flex items-center gap-2 shadow-md"
@@ -357,6 +307,57 @@ export default function SchoolsDataTable({
               <Download className="w-4 h-4" />
               Export Excel
             </button>
+          </div>
+          
+          {/* Grade Legend - New Row */}
+          <div className="flex items-center gap-4 flex-wrap">
+            {type === 'register100' ? (
+              <>
+                <div className="flex items-center gap-2">
+                  <span className="inline-block w-3 h-3 rounded-full bg-green-500"></span>
+                  <span className="text-sm text-gray-600">ระดับดีเด่น: 160 ขึ้นไป</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="inline-block w-3 h-3 rounded-full bg-blue-500"></span>
+                  <span className="text-sm text-gray-600">ระดับดีมาก: 140-159 คะแนน</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="inline-block w-3 h-3 rounded-full bg-orange-500"></span>
+                  <span className="text-sm text-gray-600">ระดับดี: 120-139 คะแนน</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="inline-block w-3 h-3 rounded-full bg-yellow-500"></span>
+                  <span className="text-sm text-gray-600">ระดับชมเชย: 100-119 คะแนน</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="inline-block w-3 h-3 rounded-full bg-red-500"></span>
+                  <span className="text-sm text-gray-600">ต่ำกว่าเกณฑ์: 0-99 คะแนน</span>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex items-center gap-2">
+                  <span className="inline-block w-3 h-3 rounded-full bg-green-500"></span>
+                  <span className="text-sm text-gray-600">ระดับดีเด่น: 144 ขึ้นไป</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="inline-block w-3 h-3 rounded-full bg-blue-500"></span>
+                  <span className="text-sm text-gray-600">ระดับดีมาก: 126-143 คะแนน</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="inline-block w-3 h-3 rounded-full bg-orange-500"></span>
+                  <span className="text-sm text-gray-600">ระดับดี: 108-125 คะแนน</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="inline-block w-3 h-3 rounded-full bg-yellow-500"></span>
+                  <span className="text-sm text-gray-600">ระดับชมเชย: 90-107 คะแนน</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="inline-block w-3 h-3 rounded-full bg-red-500"></span>
+                  <span className="text-sm text-gray-600">ต่ำกว่าเกณฑ์: 0-89 คะแนน</span>
+                </div>
+              </>
+            )}
           </div>
         </div>
         

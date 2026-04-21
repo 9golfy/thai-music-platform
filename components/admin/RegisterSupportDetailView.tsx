@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { calculateGrade, getGradeColor, getGradeBgColor } from '@/lib/utils/gradeCalculator';
+import { calculateGrade, getGradeColor, getGradeBgColor, getGradeNameThai } from '@/lib/utils/gradeCalculator';
 import { getSchoolSizeDisplayText } from '@/lib/utils/schoolSize';
 
 interface Submission {
@@ -377,7 +377,7 @@ export default function RegisterSupportDetailView({ id, hideScores = false, read
                      (editedData?.video1_score ?? submission.video1_score ?? 0) +
                      (editedData?.video2_score ?? submission.video2_score ?? 0))
                   ))}`}>
-                    Grade {calculateGrade(
+                    {getGradeNameThai(calculateGrade(
                       ((editedData?.teacher_qualification_score ?? submission.teacher_qualification_score ?? 0) + 
                        (editedData?.support_from_org_score ?? submission.support_from_org_score ?? 0) + 
                        (editedData?.support_from_external_score ?? submission.support_from_external_score ?? 0) + 
@@ -388,7 +388,7 @@ export default function RegisterSupportDetailView({ id, hideScores = false, read
                        (editedData?.pr_activity_score ?? submission.pr_activity_score ?? 0) +
                        (editedData?.video1_score ?? submission.video1_score ?? 0) +
                        (editedData?.video2_score ?? submission.video2_score ?? 0))
-                    )}
+                    ))}
                   </span>
                   <span className="text-gray-400">|</span>
                   <span className="text-5xl font-bold text-green-600">
