@@ -1426,7 +1426,6 @@ export default function RegisterSupportDetailView({ id, hideScores = false, read
             {/* รางวัล */}
             <div>
               <h4 className="font-semibold text-gray-900 mb-1">รางวัล</h4>
-              <p className="text-xs text-gray-500 mb-3">อำเภอ 5 คะแนน / จังหวัด 10 คะแนน / ภาค 15 คะแนน / ประเทศ 20 คะแนน</p>
               {displayData?.awards && displayData.awards.length > 0 ? (
                 displayData.awards.map((award: any, index: number) => (
                   <div key={index} className="bg-gray-50 p-4 rounded-lg mb-3 relative">

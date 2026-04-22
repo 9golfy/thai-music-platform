@@ -20,6 +20,28 @@ const TEMPLATE_OPTIONS = [
   { value: 'theme3', label: 'Theme 3' },
 ];
 
+async function readJsonResponse(response: Response) {
+  const contentType = response.headers.get('content-type') || '';
+
+  if (contentType.includes('application/json')) {
+    return response.json();
+  }
+
+  const text = await response.text();
+
+  if (response.status === 413) {
+    return {
+      success: false,
+      message: 'ไฟล์รูปภาพใหญ่เกินขนาดที่ server อนุญาต กรุณาลดขนาดไฟล์หรือเพิ่ม upload limit บน server',
+    };
+  }
+
+  return {
+    success: false,
+    message: text || `Server returned ${response.status}`,
+  };
+}
+
 export default function CreateCertificateForm() {
   const router = useRouter();
   const [savingTemplate, setSavingTemplate] = useState(false);
@@ -37,7 +59,7 @@ export default function CreateCertificateForm() {
   const fetchSavedTemplates = async () => {
     try {
       const response = await fetch('/api/certificate-templates');
-      const data = await response.json();
+      const data = await readJsonResponse(response);
       
       if (data.success) {
         setSavedTemplates(data.templates || []);
@@ -97,7 +119,7 @@ export default function CreateCertificateForm() {
         body: JSON.stringify({ name: templateName }),
       });
 
-      const data = await response.json();
+      const data = await readJsonResponse(response);
 
       if (data.success) {
         await fetchSavedTemplates();

@@ -1,18 +1,38 @@
 // Certificate Templates API - Manage template name to image mappings
 import { NextResponse } from 'next/server';
-import { MongoClient } from 'mongodb';
 import { getSession } from '@/lib/auth/session';
+import { connectToDatabase } from '@/lib/mongodb';
 import fs from 'fs/promises';
 import path from 'path';
 
 // Increase body size limit for large image uploads
 export const maxDuration = 30;
 
-const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017';
-const dbName = 'thai_music_school';
-
 // Get absolute path to public directory
 const publicDir = path.join(process.cwd(), 'public');
+
+function getPublicFilePath(imageUrl: string) {
+  const legacyPublicPrefix = './public/';
+  const relativePath = imageUrl.startsWith(legacyPublicPrefix)
+    ? imageUrl.slice(legacyPublicPrefix.length)
+    : imageUrl.replace(/^\/+/, '');
+
+  const filePath = path.resolve(publicDir, relativePath);
+
+  if (!filePath.startsWith(path.resolve(publicDir))) {
+    throw new Error(`Invalid public file path: ${imageUrl}`);
+  }
+
+  return filePath;
+}
+
+function shouldManageTemplateFile(imageUrl: unknown) {
+  return (
+    typeof imageUrl === 'string' &&
+    (imageUrl.startsWith('/certificates/templates/') ||
+      imageUrl.startsWith('./public/certificates/templates/'))
+  );
+}
 
 // GET - List all saved templates
 export async function GET() {
@@ -25,12 +45,9 @@ export async function GET() {
     );
   }
 
-  const client = new MongoClient(uri);
-
   try {
-    await client.connect();
-    const database = client.db(dbName);
-    const templatesCollection = database.collection('certificate_templates');
+    const { db } = await connectToDatabase();
+    const templatesCollection = db.collection('certificate_templates');
 
     const templates = await templatesCollection
       .find({ isActive: true })
@@ -50,8 +67,6 @@ export async function GET() {
       { success: false, message: 'Failed to fetch templates' },
       { status: 500 }
     );
-  } finally {
-    await client.close();
   }
 }
 
@@ -65,8 +80,6 @@ export async function POST(request: Request) {
       { status: 401 }
     );
   }
-
-  const client = new MongoClient(uri);
 
   try {
     let body;
@@ -97,7 +110,8 @@ export async function POST(request: Request) {
     const extension = matches ? matches[1] : 'png';
     
     // Create filename
-    const filename = `${name}-${Date.now()}.${extension}`;
+    const safeName = name.replace(/[^a-zA-Z0-9_-]/g, '-');
+    const filename = `${safeName}-${Date.now()}.${extension}`;
     const filepath = path.join(publicDir, 'certificates', 'templates', filename);
     const publicPath = `/certificates/templates/${filename}`;
 
@@ -110,18 +124,17 @@ export async function POST(request: Request) {
     
     console.log(`Saved template image to: ${filepath}`);
 
-    await client.connect();
-    const database = client.db(dbName);
-    const templatesCollection = database.collection('certificate_templates');
+    const { db } = await connectToDatabase();
+    const templatesCollection = db.collection('certificate_templates');
 
     // Check if template with this name already exists
     const existingTemplate = await templatesCollection.findOne({ name, isActive: true });
 
     if (existingTemplate) {
       // Delete old file if exists
-      if (existingTemplate.imageUrl && existingTemplate.imageUrl.startsWith('/certificates/')) {
+      if (shouldManageTemplateFile(existingTemplate.imageUrl)) {
         try {
-          const oldFilepath = path.join(publicDir, existingTemplate.imageUrl);
+          const oldFilepath = getPublicFilePath(existingTemplate.imageUrl);
           await fs.unlink(oldFilepath);
           console.log(`Deleted old template file: ${oldFilepath}`);
         } catch (err) {
@@ -182,8 +195,6 @@ export async function POST(request: Request) {
       { success: false, message: errorMessage, error: error.message },
       { status: 500 }
     );
-  } finally {
-    await client.close();
   }
 }
 
@@ -198,8 +209,6 @@ export async function DELETE(request: Request) {
     );
   }
 
-  const client = new MongoClient(uri);
-
   try {
     const body = await request.json();
     const { name } = body;
@@ -211,9 +220,8 @@ export async function DELETE(request: Request) {
       );
     }
 
-    await client.connect();
-    const database = client.db(dbName);
-    const templatesCollection = database.collection('certificate_templates');
+    const { db } = await connectToDatabase();
+    const templatesCollection = db.collection('certificate_templates');
 
     // Find template to get imageUrl before deleting
     const template = await templatesCollection.findOne({ name, isActive: true });
@@ -226,9 +234,9 @@ export async function DELETE(request: Request) {
     }
 
     // Delete image file if exists
-    if (template.imageUrl && template.imageUrl.startsWith('/certificates/')) {
+    if (shouldManageTemplateFile(template.imageUrl)) {
       try {
-        const filepath = path.join(publicDir, template.imageUrl);
+        const filepath = getPublicFilePath(template.imageUrl);
         await fs.unlink(filepath);
         console.log(`Deleted template file: ${filepath}`);
       } catch (err) {
@@ -258,7 +266,5 @@ export async function DELETE(request: Request) {
       { success: false, message: 'เกิดข้อผิดพลาดในการลบ Template', error: error.message },
       { status: 500 }
     );
-  } finally {
-    await client.close();
   }
 }
