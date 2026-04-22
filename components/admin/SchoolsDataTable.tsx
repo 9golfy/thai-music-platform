@@ -180,7 +180,7 @@ export default function SchoolsDataTable({
           'จังหวัด': school.reg100_schoolProvince || school.regsup_schoolProvince || '-',
           'ระดับการศึกษา': school.reg100_schoolLevel || school.regsup_schoolLevel || 'ไม่ระบุ',
           'คะแนนรวม': totalScore,
-          'เกรด': grade,
+          'เกณฑ์': getGradeNameThai(grade),
           'School ID': school.schoolId || '-',
           'อีเมลครู': school.teacherEmail || '-',
           'เบอร์โทรศัพท์': school.teacherPhone || '-'
