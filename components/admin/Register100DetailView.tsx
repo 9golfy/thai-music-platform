@@ -1012,7 +1012,6 @@ export default function Register100DetailView({ id, hideScores = false, readOnly
             {/* รางวัลและเกียรติคุณ */}
             <div>
               <h4 className="font-semibold text-gray-900 mb-1">รางวัลและเกียรติคุณที่ได้รับในระยะเวลา ๑ ปี ย้อนหลัง</h4>
-              <p className="text-xs text-gray-500 mb-3">อำเภอ 5 คะแนน / จังหวัด 10 คะแนน / ภาค 15 คะแนน / ประเทศ 20 คะแนน</p>
               <ArraySection
                 items={isEditMode ? displayData?.reg100_awards : submission.reg100_awards}
                 isEditMode={isEditMode}
