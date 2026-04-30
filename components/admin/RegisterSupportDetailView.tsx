@@ -1340,6 +1340,11 @@ export default function RegisterSupportDetailView({ id, hideScores = false, read
               )}
             </div>
 
+            {/* หัวข้อ การสนับสนุนวัสดุ อุปกรณ์ หรืองบประมาณ */}
+            <div>
+              <h4 className="font-semibold text-gray-900 mb-3">การสนับสนุนวัสดุ อุปกรณ์ หรืองบประมาณ จากทั้งภายในและภายนอกสถานศึกษา</h4>
+            </div>
+
             {/* การสนับสนุนจากต้นสังกัด */}
             <div>
               <CheckboxField label="ได้รับการสนับสนุนจากต้นสังกัด (บุคคล/หน่วยงานภายใน)" value={displayData?.hasSupportFromOrg} />
@@ -1416,6 +1421,131 @@ export default function RegisterSupportDetailView({ id, hideScores = false, read
                   เพิ่มข้อมูล
                 </button>
               )}
+            </div>
+
+            {/* ความพร้อมของเครื่องดนตรีกับนักเรียน */}
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+              <h4 className="font-semibold text-gray-900 mb-4">ความพร้อมของเครื่องดนตรีกับนักเรียน</h4>
+              <div className="space-y-4">
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    {isEditMode ? (
+                      <input
+                        type="radio"
+                        name="instrumentReadiness"
+                        checked={displayData?.hasEnoughInstruments === 'เพียงพอ'}
+                        onChange={() => handleFieldChange('hasEnoughInstruments', 'เพียงพอ')}
+                        className="w-4 h-4 text-blue-600"
+                      />
+                    ) : (
+                      <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${displayData?.hasEnoughInstruments === 'เพียงพอ' ? 'border-blue-600' : 'border-gray-400'}`}>
+                        {displayData?.hasEnoughInstruments === 'เพียงพอ' && <div className="w-2 h-2 rounded-full bg-blue-600" />}
+                      </div>
+                    )}
+                    <span className="text-sm font-medium text-gray-700">เพียงพอ</span>
+                  </div>
+                  {isEditMode ? (
+                    <textarea
+                      value={displayData?.enoughInstrumentsReason || ''}
+                      onChange={(e) => handleFieldChange('enoughInstrumentsReason', e.target.value)}
+                      placeholder="กรอกเหตุผล"
+                      rows={3}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  ) : (
+                    <div className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 min-h-[60px]">
+                      {displayData?.enoughInstrumentsReason || <span className="text-gray-400">-</span>}
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    {isEditMode ? (
+                      <input
+                        type="radio"
+                        name="instrumentReadiness"
+                        checked={displayData?.hasEnoughInstruments === 'ไม่เพียงพอ'}
+                        onChange={() => handleFieldChange('hasEnoughInstruments', 'ไม่เพียงพอ')}
+                        className="w-4 h-4 text-blue-600"
+                      />
+                    ) : (
+                      <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${displayData?.hasEnoughInstruments === 'ไม่เพียงพอ' ? 'border-blue-600' : 'border-gray-400'}`}>
+                        {displayData?.hasEnoughInstruments === 'ไม่เพียงพอ' && <div className="w-2 h-2 rounded-full bg-blue-600" />}
+                      </div>
+                    )}
+                    <span className="text-sm font-medium text-gray-700">ไม่เพียงพอ</span>
+                  </div>
+                  {isEditMode ? (
+                    <textarea
+                      value={displayData?.notEnoughInstrumentsReason || ''}
+                      onChange={(e) => handleFieldChange('notEnoughInstrumentsReason', e.target.value)}
+                      placeholder="กรอกเหตุผล"
+                      rows={3}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  ) : (
+                    <div className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 min-h-[60px]">
+                      {displayData?.notEnoughInstrumentsReason || <span className="text-gray-400">-</span>}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* กรอบการเรียนการสอน */}
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+              <h4 className="font-semibold text-gray-900 mb-4">กรอบการเรียนการสอน</h4>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm text-gray-700 mb-1">
+                    สถานศึกษามีกรอบการเรียนการสอนดนตรีไทย หรือสาระวิชาที่มุ่งให้นักเรียนสามารถปฏิบัติได้ (เช่น วิชาพื้นฐาน/วิชาเลือก/เพิ่มเติม ที่ส่งเสริมให้นักเรียนปฏิบัติได้)
+                  </label>
+                  {isEditMode ? (
+                    <textarea
+                      value={displayData?.curriculumFramework || ''}
+                      onChange={(e) => handleFieldChange('curriculumFramework', e.target.value)}
+                      rows={4}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  ) : (
+                    <div className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 min-h-[80px]">
+                      {displayData?.curriculumFramework || <span className="text-gray-400">-</span>}
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-700 mb-1">ผลสัมฤทธิ์ในการเรียนการสอนด้านดนตรีไทย</label>
+                  {isEditMode ? (
+                    <textarea
+                      value={displayData?.learningOutcomes || ''}
+                      onChange={(e) => handleFieldChange('learningOutcomes', e.target.value)}
+                      rows={4}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  ) : (
+                    <div className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 min-h-[80px]">
+                      {displayData?.learningOutcomes || <span className="text-gray-400">-</span>}
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-700 mb-1">
+                    การบริหารจัดการสอนดนตรีไทยของสถานศึกษา โดยให้ระบุแต่ละระดับชั้นเรียน เช่น ดนตรีไทย/เพลงที่สามารถสอนให้นักเรียนปฏิบัติได้
+                  </label>
+                  {isEditMode ? (
+                    <textarea
+                      value={displayData?.managementContext || ''}
+                      onChange={(e) => handleFieldChange('managementContext', e.target.value)}
+                      rows={4}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  ) : (
+                    <div className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 min-h-[80px]">
+                      {displayData?.managementContext || <span className="text-gray-400">-</span>}
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </StepSection>
