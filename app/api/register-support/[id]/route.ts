@@ -143,11 +143,73 @@ export async function PUT(
     console.log('Updating document with ID:', id);
     console.log('Update data:', JSON.stringify(cleanData, null, 2));
 
+    // Recalculate total_score (Part 1) from individual components so it stays in sync
+    const getFieldValue = (fieldName: string) =>
+      cleanData[`regsup_${fieldName}`] ?? cleanData[fieldName];
+
+    const teachers = getFieldValue('thaiMusicTeachers') || [];
+    const uniqueQualifications = new Set<string>();
+    if (Array.isArray(teachers)) {
+      teachers.forEach((t: any) => {
+        if (t.teacherQualification) uniqueQualifications.add(t.teacherQualification);
+      });
+    }
+    const teacher_qualification_score = Math.min(uniqueQualifications.size * 5, 20);
+
+    const support_from_org_score = getFieldValue('hasSupportFromOrg') ? 5 : 0;
+
+    const externalSupport = getFieldValue('supportFromExternal') || [];
+    const externalCount = Array.isArray(externalSupport) ? externalSupport.length : 0;
+    const support_from_external_score = externalCount >= 3 ? 15 : externalCount === 2 ? 10 : externalCount === 1 ? 5 : 0;
+
+    const awards = getFieldValue('awards') || [];
+    let award_score = 0;
+    if (Array.isArray(awards)) {
+      awards.forEach((award: any) => {
+        if (award.awardLevel === 'ประเทศ') award_score = Math.max(award_score, 20);
+        else if (award.awardLevel === 'ภาค') award_score = Math.max(award_score, 15);
+        else if (award.awardLevel === 'จังหวัด') award_score = Math.max(award_score, 10);
+        else if (award.awardLevel === 'อำเภอ') award_score = Math.max(award_score, 5);
+      });
+    }
+
+    const internalActivities = getFieldValue('activitiesWithinProvinceInternal') || [];
+    const activity_within_province_internal_score = Array.isArray(internalActivities) && internalActivities.length >= 3 ? 5 : 0;
+
+    const externalActivities = getFieldValue('activitiesWithinProvinceExternal') || [];
+    const activity_within_province_external_score = Array.isArray(externalActivities) && externalActivities.length >= 3 ? 5 : 0;
+
+    const outsideActivities = getFieldValue('activitiesOutsideProvince') || [];
+    const activity_outside_province_score = Array.isArray(outsideActivities) && outsideActivities.length >= 3 ? 5 : 0;
+
+    const prActivities = getFieldValue('prActivities') || [];
+    const pr_activity_score = Array.isArray(prActivities) && prActivities.length >= 3 ? 5 : 0;
+
+    const total_score =
+      teacher_qualification_score +
+      support_from_org_score +
+      support_from_external_score +
+      award_score +
+      activity_within_province_internal_score +
+      activity_within_province_external_score +
+      activity_outside_province_score +
+      pr_activity_score;
+
     const result = await collection.updateOne(
       { _id: new ObjectId(id) },
       {
         $set: {
           ...cleanData,
+          // Always keep individual scores and total_score in sync
+          teacher_qualification_score,
+          support_from_org_score,
+          support_from_external_score,
+          award_score,
+          activity_within_province_internal_score,
+          activity_within_province_external_score,
+          activity_outside_province_score,
+          pr_activity_score,
+          total_score,
           updatedAt: new Date(),
         },
       }

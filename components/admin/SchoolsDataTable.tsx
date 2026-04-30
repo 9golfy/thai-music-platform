@@ -46,8 +46,17 @@ export default function SchoolsDataTable({
       const video2Score = school.video2_score || 0;
       return part1Score + video1Score + video2Score;
     } else {
-      // For register-support, use total_score
-      const part1Score = school.total_score || 0;
+      // For register-support, calculate Part 1 from individual components (same as register100)
+      // so the score always matches the detail view regardless of stale total_score in DB
+      const part1Score =
+        (school.teacher_qualification_score || 0) +
+        (school.support_from_org_score || 0) +
+        (school.support_from_external_score || 0) +
+        (school.award_score || 0) +
+        (school.activity_within_province_internal_score || 0) +
+        (school.activity_within_province_external_score || 0) +
+        (school.activity_outside_province_score || 0) +
+        (school.pr_activity_score || 0);
       const video1Score = school.video1_score || 0;
       const video2Score = school.video2_score || 0;
       return part1Score + video1Score + video2Score;
