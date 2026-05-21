@@ -848,10 +848,10 @@ export default function Register100DetailView({ id, hideScores = false, readOnly
                     <h5 className="font-medium text-gray-800 mb-2">{title}</h5>
                     {displayData[dataField].map((c: any, i: number) => (
                       <div key={i} className="bg-gray-50 p-3 rounded border mb-2 grid grid-cols-2 gap-3">
-                        <Field label="ระดับชั้น" value={c.gradeLevel} isEditMode={false} />
-                        <Field label="จำนวนนักเรียน (คน)" value={c.studentCount} isEditMode={false} />
-                        <Field label="ชั่วโมง/ภาคการศึกษา" value={c.hoursPerSemester} isEditMode={false} />
-                        <Field label="ชั่วโมง/ปีการศึกษา" value={c.hoursPerYear} isEditMode={false} />
+                        <Field label="ระดับชั้น" value={c.gradeLevel} isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange(dataField, i, 'gradeLevel', val)} fieldName="gradeLevel" />
+                        <Field label="จำนวนนักเรียน (คน)" value={c.studentCount} isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange(dataField, i, 'studentCount', val)} fieldName="studentCount" />
+                        <Field label="ชั่วโมง/ภาคการศึกษา" value={c.hoursPerSemester} isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange(dataField, i, 'hoursPerSemester', val)} fieldName="hoursPerSemester" />
+                        <Field label="ชั่วโมง/ปีการศึกษา" value={c.hoursPerYear} isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange(dataField, i, 'hoursPerYear', val)} fieldName="hoursPerYear" />
                       </div>
                     ))}
                   </div>
@@ -865,10 +865,10 @@ export default function Register100DetailView({ id, hideScores = false, readOnly
                   <h5 className="font-medium text-gray-800 mb-2">ตารางเรียนนอกเวลา</h5>
                   {displayData.reg100_afterSchoolSchedule.map((s: any, i: number) => (
                     <div key={i} className="bg-gray-50 p-3 rounded border mb-2 grid grid-cols-2 gap-3">
-                      <Field label="วัน" value={s.day} isEditMode={false} />
-                      <Field label="สถานที่" value={s.location} isEditMode={false} />
-                      <Field label="เวลาเริ่ม" value={s.timeFrom} isEditMode={false} />
-                      <Field label="เวลาสิ้นสุด" value={s.timeTo} isEditMode={false} />
+                      <Field label="วัน" value={s.day} isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_afterSchoolSchedule', i, 'day', val)} fieldName="day" />
+                      <Field label="สถานที่" value={s.location} isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_afterSchoolSchedule', i, 'location', val)} fieldName="location" />
+                      <Field label="เวลาเริ่ม" value={s.timeFrom} isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_afterSchoolSchedule', i, 'timeFrom', val)} fieldName="timeFrom" />
+                      <Field label="เวลาสิ้นสุด" value={s.timeTo} isEditMode={isEditMode} onChange={(val) => handleArrayFieldChange('reg100_afterSchoolSchedule', i, 'timeTo', val)} fieldName="timeTo" />
                     </div>
                   ))}
                 </div>

@@ -163,7 +163,7 @@ test('Register-Support Full Test (Step 1-9) — MAX SCORE 80pts', async ({ page 
   });
   test.setTimeout(600000);
 
-  const EMAIL = 'thaimusicplatform@gmail.com';
+  const EMAIL = '9golfy@gmail.com';
   const PHONE = '0899297983';
   const FAX = '0223456789';
 

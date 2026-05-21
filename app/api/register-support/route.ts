@@ -118,7 +118,10 @@ export async function POST(request: NextRequest) {
       const validation = await validateUploadedImage(buffer, 1); // 1MB max
       if (!validation.valid) {
         return NextResponse.json(
-          { error: `Management image validation failed: ${validation.error}` },
+          { 
+            success: false,
+            message: `รูปภาพผู้บริหารไม่ถูกต้อง: ${validation.error}` 
+          },
           { status: 400 }
         );
       }
@@ -149,7 +152,10 @@ export async function POST(request: NextRequest) {
           const validation = await validateUploadedImage(buffer, 1); // 1MB max
           if (!validation.valid) {
             return NextResponse.json(
-              { error: `Teacher image ${i} validation failed: ${validation.error}` },
+              { 
+                success: false,
+                message: `รูปภาพครูคนที่ ${i + 1} ไม่ถูกต้อง: ${validation.error}` 
+              },
               { status: 400 }
             );
           }

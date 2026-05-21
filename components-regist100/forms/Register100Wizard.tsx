@@ -621,7 +621,14 @@ export default function Register100Wizard() {
       }
     } catch (error) {
       setIsSubmitting(false);
-      alert('เกิดข้อผิดพลาดในการส่งข้อมูล');
+      
+      // Check if it's a Server Action mismatch error (happens after deployment)
+      if (error instanceof Error && error.message.includes('Failed to find Server Action')) {
+        alert('เกิดข้อผิดพลาด: เว็บไซต์มีการอัพเดท\n\nกรุณารีเฟรชหน้าเว็บ (กด Ctrl+Shift+R หรือ Cmd+Shift+R)\nแล้วกรอกข้อมูลใหม่อีกครั้ง');
+      } else {
+        alert('เกิดข้อผิดพลาดในการส่งข้อมูล');
+      }
+      
       console.error(error);
     }
   };
