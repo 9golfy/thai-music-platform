@@ -82,7 +82,7 @@ export default function HeroSection() {
                 <path d="M15.695 13.7h.009M15.695 16.7h.009M11.995 13.7h.01M11.995 16.7h.01M8.294 13.7h.01M8.294 16.7h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
               <span className="text-[#f0d48d] font-semibold text-sm sm:text-base">
-                รับสมัครตั้งแต่วันนี้ - 31 พฤษภาคม 2569
+                รับสมัครตั้งแต่วันนี้ - 12 มิถุนายน 2569
               </span>
             </div>
           </motion.div>
