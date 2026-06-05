@@ -225,9 +225,9 @@ export async function GET(
             <tr><th>จำนวนบุคลากร</th><td>${getFieldValue('staffCount')}</td></tr>
             <tr><th>จำนวนนักเรียน</th><td>${getFieldValue('studentCount')}</td></tr>
             <tr><th>จำนวนนักเรียนแต่ละชั้น</th><td>${getFieldValue('studentCountByGrade')}</td></tr>
-            <tr><th>สถานที่ตั้ง</th><td>เลขที่ ${getFieldValue('mgtAddress')} หมู่ ${getFieldValue('mgtVillage')} ถนน ${getFieldValue('mgtRoad')} ตำบล/แขวง ${getFieldValue('mgtSubdistrict')} อำเภอ/เขต ${getFieldValue('mgtDistrict')} จังหวัด ${getFieldValue('mgtProvince')} รหัสไปรษณีย์ ${getFieldValue('mgtPostalCode')}</td></tr>
-            <tr><th>โทรศัพท์</th><td>${getFieldValue('mgtPhone')}</td></tr>
-            <tr><th>โทรสาร</th><td>${getFieldValue('mgtFax')}</td></tr>
+            <tr><th>สถานที่ตั้ง</th><td>เลขที่ ${getFieldValue('addressNo')} หมู่ ${getFieldValue('moo')} ถนน ${getFieldValue('road')} ตำบล/แขวง ${getFieldValue('subDistrict')} อำเภอ/เขต ${getFieldValue('district')} จังหวัด ${getFieldValue('provinceAddress')} รหัสไปรษณีย์ ${getFieldValue('postalCode')}</td></tr>
+            <tr><th>โทรศัพท์</th><td>${getFieldValue('phone')}</td></tr>
+            <tr><th>โทรสาร</th><td>${getFieldValue('fax')}</td></tr>
         </table>
     </div>
 
