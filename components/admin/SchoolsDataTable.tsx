@@ -28,6 +28,7 @@ export default function SchoolsDataTable({
   const [levelFilter, setLevelFilter] = useState('');
   const [gradeFilter, setGradeFilter] = useState('');
   const [isFullDataLoaded, setIsFullDataLoaded] = useState(false);
+  const [totalCount, setTotalCount] = useState(0);
 
   // Helper function to calculate total score including video scores
   const calculateTotalScore = (school: any) => {
@@ -93,6 +94,7 @@ export default function SchoolsDataTable({
       
       if (data.success) {
         setSchools(data.submissions || []);
+        setTotalCount(data.total || data.submissions?.length || 0);
         if (shouldLoadAll) {
           setIsFullDataLoaded(true);
         }
@@ -170,7 +172,9 @@ export default function SchoolsDataTable({
   });
 
   // Pagination calculations
-  const totalItems = filteredSchools.length;
+  // Use totalCount when not fully loaded (initial load with 10 items)
+  // Use filteredSchools.length when filters/search are applied (full data loaded)
+  const totalItems = isFullDataLoaded ? filteredSchools.length : totalCount;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
