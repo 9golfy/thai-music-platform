@@ -27,6 +27,7 @@ export default function SchoolsDataTable({
   const [provinceFilter, setProvinceFilter] = useState('');
   const [levelFilter, setLevelFilter] = useState('');
   const [gradeFilter, setGradeFilter] = useState('');
+  const [isFullDataLoaded, setIsFullDataLoaded] = useState(false);
 
   // Helper function to calculate total score including video scores
   const calculateTotalScore = (school: any) => {
@@ -67,13 +68,22 @@ export default function SchoolsDataTable({
     fetchSchools();
   }, [type, searchQuery]);
 
-  const fetchSchools = async () => {
+  const fetchSchools = async (loadAll = false) => {
     try {
       setLoading(true);
       setError(null);
       
       const endpoint = type === 'register100' ? '/api/register100/list' : '/api/register-support/list';
-      const response = await fetch(endpoint);
+      
+      // Load all data if requested, or if filters/search are active
+      // Otherwise load only first page for faster initial load
+      const shouldLoadAll = loadAll || isFullDataLoaded || searchTerm || provinceFilter || levelFilter || gradeFilter || currentPage > 1;
+      
+      const url = shouldLoadAll 
+        ? `${endpoint}?loadAll=true`
+        : `${endpoint}?page=1&limit=10`;
+      
+      const response = await fetch(url);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -83,6 +93,9 @@ export default function SchoolsDataTable({
       
       if (data.success) {
         setSchools(data.submissions || []);
+        if (shouldLoadAll) {
+          setIsFullDataLoaded(true);
+        }
       } else {
         throw new Error(data.message || 'Failed to fetch data');
       }
@@ -94,6 +107,13 @@ export default function SchoolsDataTable({
       setLoading(false);
     }
   };
+
+  // Load full data when user interacts with filters or pagination
+  useEffect(() => {
+    if (!isFullDataLoaded && (searchTerm || provinceFilter || levelFilter || gradeFilter || currentPage > 1)) {
+      fetchSchools(true);
+    }
+  }, [searchTerm, provinceFilter, levelFilter, gradeFilter, currentPage]);
 
   // Get unique values for filters
   const uniqueProvinces = [...new Set(schools.map(school => 
