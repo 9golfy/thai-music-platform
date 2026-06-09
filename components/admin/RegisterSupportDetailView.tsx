@@ -148,9 +148,19 @@ export default function RegisterSupportDetailView({ id, hideScores = false, read
 
   const handleFieldChange = (field: string, value: any) => {
     if (editedData) {
-      // Try with regsup_ prefix first, then without prefix
-      const actualField = editedData[`regsup_${field}`] !== undefined ? `regsup_${field}` : field;
-      setEditedData({ ...editedData, [actualField]: value });
+      // For score and note fields, always use the field name directly (no prefix)
+      // These fields are stored without prefix in the database
+      const isScoreOrNoteField = field.includes('_score') || field.includes('_note');
+      
+      if (isScoreOrNoteField) {
+        // Score and note fields are always stored without prefix
+        setEditedData({ ...editedData, [field]: value });
+      } else {
+        // For other fields, check which version exists in the data
+        // Try with regsup_ prefix first, then without prefix
+        const actualField = editedData[`regsup_${field}`] !== undefined ? `regsup_${field}` : field;
+        setEditedData({ ...editedData, [actualField]: value });
+      }
     }
   };
 
@@ -414,73 +424,121 @@ export default function RegisterSupportDetailView({ id, hideScores = false, read
               step="STEP 4"
               title="คุณลักษณะครูผู้สอน"
               subtitle="ครูแต่ละประเภทคุณลักษณะไม่ซ้ำกัน ประเภทละ 5 คะแนน"
-              score={submission.teacher_qualification_score || 0}
+              score={editedData?.teacher_qualification_score ?? submission.teacher_qualification_score ?? 0}
               max={20}
               color="purple"
               note="กรอกครู 4 คนที่มีคุณลักษณะไม่ซ้ำประเภท จะได้คะแนนเต็ม 20 คะแนน"
+              isEditMode={isEditMode}
+              scoreFieldName="teacher_qualification_score"
+              noteFieldName="teacher_qualification_note"
+              adminNote={editedData?.teacher_qualification_note ?? submission.teacher_qualification_note ?? ''}
+              onScoreChange={handleFieldChange}
+              onNoteChange={handleFieldChange}
             />
             <ScoreCard
               step="STEP 6"
               title="การสนับสนุนจากต้นสังกัด"
               subtitle="บุคคล/หน่วยงานภายในสถานศึกษา"
-              score={submission.support_from_org_score || 0}
+              score={editedData?.support_from_org_score ?? submission.support_from_org_score ?? 0}
               max={5}
               color="teal"
               note="ติ๊กได้รับการสนับสนุนจากต้นสังกัด = 5 คะแนน"
+              isEditMode={isEditMode}
+              scoreFieldName="support_from_org_score"
+              noteFieldName="support_from_org_note"
+              adminNote={editedData?.support_from_org_note ?? submission.support_from_org_note ?? ''}
+              onScoreChange={handleFieldChange}
+              onNoteChange={handleFieldChange}
             />
             <ScoreCard
               step="STEP 6"
               title="การสนับสนุนจากภายนอก"
               subtitle="บุคคล/หน่วยงานภายนอกสถานศึกษา"
-              score={submission.support_from_external_score || 0}
+              score={editedData?.support_from_external_score ?? submission.support_from_external_score ?? 0}
               max={15}
               color="orange"
               note="1 คน = 5, 2 คน = 10, 3+ คน = 15 คะแนน"
+              isEditMode={isEditMode}
+              scoreFieldName="support_from_external_score"
+              noteFieldName="support_from_external_note"
+              adminNote={editedData?.support_from_external_note ?? submission.support_from_external_note ?? ''}
+              onScoreChange={handleFieldChange}
+              onNoteChange={handleFieldChange}
             />
             <ScoreCard
               step="STEP 7"
               title="ผลงาน"
               subtitle="นับเฉพาะรางวัลที่ได้คะแนนสูงสุด"
-              score={submission.award_score || 0}
+              score={editedData?.award_score ?? submission.award_score ?? 0}
               max={20}
               color="amber"
               note="อำเภอ = 5, จังหวัด = 10, ภาค = 15, ประเทศ = 20 คะแนน"
+              isEditMode={isEditMode}
+              scoreFieldName="award_score"
+              noteFieldName="award_note"
+              adminNote={editedData?.award_note ?? submission.award_note ?? ''}
+              onScoreChange={handleFieldChange}
+              onNoteChange={handleFieldChange}
             />
             <ScoreCard
               step="STEP 8"
               title="กิจกรรมภายในจังหวัด - ภายในสถานศึกษา"
               subtitle="กรอกข้อมูล 3 ครั้งต่อปีขึ้นไป"
-              score={submission.activity_within_province_internal_score || 0}
+              score={editedData?.activity_within_province_internal_score ?? submission.activity_within_province_internal_score ?? 0}
               max={5}
               color="cyan"
               note="ครบ 3 ครั้ง/ปี = 5 คะแนน"
+              isEditMode={isEditMode}
+              scoreFieldName="activity_within_province_internal_score"
+              noteFieldName="activity_within_province_internal_note"
+              adminNote={editedData?.activity_within_province_internal_note ?? submission.activity_within_province_internal_note ?? ''}
+              onScoreChange={handleFieldChange}
+              onNoteChange={handleFieldChange}
             />
             <ScoreCard
               step="STEP 8"
               title="กิจกรรมภายในจังหวัด - ภายนอกสถานศึกษา"
               subtitle="กรอกข้อมูล 3 ครั้งต่อปีขึ้นไป"
-              score={submission.activity_within_province_external_score || 0}
+              score={editedData?.activity_within_province_external_score ?? submission.activity_within_province_external_score ?? 0}
               max={5}
               color="indigo"
               note="ครบ 3 ครั้ง/ปี = 5 คะแนน"
+              isEditMode={isEditMode}
+              scoreFieldName="activity_within_province_external_score"
+              noteFieldName="activity_within_province_external_note"
+              adminNote={editedData?.activity_within_province_external_note ?? submission.activity_within_province_external_note ?? ''}
+              onScoreChange={handleFieldChange}
+              onNoteChange={handleFieldChange}
             />
             <ScoreCard
               step="STEP 8"
               title="กิจกรรมภายนอกจังหวัด"
               subtitle="กรอกข้อมูล 3 ครั้งต่อปีขึ้นไป"
-              score={submission.activity_outside_province_score || 0}
+              score={editedData?.activity_outside_province_score ?? submission.activity_outside_province_score ?? 0}
               max={5}
               color="pink"
               note="ครบ 3 ครั้ง/ปี = 5 คะแนน"
+              isEditMode={isEditMode}
+              scoreFieldName="activity_outside_province_score"
+              noteFieldName="activity_outside_province_note"
+              adminNote={editedData?.activity_outside_province_note ?? submission.activity_outside_province_note ?? ''}
+              onScoreChange={handleFieldChange}
+              onNoteChange={handleFieldChange}
             />
             <ScoreCard
               step="STEP 9"
               title="การประชาสัมพันธ์ผลงาน"
               subtitle="Facebook, YouTube, TikTok, Website"
-              score={submission.pr_activity_score || 0}
+              score={editedData?.pr_activity_score ?? submission.pr_activity_score ?? 0}
               max={5}
               color="rose"
               note="กรอกข้อมูล 3 ครั้ง/ปีขึ้นไป = 5 คะแนน"
+              isEditMode={isEditMode}
+              scoreFieldName="pr_activity_score"
+              noteFieldName="pr_activity_note"
+              adminNote={editedData?.pr_activity_note ?? submission.pr_activity_note ?? ''}
+              onScoreChange={handleFieldChange}
+              onNoteChange={handleFieldChange}
             />
           </div>
 
@@ -547,8 +605,17 @@ export default function RegisterSupportDetailView({ id, hideScores = false, read
                         max="50"
                         value={editedData?.video1_score ?? submission.video1_score ?? 0}
                         onChange={(e) => {
-                          const value = Math.min(50, Math.max(0, parseInt(e.target.value) || 0));
-                          handleFieldChange('video1_score', value);
+                          const inputValue = e.target.value;
+                          // Allow empty string temporarily while typing
+                          if (inputValue === '') {
+                            handleFieldChange('video1_score', 0);
+                            return;
+                          }
+                          const numValue = parseInt(inputValue);
+                          if (!isNaN(numValue)) {
+                            const value = Math.min(50, Math.max(0, numValue));
+                            handleFieldChange('video1_score', value);
+                          }
                         }}
                         className="w-16 px-2 py-1 text-center font-semibold border-2 border-green-500 rounded focus:outline-none focus:ring-2 focus:ring-green-500 bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       />
@@ -574,8 +641,17 @@ export default function RegisterSupportDetailView({ id, hideScores = false, read
                         max="50"
                         value={editedData?.video2_score ?? submission.video2_score ?? 0}
                         onChange={(e) => {
-                          const value = Math.min(50, Math.max(0, parseInt(e.target.value) || 0));
-                          handleFieldChange('video2_score', value);
+                          const inputValue = e.target.value;
+                          // Allow empty string temporarily while typing
+                          if (inputValue === '') {
+                            handleFieldChange('video2_score', 0);
+                            return;
+                          }
+                          const numValue = parseInt(inputValue);
+                          if (!isNaN(numValue)) {
+                            const value = Math.min(50, Math.max(0, numValue));
+                            handleFieldChange('video2_score', value);
+                          }
                         }}
                         className="w-16 px-2 py-1 text-center font-semibold border-2 border-green-500 rounded focus:outline-none focus:ring-2 focus:ring-green-500 bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       />
@@ -1941,7 +2017,21 @@ function StepSection({ title, stepNumber, children }: { title: string; stepNumbe
   );
 }
 
-function ScoreCard({ step, title, subtitle, score, max, color, note }: {
+function ScoreCard({ 
+  step, 
+  title, 
+  subtitle, 
+  score, 
+  max, 
+  color, 
+  note,
+  isEditMode = false,
+  scoreFieldName,
+  noteFieldName,
+  adminNote = '',
+  onScoreChange,
+  onNoteChange
+}: {
   step: string;
   title: string;
   subtitle: string;
@@ -1949,6 +2039,12 @@ function ScoreCard({ step, title, subtitle, score, max, color, note }: {
   max: number;
   color: 'purple' | 'teal' | 'orange' | 'amber' | 'cyan' | 'indigo' | 'pink' | 'rose';
   note: string;
+  isEditMode?: boolean;
+  scoreFieldName?: string;
+  noteFieldName?: string;
+  adminNote?: string;
+  onScoreChange?: (fieldName: string, value: number) => void;
+  onNoteChange?: (fieldName: string, value: string) => void;
 }) {
   const themes = {
     purple: ['bg-purple-50', 'border-purple-200', 'text-purple-800', 'text-purple-600', 'text-purple-700', 'bg-purple-100'],
@@ -1972,13 +2068,60 @@ function ScoreCard({ step, title, subtitle, score, max, color, note }: {
           <div className="text-xs text-gray-600 mt-1">{subtitle}</div>
         </div>
         <div className="text-right ml-3">
-          <div className={`text-2xl font-bold ${scoreColor}`}>{score}</div>
-          <div className="text-xs text-gray-500">/ {max}</div>
+          {isEditMode && scoreFieldName && onScoreChange ? (
+            <div className="flex flex-col items-end gap-1">
+              <input
+                type="number"
+                min="0"
+                max={max}
+                value={score}
+                onChange={(e) => {
+                  const inputValue = e.target.value;
+                  // Allow empty string temporarily while typing
+                  if (inputValue === '') {
+                    onScoreChange(scoreFieldName, 0);
+                    return;
+                  }
+                  const numValue = parseInt(inputValue);
+                  if (!isNaN(numValue)) {
+                    const value = Math.min(max, Math.max(0, numValue));
+                    onScoreChange(scoreFieldName, value);
+                  }
+                }}
+                className={`w-16 px-2 py-1 text-center text-xl font-bold border-2 ${border} rounded focus:outline-none focus:ring-2 focus:ring-offset-1 ${scoreColor.replace('text-', 'focus:ring-')} bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`}
+              />
+              <div className="text-xs text-gray-500">/ {max}</div>
+            </div>
+          ) : (
+            <>
+              <div className={`text-2xl font-bold ${scoreColor}`}>{score}</div>
+              <div className="text-xs text-gray-500">/ {max}</div>
+            </>
+          )}
         </div>
       </div>
       <div className={`text-xs ${noteText} ${noteBg} px-2 py-1 rounded mt-2`}>
         {note}
       </div>
+      
+      {/* Admin Note Section */}
+      {isEditMode && noteFieldName && onNoteChange ? (
+        <div className="mt-3">
+          <label className="text-xs font-medium text-gray-700 mb-1 block">หมายเหตุ (Admin):</label>
+          <textarea
+            value={adminNote}
+            onChange={(e) => onNoteChange(noteFieldName, e.target.value)}
+            placeholder="เพิ่มหมายเหตุสำหรับคะแนนนี้..."
+            className="w-full px-3 py-2 text-xs border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none bg-white"
+            rows={2}
+          />
+        </div>
+      ) : adminNote ? (
+        <div className="mt-3 bg-yellow-50 border border-yellow-200 rounded-md p-2">
+          <div className="text-xs font-medium text-yellow-800 mb-1">หมายเหตุ:</div>
+          <div className="text-xs text-yellow-700 whitespace-pre-wrap">{adminNote}</div>
+        </div>
+      ) : null}
     </div>
   );
 }
