@@ -66,6 +66,8 @@ export default function SchoolsDataTable({
   };
 
   useEffect(() => {
+    // Reset full data loaded state when changing type
+    setIsFullDataLoaded(false);
     fetchSchools();
   }, [type, searchQuery]);
 
@@ -76,9 +78,9 @@ export default function SchoolsDataTable({
       
       const endpoint = type === 'register100' ? '/api/register100/list' : '/api/register-support/list';
       
-      // Load all data if requested, or if filters/search are active
-      // Otherwise load only first page for faster initial load
-      const shouldLoadAll = loadAll || isFullDataLoaded || searchTerm || provinceFilter || levelFilter || gradeFilter || currentPage > 1;
+      // Only load all data if explicitly requested OR if we already have full data loaded
+      // Don't auto-load all just because filters exist - wait for user interaction
+      const shouldLoadAll = loadAll || (isFullDataLoaded && (searchTerm || provinceFilter || levelFilter || gradeFilter));
       
       const url = shouldLoadAll 
         ? `${endpoint}?loadAll=true`
@@ -116,6 +118,13 @@ export default function SchoolsDataTable({
       fetchSchools(true);
     }
   }, [searchTerm, provinceFilter, levelFilter, gradeFilter, currentPage]);
+
+  // Load full data when changing items per page (if not already loaded)
+  useEffect(() => {
+    if (!isFullDataLoaded && itemsPerPage !== 10) {
+      fetchSchools(true);
+    }
+  }, [itemsPerPage]);
 
   // Get unique values for filters
   const uniqueProvinces = [...new Set(schools.map(school => 
