@@ -352,15 +352,141 @@ export default function Register100DetailView({ id, hideScores = false, readOnly
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <ScoreCard step="STEP 5" title="การเรียนการสอนดนตรีไทย" subtitle="วิชาบังคับ, หลักสูตรเรียน, วิชาเลือก, หลักสูตรท้องถิ่น" score={editedData?.teaching_curriculum_score ?? submission.teaching_curriculum_score ?? 0} max={20} color="blue" note="5 คะแนน/ข้อ (สูงสุด 4 ข้อ)" />
-              <ScoreCard step="STEP 4" title="คุณลักษณะครูผู้สอน" subtitle="ครูดนตรีไทย, ครูภูมิปัญญา, ผู้ทรงคุณวุฒิ, วิทยากร" score={editedData?.teacher_qualification_score ?? submission.teacher_qualification_score ?? 0} max={20} color="purple" note="5 คะแนน/ประเภท (สูงสุด 4 ประเภท)" />
-              <ScoreCard step="STEP 7" title="การสนับสนุนจากหน่วยงาน" subtitle="บุคคล/หน่วยงานภายในสถานศึกษา" score={editedData?.support_from_org_score ?? submission.support_from_org_score ?? 0} max={5} color="teal" note="ติ๊กถูก = 5 คะแนน" />
-              <ScoreCard step="STEP 7" title="การสนับสนุนจากภายนอก" subtitle="บุคคล/หน่วยงานภายนอกสถานศึกษา" score={editedData?.support_from_external_score ?? submission.support_from_external_score ?? 0} max={15} color="orange" note="1 คน = 5, 2 คน = 10, 3+ คน = 15 คะแนน" />
-              <ScoreCard step="STEP 7" title="รางวัลและเกียรติคุณ" subtitle="อำเภอ, จังหวัด, ภาค, ประเทศ" score={editedData?.award_score ?? submission.award_score ?? 0} max={20} color="amber" note="อำเภอ=5, จังหวัด=10, ภาค=15, ประเทศ=20 คะแนน" />
-              <ScoreCard step="STEP 8" title="กิจกรรมภายในสถานศึกษา" subtitle="ภายในจังหวัด - ภายในโรงเรียน" score={editedData?.activity_within_province_internal_score ?? submission.activity_within_province_internal_score ?? 0} max={5} color="cyan" note="≥ 3 กิจกรรม = 5 คะแนน" />
-              <ScoreCard step="STEP 8" title="กิจกรรมนอกสถานศึกษา" subtitle="ภายนอกจังหวัด" score={editedData?.activity_within_province_external_score ?? submission.activity_within_province_external_score ?? 0} max={5} color="indigo" note="≥ 3 กิจกรรม = 5 คะแนน" />
-              <ScoreCard step="STEP 8" title="กิจกรรมนอกจังหวัด" subtitle="กรอกข้อมูล 3 ครั้งขึ้นไป" score={editedData?.activity_outside_province_score ?? submission.activity_outside_province_score ?? 0} max={5} color="pink" note="≥ 3 กิจกรรม = 5 คะแนน" />
-              <ScoreCard step="STEP 9" title="การประชาสัมพันธ์พันธ์" subtitle="Facebook, YouTube, TikTok, Website" score={editedData?.pr_activity_score ?? submission.pr_activity_score ?? 0} max={5} color="rose" note="≥ 3 กิจกรรม = 5 คะแนน" />
+              <ScoreCard 
+                step="STEP 5" 
+                title="การเรียนการสอนดนตรีไทย" 
+                subtitle="วิชาบังคับ, หลักสูตรเรียน, วิชาเลือก, หลักสูตรท้องถิ่น" 
+                score={editedData?.teaching_curriculum_score ?? submission.teaching_curriculum_score ?? 0} 
+                max={20} 
+                color="blue" 
+                note="5 คะแนน/ข้อ (สูงสุด 4 ข้อ)" 
+                isEditMode={isEditMode}
+                scoreFieldName="teaching_curriculum_score"
+                noteFieldName="teaching_curriculum_note"
+                adminNote={editedData?.teaching_curriculum_note ?? submission.teaching_curriculum_note ?? ''}
+                onScoreChange={handleFieldChange}
+                onNoteChange={handleFieldChange}
+              />
+              <ScoreCard 
+                step="STEP 4" 
+                title="คุณลักษณะครูผู้สอน" 
+                subtitle="ครูดนตรีไทย, ครูภูมิปัญญา, ผู้ทรงคุณวุฒิ, วิทยากร" 
+                score={editedData?.teacher_qualification_score ?? submission.teacher_qualification_score ?? 0} 
+                max={20} 
+                color="purple" 
+                note="5 คะแนน/ประเภท (สูงสุด 4 ประเภท)" 
+                isEditMode={isEditMode}
+                scoreFieldName="teacher_qualification_score"
+                noteFieldName="teacher_qualification_note"
+                adminNote={editedData?.teacher_qualification_note ?? submission.teacher_qualification_note ?? ''}
+                onScoreChange={handleFieldChange}
+                onNoteChange={handleFieldChange}
+              />
+              <ScoreCard 
+                step="STEP 7" 
+                title="การสนับสนุนจากหน่วยงาน" 
+                subtitle="บุคคล/หน่วยงานภายในสถานศึกษา" 
+                score={editedData?.support_from_org_score ?? submission.support_from_org_score ?? 0} 
+                max={5} 
+                color="teal" 
+                note="ติ๊กถูก = 5 คะแนน" 
+                isEditMode={isEditMode}
+                scoreFieldName="support_from_org_score"
+                noteFieldName="support_from_org_note"
+                adminNote={editedData?.support_from_org_note ?? submission.support_from_org_note ?? ''}
+                onScoreChange={handleFieldChange}
+                onNoteChange={handleFieldChange}
+              />
+              <ScoreCard 
+                step="STEP 7" 
+                title="การสนับสนุนจากภายนอก" 
+                subtitle="บุคคล/หน่วยงานภายนอกสถานศึกษา" 
+                score={editedData?.support_from_external_score ?? submission.support_from_external_score ?? 0} 
+                max={15} 
+                color="orange" 
+                note="1 คน = 5, 2 คน = 10, 3+ คน = 15 คะแนน" 
+                isEditMode={isEditMode}
+                scoreFieldName="support_from_external_score"
+                noteFieldName="support_from_external_note"
+                adminNote={editedData?.support_from_external_note ?? submission.support_from_external_note ?? ''}
+                onScoreChange={handleFieldChange}
+                onNoteChange={handleFieldChange}
+              />
+              <ScoreCard 
+                step="STEP 7" 
+                title="รางวัลและเกียรติคุณ" 
+                subtitle="อำเภอ, จังหวัด, ภาค, ประเทศ" 
+                score={editedData?.award_score ?? submission.award_score ?? 0} 
+                max={20} 
+                color="amber" 
+                note="อำเภอ=5, จังหวัด=10, ภาค=15, ประเทศ=20 คะแนน" 
+                isEditMode={isEditMode}
+                scoreFieldName="award_score"
+                noteFieldName="award_note"
+                adminNote={editedData?.award_note ?? submission.award_note ?? ''}
+                onScoreChange={handleFieldChange}
+                onNoteChange={handleFieldChange}
+              />
+              <ScoreCard 
+                step="STEP 8" 
+                title="กิจกรรมภายในสถานศึกษา" 
+                subtitle="ภายในจังหวัด - ภายในโรงเรียน" 
+                score={editedData?.activity_within_province_internal_score ?? submission.activity_within_province_internal_score ?? 0} 
+                max={5} 
+                color="cyan" 
+                note="≥ 3 กิจกรรม = 5 คะแนน" 
+                isEditMode={isEditMode}
+                scoreFieldName="activity_within_province_internal_score"
+                noteFieldName="activity_within_province_internal_note"
+                adminNote={editedData?.activity_within_province_internal_note ?? submission.activity_within_province_internal_note ?? ''}
+                onScoreChange={handleFieldChange}
+                onNoteChange={handleFieldChange}
+              />
+              <ScoreCard 
+                step="STEP 8" 
+                title="กิจกรรมนอกสถานศึกษา" 
+                subtitle="ภายนอกจังหวัด" 
+                score={editedData?.activity_within_province_external_score ?? submission.activity_within_province_external_score ?? 0} 
+                max={5} 
+                color="indigo" 
+                note="≥ 3 กิจกรรม = 5 คะแนน" 
+                isEditMode={isEditMode}
+                scoreFieldName="activity_within_province_external_score"
+                noteFieldName="activity_within_province_external_note"
+                adminNote={editedData?.activity_within_province_external_note ?? submission.activity_within_province_external_note ?? ''}
+                onScoreChange={handleFieldChange}
+                onNoteChange={handleFieldChange}
+              />
+              <ScoreCard 
+                step="STEP 8" 
+                title="กิจกรรมนอกจังหวัด" 
+                subtitle="กรอกข้อมูล 3 ครั้งขึ้นไป" 
+                score={editedData?.activity_outside_province_score ?? submission.activity_outside_province_score ?? 0} 
+                max={5} 
+                color="pink" 
+                note="≥ 3 กิจกรรม = 5 คะแนน" 
+                isEditMode={isEditMode}
+                scoreFieldName="activity_outside_province_score"
+                noteFieldName="activity_outside_province_note"
+                adminNote={editedData?.activity_outside_province_note ?? submission.activity_outside_province_note ?? ''}
+                onScoreChange={handleFieldChange}
+                onNoteChange={handleFieldChange}
+              />
+              <ScoreCard 
+                step="STEP 9" 
+                title="การประชาสัมพันธ์พันธ์" 
+                subtitle="Facebook, YouTube, TikTok, Website" 
+                score={editedData?.pr_activity_score ?? submission.pr_activity_score ?? 0} 
+                max={5} 
+                color="rose" 
+                note="≥ 3 กิจกรรม = 5 คะแนน" 
+                isEditMode={isEditMode}
+                scoreFieldName="pr_activity_score"
+                noteFieldName="pr_activity_note"
+                adminNote={editedData?.pr_activity_note ?? submission.pr_activity_note ?? ''}
+                onScoreChange={handleFieldChange}
+                onNoteChange={handleFieldChange}
+              />
             </div>
 
             <div className="mt-6 bg-gray-50 p-4 rounded-lg border border-gray-200">
@@ -418,8 +544,17 @@ export default function Register100DetailView({ id, hideScores = false, readOnly
                           max="50"
                           value={editedData?.video1_score ?? submission.video1_score ?? 0}
                           onChange={(e) => {
-                            const value = Math.min(50, Math.max(0, parseInt(e.target.value) || 0));
-                            handleFieldChange('video1_score', value);
+                            const inputValue = e.target.value;
+                            // Allow empty string temporarily while typing
+                            if (inputValue === '') {
+                              handleFieldChange('video1_score', 0);
+                              return;
+                            }
+                            const numValue = parseInt(inputValue);
+                            if (!isNaN(numValue)) {
+                              const value = Math.min(50, Math.max(0, numValue));
+                              handleFieldChange('video1_score', value);
+                            }
                           }}
                           className="w-16 px-2 py-1 text-center font-semibold border-2 border-green-500 rounded focus:outline-none focus:ring-2 focus:ring-green-500 bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         />
@@ -445,8 +580,17 @@ export default function Register100DetailView({ id, hideScores = false, readOnly
                           max="50"
                           value={editedData?.video2_score ?? submission.video2_score ?? 0}
                           onChange={(e) => {
-                            const value = Math.min(50, Math.max(0, parseInt(e.target.value) || 0));
-                            handleFieldChange('video2_score', value);
+                            const inputValue = e.target.value;
+                            // Allow empty string temporarily while typing
+                            if (inputValue === '') {
+                              handleFieldChange('video2_score', 0);
+                              return;
+                            }
+                            const numValue = parseInt(inputValue);
+                            if (!isNaN(numValue)) {
+                              const value = Math.min(50, Math.max(0, numValue));
+                              handleFieldChange('video2_score', value);
+                            }
                           }}
                           className="w-16 px-2 py-1 text-center font-semibold border-2 border-green-500 rounded focus:outline-none focus:ring-2 focus:ring-green-500 bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         />
@@ -674,27 +818,54 @@ export default function Register100DetailView({ id, hideScores = false, readOnly
                       {teacher.musicInstituteEducation?.length > 0 ? (
                         <div className="space-y-3">
                           {teacher.musicInstituteEducation.map((edu: any, ei: number) => (
-                            <div key={ei} className="grid grid-cols-2 gap-4 bg-blue-50 p-3 rounded">
-                              <Field label="วุฒิการศึกษา/ประกาศนียบัตร *" value={edu.graduationYear} isEditMode={isEditMode} onChange={(val) => {
-                                const updated = [...(teacher.musicInstituteEducation || [])];
-                                updated[ei] = { ...updated[ei], graduationYear: val };
-                                handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'musicInstituteEducation', updated);
-                              }} fieldName="graduationYear" />
-                              <Field label="สาขา/หลักสูตร *" value={edu.major} isEditMode={isEditMode} onChange={(val) => {
-                                const updated = [...(teacher.musicInstituteEducation || [])];
-                                updated[ei] = { ...updated[ei], major: val };
-                                handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'musicInstituteEducation', updated);
-                              }} fieldName="major" />
-                              <Field label="ปีที่สำเร็จการศึกษา / ได้รับประกาศนียบัตร *" value={edu.completionYear} isEditMode={isEditMode} onChange={(val) => {
-                                const updated = [...(teacher.musicInstituteEducation || [])];
-                                updated[ei] = { ...updated[ei], completionYear: val };
-                                handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'musicInstituteEducation', updated);
-                              }} fieldName="completionYear" />
+                            <div key={ei} className="bg-blue-50 p-3 rounded relative">
+                              <div className="grid grid-cols-2 gap-4">
+                                <Field label="วุฒิการศึกษา/ประกาศนียบัตร *" value={edu.graduationYear} isEditMode={isEditMode} onChange={(val) => {
+                                  const updated = [...(teacher.musicInstituteEducation || [])];
+                                  updated[ei] = { ...updated[ei], graduationYear: val };
+                                  handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'musicInstituteEducation', updated);
+                                }} fieldName="graduationYear" />
+                                <Field label="สาขา/หลักสูตร *" value={edu.major} isEditMode={isEditMode} onChange={(val) => {
+                                  const updated = [...(teacher.musicInstituteEducation || [])];
+                                  updated[ei] = { ...updated[ei], major: val };
+                                  handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'musicInstituteEducation', updated);
+                                }} fieldName="major" />
+                                <Field label="ปีที่สำเร็จการศึกษา / ได้รับประกาศนียบัตร *" value={edu.completionYear} isEditMode={isEditMode} onChange={(val) => {
+                                  const updated = [...(teacher.musicInstituteEducation || [])];
+                                  updated[ei] = { ...updated[ei], completionYear: val };
+                                  handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'musicInstituteEducation', updated);
+                                }} fieldName="completionYear" />
+                              </div>
+                              {isEditMode && (
+                                <button
+                                  onClick={() => {
+                                    const updated = [...(teacher.musicInstituteEducation || [])];
+                                    updated.splice(ei, 1);
+                                    handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'musicInstituteEducation', updated);
+                                  }}
+                                  className="absolute top-2 right-2 text-red-500 hover:text-red-700"
+                                  title="ลบการศึกษานี้"
+                                >
+                                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                                </button>
+                              )}
                             </div>
                           ))}
                         </div>
                       ) : (
                         <div className="text-sm text-gray-500">ไม่มีข้อมูลการศึกษาด้านดนตรีไทย</div>
+                      )}
+                      {isEditMode && (
+                        <button
+                          onClick={() => {
+                            const updated = [...(teacher.musicInstituteEducation || []), { graduationYear: '', major: '', completionYear: '' }];
+                            handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'musicInstituteEducation', updated);
+                          }}
+                          className="mt-3 px-3 py-1.5 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition-colors flex items-center gap-1"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                          เพิ่มการศึกษาด้านดนตรีไทย
+                        </button>
                       )}
                     </div>
                     
@@ -705,27 +876,54 @@ export default function Register100DetailView({ id, hideScores = false, readOnly
                       {teacher.otherEducation?.length > 0 ? (
                         <div className="space-y-3">
                           {teacher.otherEducation.map((edu: any, ei: number) => (
-                            <div key={ei} className="grid grid-cols-2 gap-4 bg-green-50 p-3 rounded">
-                              <Field label="วุฒิการศึกษา/ประกาศนียบัตร *" value={edu.graduationYear} isEditMode={isEditMode} onChange={(val) => {
-                                const updated = [...(teacher.otherEducation || [])];
-                                updated[ei] = { ...updated[ei], graduationYear: val };
-                                handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'otherEducation', updated);
-                              }} fieldName="graduationYear" />
-                              <Field label="สาขา/หลักสูตร *" value={edu.major} isEditMode={isEditMode} onChange={(val) => {
-                                const updated = [...(teacher.otherEducation || [])];
-                                updated[ei] = { ...updated[ei], major: val };
-                                handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'otherEducation', updated);
-                              }} fieldName="major" />
-                              <Field label="ปีที่สำเร็จการศึกษา / ได้รับประกาศนียบัตร *" value={edu.completionYear} isEditMode={isEditMode} onChange={(val) => {
-                                const updated = [...(teacher.otherEducation || [])];
-                                updated[ei] = { ...updated[ei], completionYear: val };
-                                handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'otherEducation', updated);
-                              }} fieldName="completionYear" />
+                            <div key={ei} className="bg-green-50 p-3 rounded relative">
+                              <div className="grid grid-cols-2 gap-4">
+                                <Field label="วุฒิการศึกษา/ประกาศนียบัตร *" value={edu.graduationYear} isEditMode={isEditMode} onChange={(val) => {
+                                  const updated = [...(teacher.otherEducation || [])];
+                                  updated[ei] = { ...updated[ei], graduationYear: val };
+                                  handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'otherEducation', updated);
+                                }} fieldName="graduationYear" />
+                                <Field label="สาขา/หลักสูตร *" value={edu.major} isEditMode={isEditMode} onChange={(val) => {
+                                  const updated = [...(teacher.otherEducation || [])];
+                                  updated[ei] = { ...updated[ei], major: val };
+                                  handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'otherEducation', updated);
+                                }} fieldName="major" />
+                                <Field label="ปีที่สำเร็จการศึกษา / ได้รับประกาศนียบัตร *" value={edu.completionYear} isEditMode={isEditMode} onChange={(val) => {
+                                  const updated = [...(teacher.otherEducation || [])];
+                                  updated[ei] = { ...updated[ei], completionYear: val };
+                                  handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'otherEducation', updated);
+                                }} fieldName="completionYear" />
+                              </div>
+                              {isEditMode && (
+                                <button
+                                  onClick={() => {
+                                    const updated = [...(teacher.otherEducation || [])];
+                                    updated.splice(ei, 1);
+                                    handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'otherEducation', updated);
+                                  }}
+                                  className="absolute top-2 right-2 text-red-500 hover:text-red-700"
+                                  title="ลบการศึกษานี้"
+                                >
+                                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                                </button>
+                              )}
                             </div>
                           ))}
                         </div>
                       ) : (
                         <div className="text-sm text-gray-500">ไม่มีข้อมูลการศึกษาด้านอื่น</div>
+                      )}
+                      {isEditMode && (
+                        <button
+                          onClick={() => {
+                            const updated = [...(teacher.otherEducation || []), { graduationYear: '', major: '', completionYear: '' }];
+                            handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'otherEducation', updated);
+                          }}
+                          className="mt-3 px-3 py-1.5 bg-green-500 text-white text-sm rounded hover:bg-green-600 transition-colors flex items-center gap-1"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                          เพิ่มการศึกษาด้านอื่น
+                        </button>
                       )}
                     </div>
                   </div>
@@ -735,14 +933,16 @@ export default function Register100DetailView({ id, hideScores = false, readOnly
                     {isEditMode ? (
                       <Field label="ลิงก์รูปภาพครู (URL)" value={teacher.teacherImage} fullWidth isEditMode onChange={(val) => handleArrayFieldChange('reg100_thaiMusicTeachers', i, 'teacherImage', val)} fieldName="teacherImage" />
                     ) : (
-                      teacher.teacherImage && (
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">รูปภาพครู</label>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">รูปภาพครู</label>
+                        {teacher.teacherImage ? (
                           <div onClick={() => handleImageClick(resolveImageUrl(teacher.teacherImage))} className="cursor-pointer hover:opacity-80 transition-opacity inline-block">
                             <img src={resolveImageUrl(teacher.teacherImage)} alt={`ครู ${i + 1}`} className="rounded-lg border border-gray-300 w-[150px] h-[150px] object-cover" />
                           </div>
-                        </div>
-                      )
+                        ) : (
+                          <div className="text-sm text-gray-500 italic">ไม่มีรูปภาพ</div>
+                        )}
+                      </div>
                     )}
                   </div>
                 </>
@@ -1213,7 +1413,35 @@ function resolveImageUrl(src: string): string {
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
-function ScoreCard({ step, title, subtitle, score, max, color, note }: { step: string; title: string; subtitle: string; score: number; max: number; color: string; note: string }) {
+function ScoreCard({ 
+  step, 
+  title, 
+  subtitle, 
+  score, 
+  max, 
+  color, 
+  note, 
+  isEditMode = false,
+  scoreFieldName,
+  noteFieldName,
+  adminNote = '',
+  onScoreChange,
+  onNoteChange
+}: { 
+  step: string; 
+  title: string; 
+  subtitle: string; 
+  score: number; 
+  max: number; 
+  color: string; 
+  note: string;
+  isEditMode?: boolean;
+  scoreFieldName?: string;
+  noteFieldName?: string;
+  adminNote?: string;
+  onScoreChange?: (fieldName: string, value: number) => void;
+  onNoteChange?: (fieldName: string, value: string) => void;
+}) {
   const colors: Record<string, string> = {
     blue: 'bg-blue-50 border-blue-200 text-blue-800 text-blue-600 bg-blue-100 text-blue-700',
     purple: 'bg-purple-50 border-purple-200 text-purple-800 text-purple-600 bg-purple-100 text-purple-700',
@@ -1226,6 +1454,7 @@ function ScoreCard({ step, title, subtitle, score, max, color, note }: { step: s
     rose: 'bg-rose-50 border-rose-200 text-rose-800 text-rose-600 bg-rose-100 text-rose-700',
   };
   const [bg, border, stepColor, scoreColor, noteBg, noteText] = colors[color]?.split(' ') ?? Array(6).fill('');
+  
   return (
     <div className={`${bg} p-4 rounded-lg border ${border}`}>
       <div className="flex items-start justify-between mb-2">
@@ -1235,11 +1464,58 @@ function ScoreCard({ step, title, subtitle, score, max, color, note }: { step: s
           <div className="text-xs text-gray-600 mt-1">{subtitle}</div>
         </div>
         <div className="text-right ml-3">
-          <div className={`text-2xl font-bold ${scoreColor}`}>{score}</div>
-          <div className="text-xs text-gray-500">/ {max}</div>
+          {isEditMode && scoreFieldName && onScoreChange ? (
+            <div className="flex flex-col items-end gap-1">
+              <input
+                type="number"
+                min="0"
+                max={max}
+                value={score}
+                onChange={(e) => {
+                  const inputValue = e.target.value;
+                  // Allow empty string temporarily while typing
+                  if (inputValue === '') {
+                    onScoreChange(scoreFieldName, 0);
+                    return;
+                  }
+                  const numValue = parseInt(inputValue);
+                  if (!isNaN(numValue)) {
+                    const value = Math.min(max, Math.max(0, numValue));
+                    onScoreChange(scoreFieldName, value);
+                  }
+                }}
+                className={`w-16 px-2 py-1 text-center text-xl font-bold border-2 ${border.replace('border-', 'border-')} rounded focus:outline-none focus:ring-2 focus:ring-offset-1 ${scoreColor.replace('text-', 'focus:ring-')} bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`}
+              />
+              <div className="text-xs text-gray-500">/ {max}</div>
+            </div>
+          ) : (
+            <>
+              <div className={`text-2xl font-bold ${scoreColor}`}>{score}</div>
+              <div className="text-xs text-gray-500">/ {max}</div>
+            </>
+          )}
         </div>
       </div>
       <div className={`text-xs ${noteText} ${noteBg} px-2 py-1 rounded mt-2`}>{note}</div>
+      
+      {/* Admin Note Section */}
+      {isEditMode && noteFieldName && onNoteChange ? (
+        <div className="mt-3">
+          <label className="text-xs font-medium text-gray-700 mb-1 block">หมายเหตุ (Admin):</label>
+          <textarea
+            value={adminNote}
+            onChange={(e) => onNoteChange(noteFieldName, e.target.value)}
+            placeholder="เพิ่มหมายเหตุสำหรับคะแนนนี้..."
+            className="w-full px-3 py-2 text-xs border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none bg-white"
+            rows={2}
+          />
+        </div>
+      ) : adminNote ? (
+        <div className="mt-3 bg-yellow-50 border border-yellow-200 rounded-md p-2">
+          <div className="text-xs font-medium text-yellow-800 mb-1">หมายเหตุ:</div>
+          <div className="text-xs text-yellow-700 whitespace-pre-wrap">{adminNote}</div>
+        </div>
+      ) : null}
     </div>
   );
 }
