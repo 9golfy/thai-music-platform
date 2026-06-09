@@ -132,12 +132,12 @@ export function useGradeDistribution() {
 
   const fetchGradeDistribution = async () => {
     try {
-      // Fetch Register 100 data
-      const res100 = await fetch('/api/register100/list');
+      // Fetch Register 100 data - load all for grade distribution
+      const res100 = await fetch('/api/register100/list?loadAll=true');
       const data100 = await res100.json();
       
-      // Fetch Register Support data
-      const resSupport = await fetch('/api/register-support/list');
+      // Fetch Register Support data - load all for grade distribution
+      const resSupport = await fetch('/api/register-support/list?loadAll=true');
       const dataSupport = await resSupport.json();
       
       // Process Register 100 grades

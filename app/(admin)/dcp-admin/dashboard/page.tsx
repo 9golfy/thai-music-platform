@@ -22,12 +22,12 @@ export default function DashboardPage() {
 
   const fetchStats = async () => {
     try {
-      // Fetch Register 100
-      const res100 = await fetch('/api/register100/list');
+      // Fetch Register 100 - load all for accurate count
+      const res100 = await fetch('/api/register100/list?loadAll=true');
       const data100 = await res100.json();
       
-      // Fetch Register Support
-      const resSupport = await fetch('/api/register-support/list');
+      // Fetch Register Support - load all for accurate count
+      const resSupport = await fetch('/api/register-support/list?loadAll=true');
       const dataSupport = await resSupport.json();
       
       // Fetch Certificates
@@ -157,7 +157,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Quick Links */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* Register 100 Card */}
         <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
           <div className="bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-4 flex items-center gap-3">
@@ -196,6 +196,27 @@ export default function DashboardPage() {
               className="block w-full text-center px-4 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-lg hover:from-cyan-600 hover:to-blue-700 transition-all font-medium shadow-md cursor-pointer"
             >
               ดูรายการทั้งหมด คลิกที่นี่
+            </Link>
+          </div>
+        </div>
+
+        {/* Draft Management Card */}
+        <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
+          <div className="bg-gradient-to-r from-amber-500 to-orange-600 px-6 py-4 flex items-center gap-3">
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <h3 className="text-lg font-semibold text-white">จัดการ Draft Tokens</h3>
+          </div>
+          <div className="p-6">
+            <p className="text-gray-600 mb-4">
+              สร้าง Token ใหม่สำหรับ Draft ที่หมดอายุ และจัดการ Draft Submissions
+            </p>
+            <Link
+              href="/dcp-admin/dashboard/drafts"
+              className="block w-full text-center px-4 py-3 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-lg hover:from-amber-600 hover:to-orange-700 transition-all font-medium shadow-md cursor-pointer"
+            >
+              จัดการ Draft คลิกที่นี่
             </Link>
           </div>
         </div>
