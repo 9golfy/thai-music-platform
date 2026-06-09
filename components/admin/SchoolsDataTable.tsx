@@ -312,7 +312,7 @@ export default function SchoolsDataTable({
             <div className="text-center">
               <p className="text-red-500 mb-2">เกิดข้อผิดพลาด: {error}</p>
               <button 
-                onClick={fetchSchools}
+                onClick={() => fetchSchools(false)}
                 className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
               >
                 ลองใหม่
