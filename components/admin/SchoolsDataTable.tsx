@@ -78,14 +78,24 @@ export default function SchoolsDataTable({
       
       const endpoint = type === 'register100' ? '/api/register100/list' : '/api/register-support/list';
       
-      // Only load all data if explicitly requested OR if we already have full data loaded
-      // Don't auto-load all just because filters exist - wait for user interaction
-      const shouldLoadAll = loadAll || (isFullDataLoaded && (searchTerm || provinceFilter || levelFilter || gradeFilter));
+      // Build query parameters
+      const params = new URLSearchParams();
       
-      const url = shouldLoadAll 
-        ? `${endpoint}?loadAll=true`
-        : `${endpoint}?page=1&limit=10`;
+      // Add filters to query (server-side filtering)
+      if (provinceFilter) params.set('province', provinceFilter);
+      if (levelFilter) params.set('level', levelFilter);
+      if (searchTerm) params.set('search', searchTerm);
       
+      // Grade filter must be done client-side because it requires score calculation
+      // Only add loadAll or pagination params
+      if (loadAll || gradeFilter) {
+        params.set('loadAll', 'true');
+      } else {
+        params.set('page', '1');
+        params.set('limit', '10');
+      }
+      
+      const url = `${endpoint}?${params.toString()}`;
       const response = await fetch(url);
       
       if (!response.ok) {
@@ -97,7 +107,7 @@ export default function SchoolsDataTable({
       if (data.success) {
         setSchools(data.submissions || []);
         setTotalCount(data.total || data.submissions?.length || 0);
-        if (shouldLoadAll) {
+        if (loadAll || gradeFilter) {
           setIsFullDataLoaded(true);
         }
       } else {
@@ -114,14 +124,22 @@ export default function SchoolsDataTable({
 
   // Load full data when user interacts with filters or pagination
   useEffect(() => {
-    if (!isFullDataLoaded && (searchTerm || provinceFilter || levelFilter || gradeFilter || currentPage > 1)) {
+    // Refetch when filters change
+    if (searchTerm || provinceFilter || levelFilter || gradeFilter) {
+      fetchSchools(gradeFilter ? true : false);
+    }
+  }, [searchTerm, provinceFilter, levelFilter, gradeFilter]);
+
+  // Handle pagination separately
+  useEffect(() => {
+    if (currentPage > 1 && !isFullDataLoaded) {
       fetchSchools(true);
     }
-  }, [searchTerm, provinceFilter, levelFilter, gradeFilter, currentPage]);
+  }, [currentPage]);
 
-  // Load full data when changing items per page (if not already loaded)
+  // Load full data when changing items per page (if not already loaded and no filters)
   useEffect(() => {
-    if (!isFullDataLoaded && itemsPerPage !== 10) {
+    if (!isFullDataLoaded && itemsPerPage !== 10 && !searchTerm && !provinceFilter && !levelFilter && !gradeFilter) {
       fetchSchools(true);
     }
   }, [itemsPerPage]);
@@ -199,17 +217,22 @@ export default function SchoolsDataTable({
   };
 
   const handleExportExcel = async () => {
+    if (filteredSchools.length === 0) {
+      alert('ไม่มีข้อมูลสำหรับ Export');
+      return;
+    }
+
     try {
       console.log('🔄 Starting Excel export...');
       
-      // Create Excel data from current filtered schools
+      // Create Excel data with all scores in horizontal columns
       const excelData = filteredSchools.map((school, index) => {
         const totalScore = calculateTotalScore(school);
         const grade = type === 'register100'
           ? calculateGradeRegister100(totalScore)
           : calculateGrade(totalScore, 180);
         
-        return {
+        const baseData = {
           'ลำดับ': index + 1,
           'วันที่บันทึก': school.createdAt 
             ? new Date(school.createdAt).toLocaleDateString('th-TH', {
@@ -221,20 +244,70 @@ export default function SchoolsDataTable({
           'ชื่อโรงเรียน': school.reg100_schoolName || school.regsup_schoolName || '-',
           'จังหวัด': school.reg100_schoolProvince || school.regsup_schoolProvince || '-',
           'ระดับการศึกษา': school.reg100_schoolLevel || school.regsup_schoolLevel || 'ไม่ระบุ',
-          'คะแนนรวม': totalScore,
           'เกณฑ์': getGradeNameThai(grade),
           'School ID': school.schoolId || '-',
           'อีเมลครู': school.teacherEmail || '-',
-          'เบอร์โทรศัพท์': school.teacherPhone || '-'
+          'เบอร์โทรศัพท์': school.teacherPhone || '-',
         };
+
+        // Add score columns based on type
+        if (type === 'register100') {
+          return {
+            ...baseData,
+            'Step 5: นโยบาย (20)': school.teaching_curriculum_score || 0,
+            'Step 4: คุณวุฒิครู (20)': school.teacher_qualification_score || 0,
+            'Step 6: สนับสนุนต้นสังกัด (5)': school.support_from_org_score || 0,
+            'Step 6: สนับสนุนภายนอก (15)': school.support_from_external_score || 0,
+            'Step 7: รางวัล (20)': school.award_score || 0,
+            'Step 8: กิจกรรมภายใน (5)': school.activity_within_province_internal_score || 0,
+            'Step 8: กิจกรรมภายนอก (5)': school.activity_within_province_external_score || 0,
+            'Step 8: กิจกรรมนอกจังหวัด (5)': school.activity_outside_province_score || 0,
+            'Step 9: ประชาสัมพันธ์ (5)': school.pr_activity_score || 0,
+            'รวมส่วนที่ 1 (100)': (school.teaching_curriculum_score || 0) + 
+                                  (school.teacher_qualification_score || 0) + 
+                                  (school.support_from_org_score || 0) + 
+                                  (school.support_from_external_score || 0) + 
+                                  (school.award_score || 0) + 
+                                  (school.activity_within_province_internal_score || 0) + 
+                                  (school.activity_within_province_external_score || 0) + 
+                                  (school.activity_outside_province_score || 0) + 
+                                  (school.pr_activity_score || 0),
+            'วิดีโอ 1 (50)': school.video1_score || 0,
+            'วิดีโอ 2 (50)': school.video2_score || 0,
+            'รวมส่วนที่ 2 (100)': (school.video1_score || 0) + (school.video2_score || 0),
+            'คะแนนรวมทั้งหมด (200)': totalScore,
+          };
+        } else {
+          // register-support
+          return {
+            ...baseData,
+            'Step 4: ฝึกอบรมครู (20)': school.teacher_training_score || 0,
+            'Step 4: คุณวุฒิครู (20)': school.teacher_qualification_score || 0,
+            'Step 6: สนับสนุนต้นสังกัด (5)': school.support_from_org_score || 0,
+            'Step 6: สนับสนุนภายนอก (15)': school.support_from_external_score || 0,
+            'Step 7: รางวัล (20)': school.award_score || 0,
+            'Step 8: กิจกรรมภายใน (5)': school.activity_within_province_internal_score || 0,
+            'Step 8: กิจกรรมภายนอก (5)': school.activity_within_province_external_score || 0,
+            'Step 8: กิจกรรมนอกจังหวัด (5)': school.activity_outside_province_score || 0,
+            'Step 9: ประชาสัมพันธ์ (5)': school.pr_activity_score || 0,
+            'รวมส่วนที่ 1 (100)': (school.teacher_training_score || 0) + 
+                                  (school.teacher_qualification_score || 0) + 
+                                  (school.support_from_org_score || 0) + 
+                                  (school.support_from_external_score || 0) + 
+                                  (school.award_score || 0) + 
+                                  (school.activity_within_province_internal_score || 0) + 
+                                  (school.activity_within_province_external_score || 0) + 
+                                  (school.activity_outside_province_score || 0) + 
+                                  (school.pr_activity_score || 0),
+            'วิดีโอ 1 (40)': school.video1_score || 0,
+            'วิดีโอ 2 (40)': school.video2_score || 0,
+            'รวมส่วนที่ 2 (80)': (school.video1_score || 0) + (school.video2_score || 0),
+            'คะแนนรวมทั้งหมด (180)': totalScore,
+          };
+        }
       });
 
-      if (excelData.length === 0) {
-        alert('ไม่มีข้อมูลสำหรับ Export');
-        return;
-      }
-
-      // Convert to CSV format (simple Excel export)
+      // Convert to CSV format
       const headers = Object.keys(excelData[0]);
       const csvContent = [
         headers.join(','),
@@ -259,16 +332,14 @@ export default function SchoolsDataTable({
       const fileName = `${type === 'register100' ? 'Register100' : 'RegisterSupport'}_Export_${new Date().toISOString().split('T')[0]}.csv`;
       link.setAttribute('download', fileName);
       link.style.visibility = 'hidden';
-      
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       
       console.log('✅ Excel export completed:', fileName);
-      
     } catch (error) {
-      console.error('❌ Export failed:', error);
-      alert('เกิดข้อผิดพลาดในการ Export ข้อมูล');
+      console.error('❌ Excel export failed:', error);
+      alert('เกิดข้อผิดพลาดในการ Export');
     }
   };
 

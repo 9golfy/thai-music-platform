@@ -39,6 +39,9 @@ export async function GET(
 
     const schoolName = getFieldValue('schoolName') || 'ไม่ระบุ';
     const totalScore = submission.total_score || 0;
+    
+    // Debug: Check scores
+    // console.log('School:', schoolName, 'Total:', totalScore);
 
     // Helper function to format teachers data for CSV
     const formatTeachersData = (teachers: any[]) => {
@@ -392,19 +395,53 @@ export async function GET(
       ['ข้าพเจ้าขอรับรองว่าข้อมูลที่กรอกในแบบฟอร์มนี้เป็นความจริงทุกประการ', (getFieldValue('certifiedByAdmin') || getFieldValue('reg100_certifiedByAdmin')) ? 'ยอมรับ' : 'ไม่ยอมรับ'],
       [''],
       
-      // Score Summary
+      // Score Summary - Horizontal Layout
       ['=== สรุปคะแนน ==='],
-      ['หมวด', 'คะแนนที่ได้', 'คะแนนเต็ม'],
-      ['การเรียนการสอนดนตรีไทย', submission.teacher_training_score || 0, 20],
-      ['คุณลักษณะครูผู้สอน', submission.teacher_qualification_score || 0, 20],
-      ['การสนับสนุนจากต้นสังกัด', submission.support_from_org_score || 0, 5],
-      ['การสนับสนุนจากภายนอก', submission.support_from_external_score || 0, 15],
-      ['รางวัลและเกียรติคุณ', submission.award_score || 0, 20],
-      ['กิจกรรมภายในสถานศึกษา', submission.activity_within_province_internal_score || 0, 5],
-      ['กิจกรรมภายนอกสถานศึกษา', submission.activity_within_province_external_score || 0, 5],
-      ['กิจกรรมนอกจังหวัด', submission.activity_outside_province_score || 0, 5],
-      ['การประชาสัมพันธ์', submission.pr_activity_score || 0, 5],
-      ['รวมทั้งหมด', totalScore, 100],
+      [''],
+      ['ส่วนที่ 1: สรุปการหาคะแนนคะแนนแบบ (100 คะแนน)'],
+      [
+        'Step 5: การมีนโยบายการสนับสนุนดนตรีไทย (4 ข้อ x 5)',
+        'Step 4: คุณสมบัติและคุณวุฒิครูผู้สอน (จำนวนคุณสมบัติไม่ซ้ำ x 5)',
+        'Step 6: การสนับสนุนจากต้นสังกัด (มี/ไม่มี)',
+        'Step 6: การสนับสนุนจากภายนอก (1=5, 2=10, 3+=15)',
+        'Step 7: รางวัล (ระดับสูงสุด: อำเภอ=5, จังหวัด=10, ภาค=15, ประเทศ=20)',
+        'Step 8: กิจกรรมภายในสถานศึกษา (≥3 กิจกรรม = 5 คะแนน)',
+        'Step 8: กิจกรรมภายนอกสถานศึกษา (≥3 กิจกรรม = 5 คะแนน)',
+        'Step 8: กิจกรรมนอกจังหวัด (≥3 กิจกรรม = 5 คะแนน)',
+        'Step 9: การประชาสัมพันธ์ผ่านสื่อสังคมออนไลน์ (≥3 กิจกรรม = 5 คะแนน)',
+        'รวมคะแนนส่วนที่ 1'
+      ],
+      [
+        submission.teaching_curriculum_score || 0,
+        submission.teacher_qualification_score || 0,
+        submission.support_from_org_score || 0,
+        submission.support_from_external_score || 0,
+        submission.award_score || 0,
+        submission.activity_within_province_internal_score || 0,
+        submission.activity_within_province_external_score || 0,
+        submission.activity_outside_province_score || 0,
+        submission.pr_activity_score || 0,
+        (submission.teaching_curriculum_score || 0) + (submission.teacher_qualification_score || 0) + (submission.support_from_org_score || 0) + (submission.support_from_external_score || 0) + (submission.award_score || 0) + (submission.activity_within_province_internal_score || 0) + (submission.activity_within_province_external_score || 0) + (submission.activity_outside_province_score || 0) + (submission.pr_activity_score || 0)
+      ],
+      [20, 20, 5, 15, 20, 5, 5, 5, 5, 100],
+      [''],
+      ['ส่วนที่ 2: คะแนนมาจากการบรรยายกันทีเดียว (100 คะแนน)'],
+      ['วิดีโอ/คลิป', '', ''],
+      [
+        '1 บรรยากาศการเรียนการสอนในชั้นเรียน (ทุกระดับชั้น) - วิดีโอความยาวไม่เกิน 3 นาที',
+        '2 การแสดงผลงานด้านดนตรีไทยของนักเรียนทั้งโรงเรียน - วิดีโอความยาวไม่เกิน 3 นาที',
+        'รวมคะแนนส่วนที่ 2'
+      ],
+      [
+        'Link/URL สำหรับ Share Drive (Google Drive, Dropbox, etc.)',
+        'Link/URL สำหรับ Share Drive (Google Drive, Dropbox, etc.)',
+        ''
+      ],
+      [getFieldValue('videoLink') || '-', getFieldValue('videoLink2') || '-', ''],
+      [submission.video1_score || 0, submission.video2_score || 0, (submission.video1_score || 0) + (submission.video2_score || 0)],
+      [50, 50, 100],
+      [''],
+      ['รวมคะแนนทั้งหมด', totalScore, '/ 200 คะแนน'],
       [''],
       
       // Footer

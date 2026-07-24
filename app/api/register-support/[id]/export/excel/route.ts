@@ -367,6 +367,55 @@ export async function GET(
       ['ข้าพเจ้าขอรับรองว่าข้อมูลที่กรอกในแบบฟอร์มนี้เป็นความจริงทุกประการ', (getFieldValue('certifiedByAdmin') || getFieldValue('regsup_certifiedByAdmin')) ? 'ยอมรับ' : 'ไม่ยอมรับ'],
       [''],
       
+      // Score Summary - Horizontal Layout
+      ['=== สรุปคะแนน ==='],
+      [''],
+      ['ส่วนที่ 1: สรุปการหาคะแนนคะแนนแบบ (100 คะแนน)'],
+      [
+        'Step 4: การฝึกอบรมครูผู้สอนดนตรีไทย (4 ข้อ x 5)',
+        'Step 4: คุณสมบัติและคุณวุฒิครูผู้สอน (จำนวนคุณสมบัติไม่ซ้ำ x 5)',
+        'Step 6: การสนับสนุนจากต้นสังกัด (มี/ไม่มี)',
+        'Step 6: การสนับสนุนจากภายนอก (1=5, 2=10, 3+=15)',
+        'Step 7: รางวัล (ระดับสูงสุด: อำเภอ=5, จังหวัด=10, ภาค=15, ประเทศ=20)',
+        'Step 8: กิจกรรมภายในสถานศึกษา (≥3 กิจกรรม = 5 คะแนน)',
+        'Step 8: กิจกรรมภายนอกสถานศึกษา (≥3 กิจกรรม = 5 คะแนน)',
+        'Step 8: กิจกรรมนอกจังหวัด (≥3 กิจกรรม = 5 คะแนน)',
+        'Step 9: การประชาสัมพันธ์ผ่านสื่อสังคมออนไลน์ (≥3 กิจกรรม = 5 คะแนน)',
+        'รวมคะแนนส่วนที่ 1'
+      ],
+      [
+        submission.teacher_training_score || 0,
+        submission.teacher_qualification_score || 0,
+        submission.support_from_org_score || 0,
+        submission.support_from_external_score || 0,
+        submission.award_score || 0,
+        submission.activity_within_province_internal_score || 0,
+        submission.activity_within_province_external_score || 0,
+        submission.activity_outside_province_score || 0,
+        submission.pr_activity_score || 0,
+        (submission.teacher_training_score || 0) + (submission.teacher_qualification_score || 0) + (submission.support_from_org_score || 0) + (submission.support_from_external_score || 0) + (submission.award_score || 0) + (submission.activity_within_province_internal_score || 0) + (submission.activity_within_province_external_score || 0) + (submission.activity_outside_province_score || 0) + (submission.pr_activity_score || 0)
+      ],
+      [20, 20, 5, 15, 20, 5, 5, 5, 5, 100],
+      [''],
+      ['ส่วนที่ 2: คะแนนมาจากการบรรยายกันทีเดียว (80 คะแนน)'],
+      ['วิดีโอ/คลิป', '', ''],
+      [
+        '1 บรรยากาศการเรียนการสอนในชั้นเรียน และในสถานศึกษา - วิดีโอความยาวไม่เกิน 3 นาที',
+        '2 การแสดงผลงานด้านดนตรีของนักเรียน - วิดีโอความยาวไม่เกิน 3 นาที',
+        'รวมคะแนนส่วนที่ 2'
+      ],
+      [
+        'Link/URL สำหรับ Share Drive (Google Drive, Dropbox, etc.)',
+        'Link/URL สำหรับ Share Drive (Google Drive, Dropbox, etc.)',
+        ''
+      ],
+      [getFieldValue('videoLink') || '-', getFieldValue('videoLink2') || '-', ''],
+      [submission.video1_score || 0, submission.video2_score || 0, (submission.video1_score || 0) + (submission.video2_score || 0)],
+      [40, 40, 80],
+      [''],
+      ['รวมคะแนนทั้งหมด', totalScore, '/ 180 คะแนน'],
+      [''],
+      
       // Footer
       ['สร้างเมื่อ', new Date().toLocaleDateString('th-TH', { 
         year: 'numeric', 
