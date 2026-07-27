@@ -125,8 +125,10 @@ export default function SchoolsDataTable({
   // Load full data when user interacts with filters or pagination
   useEffect(() => {
     // Refetch when filters change
+    // Always load all data when there are filters (search, province, level, grade)
+    // This ensures search can find results across all pages
     if (searchTerm || provinceFilter || levelFilter || gradeFilter) {
-      fetchSchools(gradeFilter ? true : false);
+      fetchSchools(true); // ✅ Load all data for filtering
     }
   }, [searchTerm, provinceFilter, levelFilter, gradeFilter]);
 

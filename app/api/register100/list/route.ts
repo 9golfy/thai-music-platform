@@ -13,14 +13,44 @@ export async function GET(request: Request) {
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
     const loadAll = searchParams.get('loadAll') === 'true';
+    const province = searchParams.get('province') || '';
+    const level = searchParams.get('level') || '';
+    const search = searchParams.get('search') || '';
 
     await client.connect();
     const database = client.db(dbName);
     const collection = database.collection('register100_submissions');
 
+    // Build MongoDB query
+    const query: any = {};
+    
+    // Filter by province
+    if (province) {
+      query.reg100_schoolProvince = province;
+    }
+    
+    // Filter by level
+    if (level) {
+      query.reg100_schoolLevel = level;
+    }
+    
+    // Search by school name or school ID
+    if (search) {
+      const searchRegex = new RegExp(search.replace(/-/g, ''), 'i'); // Remove hyphens for flexible search
+      
+      // Use simple string matching for Thai characters
+      // MongoDB regex with 'i' flag works for Thai, but we need to escape special regex characters
+      const escapedSearch = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      
+      query.$or = [
+        { reg100_schoolName: { $regex: escapedSearch, $options: 'i' } },
+        { schoolId: { $regex: searchRegex } },
+      ];
+    }
+
     // Get all submissions sorted by createdAt descending (newest first)
     const submissions = await collection
-      .find({})
+      .find(query)
       .sort({ createdAt: -1, _id: -1 })
       .toArray();
 

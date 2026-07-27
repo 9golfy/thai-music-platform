@@ -136,22 +136,28 @@ export function useGradeDistribution() {
       const res100 = await fetch('/api/register100/list?loadAll=true');
       const data100 = await res100.json();
       
+      console.log('📊 Register100 API Response:', data100);
+      
       // Fetch Register Support data - load all for grade distribution
       const resSupport = await fetch('/api/register-support/list?loadAll=true');
       const dataSupport = await resSupport.json();
       
+      console.log('📊 Register-Support API Response:', dataSupport);
+      
       // Process Register 100 grades
       const register100Data = data100.success ? data100.submissions : [];
+      console.log('📝 Register100 Submissions Count:', register100Data.length);
       const register100GradeCounts = processGradeData(register100Data, 'register100');
       setRegister100Grades(register100GradeCounts);
       
       // Process Register Support grades
       const registerSupportData = dataSupport.success ? dataSupport.submissions : [];
+      console.log('📝 Register-Support Submissions Count:', registerSupportData.length);
       const registerSupportGradeCounts = processGradeData(registerSupportData, 'register-support');
       setRegisterSupportGrades(registerSupportGradeCounts);
       
     } catch (error) {
-      console.error('Error fetching grade distribution:', error);
+      console.error('❌ Error fetching grade distribution:', error);
     } finally {
       setLoading(false);
     }
@@ -160,25 +166,66 @@ export function useGradeDistribution() {
   const processGradeData = (submissions: any[], type: 'register100' | 'register-support'): GradeData[] => {
     const gradeCounts = { A: 0, B: 0, C: 0, D: 0, F: 0 };
     
+    console.log(`Processing ${type} grades for ${submissions.length} submissions`);
+    
     submissions.forEach(submission => {
-      const score = submission.total_score || 0;
+      // Calculate actual total score from all parts
+      let score = 0;
       
       if (type === 'register100') {
-        // โรงเรียนดนตรีไทย 100%
-        if (score >= 160) gradeCounts.A++;           // ระดับดีเด่น: 160 ขึ้นไป
-        else if (score >= 140) gradeCounts.B++;      // ระดับดีมาก: 140-159 คะแนน
-        else if (score >= 120) gradeCounts.C++;      // ระดับดี: 120-139 คะแนน
-        else if (score >= 100) gradeCounts.D++;      // ระดับชมเชย: 100-119 คะแนน
-        else gradeCounts.F++;                        // ต่ำกว่าเกณฑ์: 0-99 คะแนน
+        // Part 1 scores (max 100)
+        const part1 = (submission.teaching_curriculum_score || 0) +
+                      (submission.teacher_qualification_score || 0) +
+                      (submission.support_from_org_score || 0) +
+                      (submission.support_from_external_score || 0) +
+                      (submission.award_score || 0) +
+                      (submission.activity_within_province_internal_score || 0) +
+                      (submission.activity_within_province_external_score || 0) +
+                      (submission.activity_outside_province_score || 0) +
+                      (submission.pr_activity_score || 0);
+        
+        // Part 2 scores (max 100)
+        const part2 = (submission.video1_score || 0) + (submission.video2_score || 0);
+        
+        score = part1 + part2;
+        
+        console.log(`Register100 - School: ${submission.schoolId}, Part1: ${part1}, Part2: ${part2}, Total: ${score}, Grade: ${score >= 160 ? 'A' : score >= 140 ? 'B' : score >= 120 ? 'C' : score >= 100 ? 'D' : 'F'}`);
+        
+        // Grade calculation
+        if (score >= 160) gradeCounts.A++;           // ระดับดีเด่น: 160 ขึ้นไป (80%+)
+        else if (score >= 140) gradeCounts.B++;      // ระดับดีมาก: 140-159 คะแนน (70-79%)
+        else if (score >= 120) gradeCounts.C++;      // ระดับดี: 120-139 คะแนน (60-69%)
+        else if (score >= 100) gradeCounts.D++;      // ระดับชมเชย: 100-119 คะแนน (50-59%)
+        else gradeCounts.F++;                        // ต่ำกว่าเกณฑ์: 0-99 คะแนน (<50%)
       } else {
-        // โรงเรียนสนับสนุนและส่งเสริม
-        if (score >= 144) gradeCounts.A++;           // ระดับดีเด่น: 144 ขึ้นไป
-        else if (score >= 126) gradeCounts.B++;      // ระดับดีมาก: 126-143 คะแนน
-        else if (score >= 108) gradeCounts.C++;      // ระดับดี: 108-125 คะแนน
-        else if (score >= 90) gradeCounts.D++;       // ระดับชมเชย: 90-107 คะแนน
-        else gradeCounts.F++;                        // ต่ำกว่าเกณฑ์: 0-89 คะแนน
+        // Part 1 scores (max 100)
+        const part1 = (submission.teacher_training_score || 0) +
+                      (submission.teacher_qualification_score || 0) +
+                      (submission.support_from_org_score || 0) +
+                      (submission.support_from_external_score || 0) +
+                      (submission.award_score || 0) +
+                      (submission.activity_within_province_internal_score || 0) +
+                      (submission.activity_within_province_external_score || 0) +
+                      (submission.activity_outside_province_score || 0) +
+                      (submission.pr_activity_score || 0);
+        
+        // Part 2 scores (max 80)
+        const part2 = (submission.video1_score || 0) + (submission.video2_score || 0);
+        
+        score = part1 + part2;
+        
+        console.log(`Register-Support - School: ${submission.schoolId}, Part1: ${part1}, Part2: ${part2}, Total: ${score}, Grade: ${score >= 144 ? 'A' : score >= 126 ? 'B' : score >= 108 ? 'C' : score >= 90 ? 'D' : 'F'}`);
+        
+        // Grade calculation
+        if (score >= 144) gradeCounts.A++;           // ระดับดีเด่น: 144 ขึ้นไป (80%+)
+        else if (score >= 126) gradeCounts.B++;      // ระดับดีมาก: 126-143 คะแนน (70-79%)
+        else if (score >= 108) gradeCounts.C++;      // ระดับดี: 108-125 คะแนน (60-69%)
+        else if (score >= 90) gradeCounts.D++;       // ระดับชมเชย: 90-107 คะแนน (50-59%)
+        else gradeCounts.F++;                        // ต่ำกว่าเกณฑ์: 0-89 คะแนน (<50%)
       }
     });
+    
+    console.log(`Grade counts for ${type}:`, gradeCounts);
 
     return [
       { grade: 'A', count: gradeCounts.A, color: 'bg-green-500' },
