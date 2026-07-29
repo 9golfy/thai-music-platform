@@ -22,7 +22,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
-import { calculateGrade, getGradeColor } from '@/lib/utils/gradeCalculator';
+import { calculateGrade, getGradeColor, getGradeNameThai } from '@/lib/utils/gradeCalculator';
 
 const TEMPLATE_OPTIONS = [
   { value: 'default', label: 'Default' },
@@ -733,7 +733,7 @@ export default function SchoolCertificateAssignment() {
                   <TableHead className="font-semibold text-gray-700">ชื่อโรงเรียน</TableHead>
                   <TableHead className="text-center w-48 font-semibold text-gray-700">ประเภทโรงเรียน</TableHead>
                   <TableHead className="text-center w-32 font-semibold text-gray-700">คะแนนรวม</TableHead>
-                  <TableHead className="text-center w-24 font-semibold text-gray-700">Grade</TableHead>
+                  <TableHead className="text-center w-40 font-semibold text-gray-700">เกณฑ์</TableHead>
                   <TableHead className="w-64 font-semibold text-gray-700">การดำเนินการ</TableHead>
                   <TableHead className="text-center w-40 font-semibold text-gray-700">สถานะ</TableHead>
                   <TableHead className="w-32 text-center font-semibold text-gray-700">ดูใบประกาศ</TableHead>
@@ -805,8 +805,8 @@ export default function SchoolCertificateAssignment() {
                         </span>
                       </TableCell>
                       <TableCell className="text-center">
-                        <span className={`inline-flex items-center justify-center w-10 h-10 rounded-full text-lg font-bold ${getGradeColor(school.grade || 'F')} ${getGradeBgClass(school.grade || 'F')}`}>
-                          {school.grade || '-'}
+                        <span className={`inline-flex items-center justify-center px-3 py-1.5 rounded-full text-sm font-semibold ${getGradeColor(school.grade || 'F')} ${getGradeBgClass(school.grade || 'F')}`}>
+                          {getGradeNameThai(school.grade || 'F')}
                         </span>
                       </TableCell>
                       <TableCell>
