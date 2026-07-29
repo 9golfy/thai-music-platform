@@ -66,6 +66,9 @@ export default function SchoolCertificateAssignment() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(50);
   const [paginatedSchools, setPaginatedSchools] = useState<School[]>([]);
+  
+  // Grade filter state
+  const [gradeFilter, setGradeFilter] = useState<string>('');
 
   useEffect(() => {
     fetchData();
@@ -73,7 +76,7 @@ export default function SchoolCertificateAssignment() {
 
   useEffect(() => {
     filterSchools();
-  }, [schools, searchTerm]);
+  }, [schools, searchTerm, gradeFilter]);
 
   useEffect(() => {
     // Apply pagination when filteredSchools or currentPage changes
@@ -253,6 +256,11 @@ export default function SchoolCertificateAssignment() {
                schoolId.toLowerCase().includes(searchLower) ||
                normalizedSchoolId.includes(normalizedSearchTerm);
       });
+    }
+
+    // Grade filter
+    if (gradeFilter) {
+      filtered = filtered.filter((school) => school.grade === gradeFilter);
     }
 
     setFilteredSchools(filtered);
@@ -477,6 +485,8 @@ export default function SchoolCertificateAssignment() {
         return 'bg-blue-100';
       case 'C':
         return 'bg-orange-100';
+      case 'D':
+        return 'bg-yellow-100';
       case 'F':
         return 'bg-red-100';
       default:
@@ -577,8 +587,8 @@ export default function SchoolCertificateAssignment() {
         <CardContent className="p-6 space-y-4">
           {/* Filters Section */}
           <div className="grid grid-cols-12 gap-4 items-end">
-            {/* 30% - School Type (Left) */}
-            <div className="col-span-4 space-y-2">
+            {/* 25% - School Type (Left) */}
+            <div className="col-span-3 space-y-2">
               <Label className="text-sm font-semibold text-gray-700">ประเภทโรงเรียน</Label>
               <Select
                 value={schoolType}
@@ -610,7 +620,58 @@ export default function SchoolCertificateAssignment() {
               </Select>
             </div>
 
-            {/* 40% - Template Dropdown (Center) */}
+            {/* 20% - Grade Filter (New) */}
+            <div className="col-span-2 space-y-2">
+              <Label className="text-sm font-semibold text-gray-700">กรองตามเกณฑ์</Label>
+              <Select
+                value={gradeFilter}
+                onValueChange={(value: any) => setGradeFilter(value === 'all' ? '' : value)}
+              >
+                <SelectTrigger className="w-full h-10 border-2 hover:border-primary transition-colors">
+                  <SelectValue placeholder="ทั้งหมด" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">
+                    <div className="flex items-center gap-2">
+                      <span className="text-base">📊</span>
+                      <span>ทั้งหมด</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="A">
+                    <div className="flex items-center gap-2">
+                      <span className="w-3 h-3 rounded-full bg-green-500"></span>
+                      <span>ระดับดีเด่น</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="B">
+                    <div className="flex items-center gap-2">
+                      <span className="w-3 h-3 rounded-full bg-blue-500"></span>
+                      <span>ระดับดีมาก</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="C">
+                    <div className="flex items-center gap-2">
+                      <span className="w-3 h-3 rounded-full bg-orange-500"></span>
+                      <span>ระดับดี</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="D">
+                    <div className="flex items-center gap-2">
+                      <span className="w-3 h-3 rounded-full bg-yellow-500"></span>
+                      <span>ระดับชมเชย</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="F">
+                    <div className="flex items-center gap-2">
+                      <span className="w-3 h-3 rounded-full bg-red-500"></span>
+                      <span>ต่ำกว่าเกณฑ์</span>
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* 30% - Template Dropdown (Center) */}
             <div className="col-span-4 space-y-2">
               <Label className="text-sm font-semibold text-gray-700">กำหนด Template แบบกลุ่ม</Label>
               <Select
@@ -640,8 +701,8 @@ export default function SchoolCertificateAssignment() {
               </Select>
             </div>
 
-            {/* 30% - Search (Right) */}
-            <div className="col-span-4 space-y-2">
+            {/* 25% - Search (Right) */}
+            <div className="col-span-3 space-y-2">
               <Label className="text-sm font-semibold text-gray-700">ค้นหาชื่อโรงเรียน</Label>
               <div className="relative">
                 <svg 
