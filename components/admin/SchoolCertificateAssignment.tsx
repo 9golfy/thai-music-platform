@@ -204,10 +204,22 @@ export default function SchoolCertificateAssignment() {
 
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
-      filtered = filtered.filter((school) =>
-        school.schoolName.toLowerCase().includes(searchLower) ||
-        school.schoolId.toLowerCase().includes(searchLower)
-      );
+      // Normalize by removing hyphens for flexible search
+      const normalizedSearchTerm = searchTerm.replace(/-/g, '').toLowerCase();
+      
+      filtered = filtered.filter((school) => {
+        const schoolName = school.schoolName || '';
+        const schoolId = school.schoolId || '';
+        const normalizedSchoolId = schoolId.replace(/-/g, '').toLowerCase();
+        
+        // Search matches:
+        // 1. School name (case-insensitive)
+        // 2. School ID with hyphens (e.g., "SCH-20260612-0817")
+        // 3. School ID without hyphens (normalized - e.g., "SCH202606120817" or "0817")
+        return schoolName.toLowerCase().includes(searchLower) ||
+               schoolId.toLowerCase().includes(searchLower) ||
+               normalizedSchoolId.includes(normalizedSearchTerm);
+      });
     }
 
     setFilteredSchools(filtered);

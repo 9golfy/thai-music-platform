@@ -169,8 +169,14 @@ export default function SchoolsDataTable({
       const normalizedSearchTerm = searchTerm.replace(/-/g, '').toLowerCase();
       const normalizedSchoolId = schoolId.replace(/-/g, '').toLowerCase();
       
+      // Check if search matches:
+      // 1. School name (case-insensitive)
+      // 2. Province (case-insensitive)
+      // 3. School ID with hyphens (e.g., "SCH-20260612-0817")
+      // 4. School ID without hyphens (normalized - e.g., "SCH202606120817")
       const searchMatch = schoolName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          province.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         schoolId.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          normalizedSchoolId.includes(normalizedSearchTerm);
       if (!searchMatch) return false;
     }
