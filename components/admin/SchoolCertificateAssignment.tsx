@@ -106,6 +106,39 @@ export default function SchoolCertificateAssignment() {
 
       let allSchools: School[] = [];
 
+      // Helper function to calculate total score from individual components
+      const calculateTotalScore = (school: any, type: string) => {
+        if (type === 'register100') {
+          const part1Score = 
+            (school.teaching_curriculum_score || 0) +
+            (school.teacher_qualification_score || 0) +
+            (school.support_from_org_score || 0) +
+            (school.support_from_external_score || 0) +
+            (school.award_score || 0) +
+            (school.activity_within_province_internal_score || 0) +
+            (school.activity_within_province_external_score || 0) +
+            (school.activity_outside_province_score || 0) +
+            (school.pr_activity_score || 0);
+          const video1Score = school.video1_score || 0;
+          const video2Score = school.video2_score || 0;
+          return part1Score + video1Score + video2Score;
+        } else {
+          // register-support
+          const part1Score =
+            (school.teacher_qualification_score || 0) +
+            (school.support_from_org_score || 0) +
+            (school.support_from_external_score || 0) +
+            (school.award_score || 0) +
+            (school.activity_within_province_internal_score || 0) +
+            (school.activity_within_province_external_score || 0) +
+            (school.activity_outside_province_score || 0) +
+            (school.pr_activity_score || 0);
+          const video1Score = school.video1_score || 0;
+          const video2Score = school.video2_score || 0;
+          return part1Score + video1Score + video2Score;
+        }
+      };
+
       // Fetch schools based on selected type
       if (schoolType === 'all') {
         // Fetch both types with loadAll=true to get all records
@@ -120,12 +153,13 @@ export default function SchoolCertificateAssignment() {
         // Map register100 schools
         const register100Schools = (register100Data.submissions || []).map((school: any) => {
           const certInfo = certificateMap.get(school.schoolId);
-          const totalScore = school.reg100_total_score || 0; // Fix: use correct field name
+          // Calculate total score from individual components (like SchoolsDataTable)
+          const totalScore = calculateTotalScore(school, 'register100');
           const grade = calculateGrade(totalScore);
           
           return {
             ...school,
-            schoolName: school.reg100_schoolName || school.schoolName, // Fix field mapping
+            schoolName: school.reg100_schoolName || school.schoolName,
             total_score: totalScore,
             grade: grade,
             type: 'register100' as const,
@@ -139,12 +173,13 @@ export default function SchoolCertificateAssignment() {
         // Map register-support schools
         const registerSupportSchools = (registerSupportData.submissions || []).map((school: any) => {
           const certInfo = certificateMap.get(school.schoolId);
-          const totalScore = school.regsup_total_score || 0; // Fix: use correct field name
+          // Calculate total score from individual components (like SchoolsDataTable)
+          const totalScore = calculateTotalScore(school, 'register-support');
           const grade = calculateGrade(totalScore);
           
           return {
             ...school,
-            schoolName: school.regsup_schoolName || school.schoolName, // Fix field mapping
+            schoolName: school.regsup_schoolName || school.schoolName,
             total_score: totalScore,
             grade: grade,
             type: 'register-support' as const,
@@ -164,17 +199,15 @@ export default function SchoolCertificateAssignment() {
 
         allSchools = (schoolsData.submissions || []).map((school: any) => {
           const certInfo = certificateMap.get(school.schoolId);
-          // Fix: use correct field name based on school type
-          const totalScore = schoolType === 'register100' 
-            ? (school.reg100_total_score || 0)
-            : (school.regsup_total_score || 0);
+          // Calculate total score from individual components (like SchoolsDataTable)
+          const totalScore = calculateTotalScore(school, schoolType);
           const grade = calculateGrade(totalScore);
           
           return {
             ...school,
             schoolName: schoolType === 'register100' 
               ? (school.reg100_schoolName || school.schoolName)
-              : (school.regsup_schoolName || school.schoolName), // Fix field mapping
+              : (school.regsup_schoolName || school.schoolName),
             total_score: totalScore,
             grade: grade,
             type: schoolType,
