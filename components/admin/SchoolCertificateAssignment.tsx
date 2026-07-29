@@ -98,10 +98,10 @@ export default function SchoolCertificateAssignment() {
 
       // Fetch schools based on selected type
       if (schoolType === 'all') {
-        // Fetch both types
+        // Fetch both types with loadAll=true to get all records
         const [register100Response, registerSupportResponse] = await Promise.all([
-          fetch('/api/register100/list'),
-          fetch('/api/register-support/list'),
+          fetch('/api/register100/list?loadAll=true'),
+          fetch('/api/register-support/list?loadAll=true'),
         ]);
 
         const register100Data = await register100Response.json();
@@ -148,8 +148,8 @@ export default function SchoolCertificateAssignment() {
         // Combine both arrays
         allSchools = [...register100Schools, ...registerSupportSchools];
       } else {
-        // Fetch single type
-        const schoolsResponse = await fetch(`/api/${schoolType}/list`);
+        // Fetch single type with loadAll=true to get all records
+        const schoolsResponse = await fetch(`/api/${schoolType}/list?loadAll=true`);
         const schoolsData = await schoolsResponse.json();
 
         allSchools = (schoolsData.submissions || []).map((school: any) => {
