@@ -61,6 +61,11 @@ export default function SchoolCertificateAssignment() {
   const [showTemplateConfirmModal, setShowTemplateConfirmModal] = useState(false);
   const [pendingTemplateChange, setPendingTemplateChange] = useState<{schoolId: string, templateName: string, schoolName: string} | null>(null);
   const [deletingCertId, setDeletingCertId] = useState<string | null>(null);
+  
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(50);
+  const [paginatedSchools, setPaginatedSchools] = useState<School[]>([]);
 
   useEffect(() => {
     fetchData();
@@ -69,6 +74,11 @@ export default function SchoolCertificateAssignment() {
   useEffect(() => {
     filterSchools();
   }, [schools, searchTerm]);
+
+  useEffect(() => {
+    // Apply pagination when filteredSchools or currentPage changes
+    applyPagination();
+  }, [filteredSchools, currentPage, itemsPerPage]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -110,7 +120,7 @@ export default function SchoolCertificateAssignment() {
         // Map register100 schools
         const register100Schools = (register100Data.submissions || []).map((school: any) => {
           const certInfo = certificateMap.get(school.schoolId);
-          const totalScore = school.total_score || 0;
+          const totalScore = school.reg100_total_score || 0; // Fix: use correct field name
           const grade = calculateGrade(totalScore);
           
           return {
@@ -129,7 +139,7 @@ export default function SchoolCertificateAssignment() {
         // Map register-support schools
         const registerSupportSchools = (registerSupportData.submissions || []).map((school: any) => {
           const certInfo = certificateMap.get(school.schoolId);
-          const totalScore = school.total_score || 0;
+          const totalScore = school.regsup_total_score || 0; // Fix: use correct field name
           const grade = calculateGrade(totalScore);
           
           return {
@@ -154,7 +164,10 @@ export default function SchoolCertificateAssignment() {
 
         allSchools = (schoolsData.submissions || []).map((school: any) => {
           const certInfo = certificateMap.get(school.schoolId);
-          const totalScore = school.total_score || 0;
+          // Fix: use correct field name based on school type
+          const totalScore = schoolType === 'register100' 
+            ? (school.reg100_total_score || 0)
+            : (school.regsup_total_score || 0);
           const grade = calculateGrade(totalScore);
           
           return {
@@ -190,20 +203,53 @@ export default function SchoolCertificateAssignment() {
     let filtered = schools;
 
     if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase();
       filtered = filtered.filter((school) =>
-        school.schoolName.toLowerCase().includes(searchTerm.toLowerCase())
+        school.schoolName.toLowerCase().includes(searchLower) ||
+        school.schoolId.toLowerCase().includes(searchLower)
       );
     }
 
     setFilteredSchools(filtered);
+    setCurrentPage(1); // Reset to first page when filtering
+  };
+
+  const applyPagination = () => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    setPaginatedSchools(filteredSchools.slice(startIndex, endIndex));
+  };
+
+  const totalPages = Math.ceil(filteredSchools.length / itemsPerPage);
+
+  const goToPage = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      goToPage(currentPage + 1);
+    }
+  };
+
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      goToPage(currentPage - 1);
+    }
   };
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      const allIds = new Set(filteredSchools.map((s) => s.schoolId));
-      setSelectedSchools(allIds);
+      // Select all on current page only
+      const currentPageIds = new Set(paginatedSchools.map((s) => s.schoolId));
+      const newSelected = new Set([...selectedSchools, ...currentPageIds]);
+      setSelectedSchools(newSelected);
     } else {
-      setSelectedSchools(new Set());
+      // Deselect all on current page
+      const currentPageIds = new Set(paginatedSchools.map((s) => s.schoolId));
+      const newSelected = new Set([...selectedSchools].filter(id => !currentPageIds.has(id)));
+      setSelectedSchools(newSelected);
     }
   };
 
@@ -633,7 +679,7 @@ export default function SchoolCertificateAssignment() {
                 <TableRow className="bg-gradient-to-r from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200">
                   <TableHead className="w-12 pl-6">
                     <Checkbox
-                      checked={selectedSchools.size === filteredSchools.length && filteredSchools.length > 0}
+                      checked={paginatedSchools.length > 0 && paginatedSchools.every(school => selectedSchools.has(school.schoolId))}
                       onCheckedChange={handleSelectAll}
                       className="border-2"
                     />
@@ -650,7 +696,7 @@ export default function SchoolCertificateAssignment() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredSchools.length === 0 ? (
+                {paginatedSchools.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={8} className="text-center py-16">
                       <div className="flex flex-col items-center gap-3">
@@ -667,7 +713,7 @@ export default function SchoolCertificateAssignment() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredSchools.map((school, index) => (
+                  paginatedSchools.map((school, index) => (
                     <TableRow 
                       key={school._id}
                       className="hover:bg-gray-50 transition-colors"
@@ -682,7 +728,7 @@ export default function SchoolCertificateAssignment() {
                           className="border-2"
                         />
                       </TableCell>
-                      <TableCell className="font-semibold text-gray-600">{index + 1}</TableCell>
+                      <TableCell className="font-semibold text-gray-600">{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
                       <TableCell>
                         <div className="py-1">
                           <div 
@@ -830,19 +876,154 @@ export default function SchoolCertificateAssignment() {
             </Table>
           </div>
 
-          {/* Summary Footer */}
-          <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-              </svg>
-              <span>แสดง <span className="font-semibold text-gray-900">{filteredSchools.length}</span> จาก <span className="font-semibold text-gray-900">{schools.length}</span> โรงเรียน</span>
-            </div>
-            {selectedSchools.size > 0 && (
-              <div className="flex items-center gap-2 text-sm">
-                <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full font-semibold">
-                  เลือกแล้ว {selectedSchools.size} โรงเรียน
+          {/* Pagination Footer */}
+          <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
+            <div className="flex items-center justify-between">
+              {/* Summary on the left */}
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+                <span>
+                  แสดง <span className="font-semibold text-gray-900">{((currentPage - 1) * itemsPerPage) + 1}</span>-<span className="font-semibold text-gray-900">{Math.min(currentPage * itemsPerPage, filteredSchools.length)}</span> จาก <span className="font-semibold text-gray-900">{filteredSchools.length}</span> โรงเรียน
+                  {filteredSchools.length !== schools.length && (
+                    <span className="text-gray-500"> (กรองจากทั้งหมด {schools.length})</span>
+                  )}
                 </span>
+              </div>
+
+              {/* Pagination controls on the right */}
+              <div className="flex items-center gap-2">
+                {/* Items per page selector */}
+                <div className="flex items-center gap-2 mr-4">
+                  <span className="text-sm text-gray-600">แสดง</span>
+                  <Select value={itemsPerPage.toString()} onValueChange={(value) => {
+                    setItemsPerPage(parseInt(value));
+                    setCurrentPage(1);
+                  }}>
+                    <SelectTrigger className="w-20 h-9 border-2">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="20">20</SelectItem>
+                      <SelectItem value="50">50</SelectItem>
+                      <SelectItem value="100">100</SelectItem>
+                      <SelectItem value="200">200</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <span className="text-sm text-gray-600">รายการ</span>
+                </div>
+
+                {/* Previous button */}
+                <button
+                  onClick={goToPreviousPage}
+                  disabled={currentPage === 1}
+                  className={`px-3 py-2 rounded-lg border-2 font-medium transition-all ${
+                    currentPage === 1
+                      ? 'border-gray-200 text-gray-400 cursor-not-allowed'
+                      : 'border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 cursor-pointer'
+                  }`}
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+
+                {/* Page numbers */}
+                <div className="flex items-center gap-1">
+                  {totalPages <= 7 ? (
+                    // Show all pages if 7 or less
+                    Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                      <button
+                        key={page}
+                        onClick={() => goToPage(page)}
+                        className={`w-10 h-10 rounded-lg font-semibold transition-all ${
+                          currentPage === page
+                            ? 'bg-blue-600 text-white shadow-md cursor-pointer'
+                            : 'text-gray-700 hover:bg-gray-100 cursor-pointer'
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    ))
+                  ) : (
+                    // Show ellipsis for many pages
+                    <>
+                      {currentPage > 3 && (
+                        <>
+                          <button onClick={() => goToPage(1)} className="w-10 h-10 rounded-lg font-semibold text-gray-700 hover:bg-gray-100 cursor-pointer">1</button>
+                          <span className="px-2 text-gray-500">...</span>
+                        </>
+                      )}
+                      
+                      {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                        let page;
+                        if (currentPage <= 3) {
+                          page = i + 1;
+                        } else if (currentPage >= totalPages - 2) {
+                          page = totalPages - 4 + i;
+                        } else {
+                          page = currentPage - 2 + i;
+                        }
+                        
+                        if (page < 1 || page > totalPages) return null;
+                        
+                        return (
+                          <button
+                            key={page}
+                            onClick={() => goToPage(page)}
+                            className={`w-10 h-10 rounded-lg font-semibold transition-all ${
+                              currentPage === page
+                                ? 'bg-blue-600 text-white shadow-md cursor-pointer'
+                                : 'text-gray-700 hover:bg-gray-100 cursor-pointer'
+                            }`}
+                          >
+                            {page}
+                          </button>
+                        );
+                      })}
+
+                      {currentPage < totalPages - 2 && (
+                        <>
+                          <span className="px-2 text-gray-500">...</span>
+                          <button onClick={() => goToPage(totalPages)} className="w-10 h-10 rounded-lg font-semibold text-gray-700 hover:bg-gray-100 cursor-pointer">{totalPages}</button>
+                        </>
+                      )}
+                    </>
+                  )}
+                </div>
+
+                {/* Next button */}
+                <button
+                  onClick={goToNextPage}
+                  disabled={currentPage === totalPages}
+                  className={`px-3 py-2 rounded-lg border-2 font-medium transition-all ${
+                    currentPage === totalPages
+                      ? 'border-gray-200 text-gray-400 cursor-not-allowed'
+                      : 'border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 cursor-pointer'
+                  }`}
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            {/* Selected schools indicator */}
+            {selectedSchools.size > 0 && (
+              <div className="mt-3 pt-3 border-t border-gray-200">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">
+                    เลือกแล้ว <span className="font-semibold text-blue-600">{selectedSchools.size}</span> โรงเรียน
+                  </span>
+                  <button
+                    onClick={() => setSelectedSchools(new Set())}
+                    className="text-sm text-red-600 hover:text-red-700 font-medium cursor-pointer"
+                  >
+                    ยกเลิกการเลือกทั้งหมด
+                  </button>
+                </div>
               </div>
             )}
           </div>
