@@ -207,10 +207,12 @@ export default function SchoolsDataTable({
   });
 
   // Pagination calculations
-  // Use totalCount when not fully loaded (initial load with 10 items)
-  // Use filteredSchools.length when filters/search are applied (full data loaded)
-  const totalItems = isFullDataLoaded ? filteredSchools.length : totalCount;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  // Always use totalCount for total items (original count before filtering)
+  // Use filteredSchools.length for filtered count
+  const totalItems = totalCount;  // Always show original total count
+  const filteredCount = filteredSchools.length;  // Actual filtered results
+  const hasActiveFilter = searchTerm || provinceFilter || levelFilter || gradeFilter;
+  const totalPages = Math.ceil(filteredCount / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentSchools = filteredSchools.slice(startIndex, endIndex);
@@ -421,7 +423,13 @@ export default function SchoolsDataTable({
       <CardHeader>
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
-            <CardTitle>รายการโรงเรียน ({totalItems})</CardTitle>
+            <CardTitle>
+              รายการโรงเรียน 
+              {hasActiveFilter 
+                ? ` (แสดง ${filteredCount} จาก ${totalItems} รายการ)`
+                : ` (${totalItems})`
+              }
+            </CardTitle>
             <button 
               onClick={handleExportExcel}
               className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all flex items-center gap-2 shadow-md"
