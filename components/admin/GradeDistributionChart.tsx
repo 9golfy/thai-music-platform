@@ -198,9 +198,8 @@ export function useGradeDistribution() {
         else if (score >= 100) gradeCounts.D++;      // ระดับชมเชย: 100-119 คะแนน (50-59%)
         else gradeCounts.F++;                        // ต่ำกว่าเกณฑ์: 0-99 คะแนน (<50%)
       } else {
-        // Part 1 scores (max 100)
-        const part1 = (submission.teacher_training_score || 0) +
-                      (submission.teacher_qualification_score || 0) +
+        // Part 1 scores (max 80) - excluding teacher_training_score to match DataTable calculation
+        const part1 = (submission.teacher_qualification_score || 0) +
                       (submission.support_from_org_score || 0) +
                       (submission.support_from_external_score || 0) +
                       (submission.award_score || 0) +
@@ -216,12 +215,12 @@ export function useGradeDistribution() {
         
         console.log(`Register-Support - School: ${submission.schoolId}, Part1: ${part1}, Part2: ${part2}, Total: ${score}, Grade: ${score >= 144 ? 'A' : score >= 126 ? 'B' : score >= 108 ? 'C' : score >= 90 ? 'D' : 'F'}`);
         
-        // Grade calculation
-        if (score >= 144) gradeCounts.A++;           // ระดับดีเด่น: 144 ขึ้นไป (80%+)
-        else if (score >= 126) gradeCounts.B++;      // ระดับดีมาก: 126-143 คะแนน (70-79%)
-        else if (score >= 108) gradeCounts.C++;      // ระดับดี: 108-125 คะแนน (60-69%)
-        else if (score >= 90) gradeCounts.D++;       // ระดับชมเชย: 90-107 คะแนน (50-59%)
-        else gradeCounts.F++;                        // ต่ำกว่าเกณฑ์: 0-89 คะแนน (<50%)
+        // Grade calculation (same criteria, max 160 instead of 180)
+        if (score >= 144) gradeCounts.A++;           // ระดับดีเด่น: 144 ขึ้นไป (90%+ of 160)
+        else if (score >= 126) gradeCounts.B++;      // ระดับดีมาก: 126-143 คะแนน (78-89%)
+        else if (score >= 108) gradeCounts.C++;      // ระดับดี: 108-125 คะแนน (67-77%)
+        else if (score >= 90) gradeCounts.D++;       // ระดับชมเชย: 90-107 คะแนน (56-66%)
+        else gradeCounts.F++;                        // ต่ำกว่าเกณฑ์: 0-89 คะแนน (<56%)
       }
     });
     
