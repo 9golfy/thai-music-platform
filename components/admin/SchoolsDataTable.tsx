@@ -291,7 +291,6 @@ export default function SchoolsDataTable({
           // register-support
           return {
             ...baseData,
-            'Step 4: ฝึกอบรมครู (20)': school.teacher_training_score || 0,
             'Step 4: คุณวุฒิครู (20)': school.teacher_qualification_score || 0,
             'Step 6: สนับสนุนต้นสังกัด (5)': school.support_from_org_score || 0,
             'Step 6: สนับสนุนภายนอก (15)': school.support_from_external_score || 0,
@@ -300,8 +299,7 @@ export default function SchoolsDataTable({
             'Step 8: กิจกรรมภายนอก (5)': school.activity_within_province_external_score || 0,
             'Step 8: กิจกรรมนอกจังหวัด (5)': school.activity_outside_province_score || 0,
             'Step 9: ประชาสัมพันธ์ (5)': school.pr_activity_score || 0,
-            'รวมส่วนที่ 1 (100)': (school.teacher_training_score || 0) + 
-                                  (school.teacher_qualification_score || 0) + 
+            'รวมส่วนที่ 1 (80)': (school.teacher_qualification_score || 0) + 
                                   (school.support_from_org_score || 0) + 
                                   (school.support_from_external_score || 0) + 
                                   (school.award_score || 0) + 
@@ -309,9 +307,9 @@ export default function SchoolsDataTable({
                                   (school.activity_within_province_external_score || 0) + 
                                   (school.activity_outside_province_score || 0) + 
                                   (school.pr_activity_score || 0),
-            'วิดีโอ 1 (40)': school.video1_score || 0,
-            'วิดีโอ 2 (40)': school.video2_score || 0,
-            'รวมส่วนที่ 2 (80)': (school.video1_score || 0) + (school.video2_score || 0),
+            'วิดีโอ 1 (50)': school.video1_score || 0,
+            'วิดีโอ 2 (50)': school.video2_score || 0,
+            'รวมส่วนที่ 2 (100)': (school.video1_score || 0) + (school.video2_score || 0),
             'คะแนนรวมทั้งหมด (180)': totalScore,
           };
         }
