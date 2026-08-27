@@ -3,6 +3,7 @@ import { MongoClient } from 'mongodb';
 import { getSchoolSizeDisplayText } from '@/lib/utils/schoolSize';
 import puppeteer from 'puppeteer';
 import JSZip from 'jszip';
+import { pdfRateLimiter } from '@/middleware/rateLimiter';
 
 // Extend global type for temp storage
 declare global {
@@ -248,6 +249,17 @@ export async function GET(request: NextRequest) {
   const stream = searchParams.get('stream'); // 'true' for SSE progress
   const download = searchParams.get('download'); // 'true' for actual download
 
+  // Rate limiting check
+  const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
+  const rateLimitCheck = pdfRateLimiter.checkRateLimit(ip);
+  
+  if (!rateLimitCheck.allowed) {
+    return NextResponse.json(
+      { success: false, message: rateLimitCheck.message },
+      { status: 429 } // Too Many Requests
+    );
+  }
+
   // If download=true, return the stored ZIP
   if (download === 'true') {
     const zipBuffer = (global as any).tempZipBuffer;
@@ -274,14 +286,17 @@ export async function GET(request: NextRequest) {
 
   // If stream=true, return SSE for progress
   if (stream === 'true') {
-    return handleStreamProgress(type);
+    return handleStreamProgress(type, ip);
   }
 
   // Otherwise, regular download (for backward compatibility)
-  return handleRegularDownload(type);
+  return handleRegularDownload(type, ip);
 }
 
-async function handleStreamProgress(type: string | null) {
+async function handleStreamProgress(type: string | null, ip: string) {
+  
+  // Mark generation as started
+  pdfRateLimiter.startGeneration();
   const encoder = new TextEncoder();
   
   const stream = new ReadableStream({

@@ -3,6 +3,7 @@ import { MongoClient } from 'mongodb';
 import { getSchoolSizeDisplayText } from '@/lib/utils/schoolSize';
 import puppeteer from 'puppeteer';
 import JSZip from 'jszip';
+import { pdfRateLimiter } from '@/middleware/rateLimiter';
 
 // Extend global type for temp storage
 declare global {
@@ -12,6 +13,10 @@ declare global {
 
 const uri = process.env.MONGODB_URI || 'mongodb://root:rootpass@localhost:27017/thai_music_school?authSource=admin';
 const dbName = process.env.MONGO_DB || 'thai_music_school';
+
+// Configuration
+const MAX_BATCH_SIZE = 50; // Process max 50 schools at a time to prevent memory overflow
+const BROWSER_POOL_SIZE = 1; // Use only 1 browser instance
 
 // Helper function to generate FULL PDF HTML content (all sections)
 function generateFullPDFHTML(
@@ -473,6 +478,17 @@ export async function GET(request: NextRequest) {
   const stream = searchParams.get('stream'); // 'true' for SSE progress
   const download = searchParams.get('download'); // 'true' for actual download
 
+  // Rate limiting check
+  const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
+  const rateLimitCheck = pdfRateLimiter.checkRateLimit(ip);
+  
+  if (!rateLimitCheck.allowed) {
+    return NextResponse.json(
+      { success: false, message: rateLimitCheck.message },
+      { status: 429 } // Too Many Requests
+    );
+  }
+
   // If download=true, return the stored ZIP
   if (download === 'true') {
     const zipBuffer = (global as any).tempFullZipBuffer;
@@ -499,19 +515,23 @@ export async function GET(request: NextRequest) {
 
   // If stream=true, return SSE for progress
   if (stream === 'true') {
-    return handleStreamProgress(type);
+    return handleStreamProgress(type, ip);
   }
 
   // Otherwise, regular download (for backward compatibility)
-  return handleRegularDownload(type);
+  return handleRegularDownload(type, ip);
 }
 
-async function handleStreamProgress(type: string | null) {
+async function handleStreamProgress(type: string | null, ip: string) {
   const encoder = new TextEncoder();
   
   const stream = new ReadableStream({
     async start(controller) {
       let browser;
+      
+      // Mark generation as started
+      pdfRateLimiter.startGeneration();
+      
       try {
         // Send initial message to confirm connection
         controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'connected' })}\n\n`));
@@ -678,6 +698,9 @@ async function handleStreamProgress(type: string | null) {
           message: error?.message || 'เกิดข้อผิดพลาดในการสร้าง ZIP'
         })}\n\n`));
         controller.close();
+      } finally {
+        // Mark generation as ended
+        pdfRateLimiter.endGeneration();
       }
     }
   });
@@ -692,8 +715,12 @@ async function handleStreamProgress(type: string | null) {
   });
 }
 
-async function handleRegularDownload(type: string | null) {
+async function handleRegularDownload(type: string | null, ip: string) {
   let browser;
+  
+  // Mark generation as started
+  pdfRateLimiter.startGeneration();
+  
   try {
     const client = new MongoClient(uri);
     await client.connect();
@@ -822,5 +849,8 @@ async function handleRegularDownload(type: string | null) {
       { success: false, message: 'เกิดข้อผิดพลาดในการสร้าง ZIP' },
       { status: 500 }
     );
+  } finally {
+    // Mark generation as ended
+    pdfRateLimiter.endGeneration();
   }
 }
