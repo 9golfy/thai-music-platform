@@ -299,7 +299,7 @@ export async function GET(request: NextRequest) {
   }
 
   // Otherwise, regular download (for backward compatibility)
-  return handleRegularDownload(type, ip);
+  return handleRegularDownload(type);
 }
 
 async function handleStreamProgress(type: string | null, ip: string) {
@@ -396,7 +396,7 @@ async function handleStreamProgress(type: string | null, ip: string) {
           const htmlContent = generatePDFHTML(submission, submissionType, schoolId);
           
           const page = await browser.newPage();
-          await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+          await page.setContent(htmlContent, { waitUntil: 'load' });
           
           const pdfBuffer = await page.pdf({
             format: 'A4',
@@ -543,7 +543,7 @@ async function handleRegularDownload(type: string | null) {
       const htmlContent = generatePDFHTML(submission, submissionType, schoolId);
       
       const page = await browser.newPage();
-      await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+      await page.setContent(htmlContent, { waitUntil: 'load' });
       
       const pdfBuffer = await page.pdf({
         format: 'A4',
@@ -578,7 +578,7 @@ async function handleRegularDownload(type: string | null) {
     const timestamp = new Date().toISOString().slice(0, 10);
     const zipFilename = `all-schools-${type || 'all'}-${timestamp}.zip`;
     
-    return new NextResponse(zipBuffer, {
+    return new NextResponse(Buffer.from(zipBuffer), {
       headers: {
         'Content-Type': 'application/zip',
         'Content-Disposition': `attachment; filename="${zipFilename}"`,

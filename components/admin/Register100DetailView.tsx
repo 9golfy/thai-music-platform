@@ -172,7 +172,7 @@ export default function Register100DetailView({ id, hideScores = false, readOnly
   };
 
   const handleSchoolPageDownload = async () => {
-    if (!submission.schoolId) {
+    if (!submission?.schoolId) {
       alert('ไม่พบ School ID');
       return;
     }

@@ -624,7 +624,7 @@ async function handleStreamProgress(type: string | null, ip: string) {
           // Enable request interception to handle external images
           await page.setRequestInterception(false);
           
-          await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+          await page.setContent(htmlContent, { waitUntil: 'load' });
           
           // Wait for images to load
           await page.evaluate(() => {
@@ -793,7 +793,7 @@ async function handleRegularDownload(type: string | null, ip: string) {
       await page.setDefaultNavigationTimeout(60000);
       await page.setDefaultTimeout(60000);
       
-      await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+      await page.setContent(htmlContent, { waitUntil: 'load' });
       
       // Wait for images to load
       await page.evaluate(() => {
@@ -842,7 +842,7 @@ async function handleRegularDownload(type: string | null, ip: string) {
     const timestamp = new Date().toISOString().slice(0, 10);
     const zipFilename = `all-schools-full-${type || 'all'}-${timestamp}.zip`;
     
-    return new NextResponse(zipBuffer, {
+    return new NextResponse(Buffer.from(zipBuffer), {
       headers: {
         'Content-Type': 'application/zip',
         'Content-Disposition': `attachment; filename="${zipFilename}"`,

@@ -208,7 +208,7 @@ export default function RegisterSupportDetailView({ id, hideScores = false, read
   };
 
   const handleSchoolPageDownload = async () => {
-    if (!submission.schoolId) {
+    if (!submission?.schoolId) {
       alert('ไม่พบ School ID');
       return;
     }

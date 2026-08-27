@@ -7,15 +7,14 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { getSession } from '@/lib/auth/session';
 
 export async function GET(request: NextRequest) {
   try {
     // Check authentication
-    const session = await getServerSession(authOptions);
+    const session = await getSession();
     
-    if (!session || session.user.role !== 'dcp_admin') {
+    if (!session || !['admin', 'root', 'super_admin'].includes(session.role)) {
       return NextResponse.json(
         { success: false, message: 'Unauthorized' },
         { status: 401 }

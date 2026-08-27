@@ -287,7 +287,7 @@ export async function GET(
     });
     
     const page = await browser.newPage();
-    await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+    await page.setContent(htmlContent, { waitUntil: 'load' });
     
     const pdfBuffer = await page.pdf({
       format: 'A4',
@@ -306,7 +306,7 @@ export async function GET(
     const safeSchoolName = schoolName.replace(/[^a-zA-Z0-9ก-๙\s]/g, '').substring(0, 50);
     const filename = `${safeSchoolName} ลำดับที่ ${schoolId}.pdf`;
     
-    return new NextResponse(pdfBuffer, {
+    return new NextResponse(Buffer.from(pdfBuffer), {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="${encodeURIComponent(filename)}"`,
