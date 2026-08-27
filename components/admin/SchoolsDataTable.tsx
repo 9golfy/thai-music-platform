@@ -259,6 +259,76 @@ export default function SchoolsDataTable({
     setShowPDFProgress(true);
   };
 
+  const handleDownloadSchoolPDF = async (schoolId: string, schoolMongoId: string) => {
+    if (!schoolMongoId) {
+      alert('ไม่พบข้อมูลโรงเรียน');
+      return;
+    }
+
+    try {
+      // ดาวน์โหลด PDF Full Version โดยตรง (ไม่เปิด print dialog)
+      const apiEndpoint = type === 'register100' 
+        ? `/api/register100/${schoolMongoId}/export/pdf-download`
+        : `/api/register-support/${schoolMongoId}/export/pdf-download`;
+      
+      const response = await fetch(apiEndpoint);
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        // Find school in current data to get name
+        const school = schools.find(s => s._id === schoolMongoId);
+        const schoolName = type === 'register100' 
+          ? (school?.reg100_schoolName || 'โรงเรียน')
+          : (school?.regsup_schoolName || 'โรงเรียน');
+        a.download = `${schoolName}_Full.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      } else {
+        alert('เกิดข้อผิดพลาดในการสร้าง PDF');
+      }
+    } catch (error) {
+      console.error('Error downloading PDF:', error);
+      alert('เกิดข้อผิดพลาดในการสร้าง PDF');
+    }
+  };
+
+  const handleDownloadSchoolPagePDF = async (schoolId: string, schoolMongoId: string) => {
+    if (!schoolId) {
+      alert('ไม่พบ School ID');
+      return;
+    }
+
+    try {
+      // ดาวน์โหลด School Page PDF (short version, 1 หน้า)
+      const response = await fetch(`/api/school/${schoolId}/download-pdf`);
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        // Find school in current data to get name
+        const school = schools.find(s => s._id === schoolMongoId);
+        const schoolName = type === 'register100' 
+          ? (school?.reg100_schoolName || schoolId)
+          : (school?.regsup_schoolName || schoolId);
+        a.download = `${schoolName}_SchoolPage.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      } else {
+        alert('เกิดข้อผิดพลาดในการดาวน์โหลด PDF');
+      }
+    } catch (error) {
+      console.error('Error downloading PDF:', error);
+      alert('เกิดข้อผิดพลาดในการดาวน์โหลด PDF');
+    }
+  };
+
   const handleExportExcel = async () => {
     if (filteredSchools.length === 0) {
       alert('ไม่มีข้อมูลสำหรับ Export');
@@ -469,6 +539,8 @@ export default function SchoolsDataTable({
                 <Download className="w-4 h-4" />
                 All School Page (ZIP)
               </button>
+              {/* Full School Page (ZIP) - HIDDEN: Too resource intensive, can cause server crash */}
+              {/* 
               <button 
                 onClick={handleDownloadFullPDF}
                 className="px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-sm rounded-lg hover:from-blue-600 hover:to-cyan-600 transition-all flex items-center gap-2 shadow-md"
@@ -476,6 +548,7 @@ export default function SchoolsDataTable({
                 <Download className="w-4 h-4" />
                 Full School Page (ZIP)
               </button>
+              */}
               <button 
                 onClick={handleExportExcel}
                 className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all flex items-center gap-2 shadow-md"
@@ -696,6 +769,26 @@ export default function SchoolsDataTable({
                               View
                             </button>
                           </Link>
+                          <button
+                            onClick={() => handleDownloadSchoolPDF(school.schoolId, school._id)}
+                            className="px-3 py-1.5 bg-gradient-to-r from-red-500 to-pink-500 text-white text-sm rounded-lg hover:from-red-600 hover:to-pink-600 transition-all shadow-md flex items-center gap-1"
+                            title="ดาวน์โหลด PDF ข้อมูลเต็ม (Full Version ~20 หน้า)"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            PDF
+                          </button>
+                          <button
+                            onClick={() => handleDownloadSchoolPagePDF(school.schoolId, school._id)}
+                            className="px-3 py-1.5 bg-gradient-to-r from-purple-500 to-indigo-500 text-white text-sm rounded-lg hover:from-purple-600 hover:to-indigo-600 transition-all shadow-md flex items-center gap-1"
+                            title="ดาวน์โหลด School Page PDF (Short Version 1 หน้า)"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                            </svg>
+                            PDF2
+                          </button>
                           <Link href={`/dcp-admin/dashboard/${basePath}/${school._id}?mode=edit`}>
                             <button className="px-3 py-1.5 bg-gradient-to-r from-orange-500 to-amber-500 text-white text-sm rounded-lg hover:from-orange-600 hover:to-amber-600 transition-all shadow-md">
                               Edit

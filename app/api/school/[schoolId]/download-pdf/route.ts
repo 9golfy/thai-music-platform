@@ -67,20 +67,9 @@ export async function GET(
     const schoolName = getFieldValue('schoolName') || 'N/A';
     const schoolProvince = getFieldValue('schoolProvince') || 'N/A';
     const schoolLevel = getFieldValue('schoolLevel') || 'N/A';
-    const pageTitle = type === 'register100'
-      ? 'รายงานข้อมูล โรงเรียนทดสอบ Register100 Full Fields Complete'
-      : 'รายงานข้อมูล โรงเรียนสนับสนุนและส่งเสริม';
-
-    // Format date and time
-    const now = new Date();
-    const month = now.getMonth() + 1;
-    const day = now.getDate();
-    const year = now.getFullYear().toString().slice(-2);
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    
-    const dateStr = `${month}/${day}/${year}`;
-    const timeStr = `${hours}:${minutes}`;
+    const registrationType = type === 'register100' 
+      ? 'ประเภท โรงเรียนดนตรีไทย 100 เปอร์เซ็นต์'
+      : 'ประเภท โรงเรียนสนับสนุนและส่งเสริมดนตรีไทย';
     
     // Generate HTML for PDF
     const htmlContent = `
@@ -89,7 +78,7 @@ export async function GET(
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${pageTitle}</title>
+  <title>รายงานข้อมูล ${schoolName}</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
     
@@ -112,21 +101,20 @@ export async function GET(
       background: white;
     }
     
-    .header {
-      text-align: right;
-      font-size: 12px;
-      color: #666;
-      margin-bottom: 10px;
-      padding-bottom: 5px;
-      border-bottom: 1px solid #e0e0e0;
-    }
-    
     .title {
       text-align: center;
-      font-size: 22px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #1a56db;
+      margin: 10px 0 5px 0;
+    }
+    
+    .subtitle {
+      text-align: center;
+      font-size: 20px;
       font-weight: bold;
       color: #1a56db;
-      margin: 20px 0 30px 0;
+      margin: 5px 0 30px 0;
     }
     
     .section {
@@ -217,11 +205,8 @@ export async function GET(
   </style>
 </head>
 <body>
-  <div class="header">
-    ${dateStr}, ${timeStr} AM
-  </div>
-  
-  <div class="title">${pageTitle}</div>
+  <div class="title">${registrationType}</div>
+  <div class="subtitle">รายงานข้อมูล ${schoolName}</div>
   
   <div class="section">
     <h2 class="section-title">1. ข้อมูลพื้นฐาน</h2>

@@ -8,10 +8,10 @@ interface RateLimitEntry {
 
 class PDFRateLimiter {
   private requests: Map<string, RateLimitEntry> = new Map();
-  private readonly maxRequestsPerMinute = 2; // Max 2 PDF generation per minute per IP
+  private readonly maxRequestsPerMinute = 5; // Max 5 PDF generation per minute per IP (เพิ่มจาก 2)
   private readonly windowMs = 60 * 1000; // 1 minute
   private activePDFGenerations = 0;
-  private readonly maxConcurrentGenerations = 2; // Max 2 concurrent PDF generations globally
+  private readonly maxConcurrentGenerations = 3; // Max 3 concurrent PDF generations globally (เพิ่มจาก 2)
 
   checkRateLimit(ip: string): { allowed: boolean; message?: string } {
     const now = Date.now();

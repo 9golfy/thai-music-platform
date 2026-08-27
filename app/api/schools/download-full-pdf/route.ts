@@ -528,11 +528,13 @@ async function handleStreamProgress(type: string | null, ip: string) {
   const stream = new ReadableStream({
     async start(controller) {
       let browser;
-      
-      // Mark generation as started
-      pdfRateLimiter.startGeneration();
+      let generationStarted = false;
       
       try {
+        // Mark generation as started
+        pdfRateLimiter.startGeneration();
+        generationStarted = true;
+        
         // Send initial message to confirm connection
         controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'connected' })}\n\n`));
         
@@ -684,6 +686,10 @@ async function handleStreamProgress(type: string | null, ip: string) {
         (global as any).tempFullZipBuffer = zipBuffer;
         (global as any).tempFullZipFilename = zipFilename;
         
+        // Mark generation as ended (success)
+        pdfRateLimiter.endGeneration();
+        generationStarted = false; // Prevent double cleanup in finally
+        
       } catch (error: any) {
         console.error('Error generating full ZIP:', error);
         if (browser) {
@@ -699,8 +705,10 @@ async function handleStreamProgress(type: string | null, ip: string) {
         })}\n\n`));
         controller.close();
       } finally {
-        // Mark generation as ended
-        pdfRateLimiter.endGeneration();
+        // Always clean up rate limiter
+        if (generationStarted) {
+          pdfRateLimiter.endGeneration();
+        }
       }
     }
   });

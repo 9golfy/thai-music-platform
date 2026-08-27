@@ -39,9 +39,9 @@ function generatePDFHTML(
   const schoolName = getFieldValue('schoolName') || 'N/A';
   const schoolProvince = getFieldValue('schoolProvince') || 'N/A';
   const schoolLevel = getFieldValue('schoolLevel') || 'N/A';
-  const pageTitle = type === 'register100'
-    ? 'รายงานข้อมูล โรงเรียนทดสอบ Register100 Full Fields Complete'
-    : 'รายงานข้อมูล โรงเรียนสนับสนุนและส่งเสริม';
+  const registrationType = type === 'register100' 
+    ? 'ประเภท โรงเรียนดนตรีไทย 100 เปอร์เซ็นต์'
+    : 'ประเภท โรงเรียนสนับสนุนและส่งเสริมดนตรีไทย';
 
   return `
 <!DOCTYPE html>
@@ -49,7 +49,7 @@ function generatePDFHTML(
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${pageTitle}</title>
+  <title>รายงานข้อมูล ${schoolName}</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
     
@@ -74,10 +74,18 @@ function generatePDFHTML(
     
     .title {
       text-align: center;
-      font-size: 22px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #1a56db;
+      margin: 10px 0 5px 0;
+    }
+    
+    .subtitle {
+      text-align: center;
+      font-size: 20px;
       font-weight: bold;
       color: #1a56db;
-      margin: 20px 0 30px 0;
+      margin: 5px 0 30px 0;
     }
     
     .section {
@@ -168,7 +176,8 @@ function generatePDFHTML(
   </style>
 </head>
 <body>
-  <div class="title">${pageTitle}</div>
+  <div class="title">${registrationType}</div>
+  <div class="subtitle">รายงานข้อมูล ${schoolName}</div>
   
   <div class="section">
     <h2 class="section-title">1. ข้อมูลพื้นฐาน</h2>
@@ -294,15 +303,18 @@ export async function GET(request: NextRequest) {
 }
 
 async function handleStreamProgress(type: string | null, ip: string) {
-  
-  // Mark generation as started
-  pdfRateLimiter.startGeneration();
   const encoder = new TextEncoder();
   
   const stream = new ReadableStream({
     async start(controller) {
       let browser;
+      let generationStarted = false;
+      
       try {
+        // Mark generation as started
+        pdfRateLimiter.startGeneration();
+        generationStarted = true;
+        
         // Send initial message to confirm connection
         controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'connected' })}\n\n`));
         
@@ -433,6 +445,10 @@ async function handleStreamProgress(type: string | null, ip: string) {
         (global as any).tempZipBuffer = zipBuffer;
         (global as any).tempZipFilename = zipFilename;
         
+        // Mark generation as ended (success)
+        pdfRateLimiter.endGeneration();
+        generationStarted = false; // Prevent double cleanup in finally
+        
       } catch (error: any) {
         console.error('Error generating ZIP:', error);
         if (browser) {
@@ -447,6 +463,11 @@ async function handleStreamProgress(type: string | null, ip: string) {
           message: error?.message || 'เกิดข้อผิดพลาดในการสร้าง ZIP'
         })}\n\n`));
         controller.close();
+      } finally {
+        // Always clean up rate limiter
+        if (generationStarted) {
+          pdfRateLimiter.endGeneration();
+        }
       }
     }
   });

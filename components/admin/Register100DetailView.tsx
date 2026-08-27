@@ -200,17 +200,18 @@ export default function Register100DetailView({ id, hideScores = false, readOnly
 
   const handleExportPDF = async () => {
     try {
-      const response = await fetch(`/api/register100/${id}/export/pdf`);
+      // ดาวน์โหลด PDF Full Version โดยตรง (ไม่เปิด print dialog)
+      const response = await fetch(`/api/register100/${id}/export/pdf-download`);
       if (response.ok) {
-        const htmlContent = await response.text();
-        const printWindow = window.open('', '_blank');
-        if (printWindow) {
-          printWindow.document.write(htmlContent);
-          printWindow.document.close();
-          printWindow.onload = () => {
-            setTimeout(() => { printWindow.print(); }, 500);
-          };
-        }
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${submission?.reg100_schoolName || 'โรงเรียน'}_Full.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
       } else {
         alert('เกิดข้อผิดพลาดในการส่งออก PDF');
       }
