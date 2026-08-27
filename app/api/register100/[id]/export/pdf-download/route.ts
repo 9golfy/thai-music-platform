@@ -27,8 +27,9 @@ export async function GET(
     }
 
     // Use the same HTML generation from the export/pdf route
-    // Get the HTML first
-    const response = await fetch(`${_request.nextUrl.origin}/api/register100/${id}/export/pdf`);
+    // Get the HTML first - use localhost for internal API calls to avoid SSL issues with reverse proxy
+    const internalApiUrl = process.env.INTERNAL_API_URL || 'http://localhost:3000';
+    const response = await fetch(`${internalApiUrl}/api/register100/${id}/export/pdf`);
     let htmlContent = await response.text();
     
     // Convert all image URLs to base64 to ensure they load in PDF
@@ -39,9 +40,9 @@ export async function GET(
       let imgUrl = match[1];
       if (imgUrl && !imgUrl.startsWith('data:')) {
         try {
-          // Convert relative URL to absolute URL
+          // Convert relative URL to absolute URL using localhost for internal requests
           if (imgUrl.startsWith('/')) {
-            imgUrl = `${_request.nextUrl.origin}${imgUrl}`;
+            imgUrl = `${internalApiUrl}${imgUrl}`;
           }
           
           // Fetch image and convert to base64
