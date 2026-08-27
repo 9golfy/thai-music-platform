@@ -266,27 +266,26 @@ export default function SchoolsDataTable({
     }
 
     try {
-      // ดาวน์โหลด PDF Full Version โดยตรง (ไม่เปิด print dialog)
+      // เปิดหน้า HTML สำหรับ print ใน tab ใหม่ (Full Version ~20 หน้า)
       const apiEndpoint = type === 'register100' 
-        ? `/api/register100/${schoolMongoId}/export/pdf-download`
-        : `/api/register-support/${schoolMongoId}/export/pdf-download`;
+        ? `/api/register100/${schoolMongoId}/export/pdf`
+        : `/api/register-support/${schoolMongoId}/export/pdf`;
       
       const response = await fetch(apiEndpoint);
       if (response.ok) {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        // Find school in current data to get name
-        const school = schools.find(s => s._id === schoolMongoId);
-        const schoolName = type === 'register100' 
-          ? (school?.reg100_schoolName || 'โรงเรียน')
-          : (school?.regsup_schoolName || 'โรงเรียน');
-        a.download = `${schoolName}_Full.pdf`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
+        const htmlContent = await response.text();
+        const printWindow = window.open('', '_blank');
+        if (printWindow) {
+          printWindow.document.write(htmlContent);
+          printWindow.document.close();
+          
+          // รอให้ content โหลดเสร็จแล้วเปิด print dialog
+          printWindow.onload = () => {
+            setTimeout(() => {
+              printWindow.print();
+            }, 500);
+          };
+        }
       } else {
         alert('เกิดข้อผิดพลาดในการสร้าง PDF');
       }
@@ -303,23 +302,22 @@ export default function SchoolsDataTable({
     }
 
     try {
-      // ดาวน์โหลด School Page PDF (short version, 1 หน้า)
-      const response = await fetch(`/api/school/${schoolId}/download-pdf`);
+      // เปิดหน้า HTML สำหรับ print ใน tab ใหม่ (School Page - short version 1 หน้า)
+      const response = await fetch(`/api/school/${schoolId}/pdf`);
       if (response.ok) {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        // Find school in current data to get name
-        const school = schools.find(s => s._id === schoolMongoId);
-        const schoolName = type === 'register100' 
-          ? (school?.reg100_schoolName || schoolId)
-          : (school?.regsup_schoolName || schoolId);
-        a.download = `${schoolName}_SchoolPage.pdf`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
+        const htmlContent = await response.text();
+        const printWindow = window.open('', '_blank');
+        if (printWindow) {
+          printWindow.document.write(htmlContent);
+          printWindow.document.close();
+          
+          // รอให้ content โหลดเสร็จแล้วเปิด print dialog
+          printWindow.onload = () => {
+            setTimeout(() => {
+              printWindow.print();
+            }, 500);
+          };
+        }
       } else {
         alert('เกิดข้อผิดพลาดในการดาวน์โหลด PDF');
       }

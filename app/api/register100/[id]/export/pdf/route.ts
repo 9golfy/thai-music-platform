@@ -210,7 +210,10 @@ export async function GET(
     </style>
 </head>
 <body>
-    <h1>รายงานข้อมูล ${getFieldValue('schoolName')}</h1>
+    <div style="text-align: center; margin-bottom: 20px;">
+        <h1 style="margin-bottom: 5px; color: #1a56db; font-size: 20px;">ประเภท โรงเรียนดนตรีไทย 100 เปอร์เซ็นต์</h1>
+        <h1 style="margin-top: 5px; color: #1a56db; font-size: 20px;">รายงานข้อมูล ${getFieldValue('schoolName')}</h1>
+    </div>
 
     <!-- Step 1: ข้อมูลพื้นฐาน -->
     <div class="section">

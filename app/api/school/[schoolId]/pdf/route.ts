@@ -84,12 +84,14 @@ export async function GET(
     const schoolName = getFieldValue('schoolName') || 'N/A';
     const schoolProvince = getFieldValue('schoolProvince') || 'N/A';
     const schoolLevel = getFieldValue('schoolLevel') || 'N/A';
-    const registrationType = type === 'register100' 
-      ? 'โรงเรียนทดสอบ Register100 Full Fields Complete'
-      : 'โรงเรียนสนับสนุนและส่งเสริม';
-    const pageTitle = type === 'register100'
-      ? 'รายงานข้อมูล โรงเรียนทดสอบ Register100 Full Fields Complete'
-      : 'รายงานข้อมูล โรงเรียนสนับสนุนและส่งเสริม';
+    
+    // Header lines (2 lines with blue color)
+    const headerLine1 = type === 'register100' 
+      ? 'ประเภท โรงเรียนดนตรีไทย 100 เปอร์เซ็นต์'
+      : 'ประเภท โรงเรียนสนับสนุนและส่งเสริมดนตรีไทย';
+    const headerLine2 = type === 'register100'
+      ? 'รายงานข้อมูล โรงเรียนดนตรีไทย Register100 Full Fields Complete'
+      : 'รายงานข้อมูล โรงเรียนสนับสนุนและส่งเสริมดนตรีไทย';
 
     // Format date and time - use simple format, Sarabun font handles Arabic numerals correctly
     const now = new Date();
@@ -114,7 +116,7 @@ export async function GET(
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${pageTitle}</title>
+  <title>${headerLine2}</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
     
@@ -137,21 +139,15 @@ export async function GET(
       background: white;
     }
     
-    .header {
-      text-align: right;
-      font-size: 12px;
-      color: #666;
-      margin-bottom: 10px;
-      padding-bottom: 5px;
-      border-bottom: 1px solid #e0e0e0;
-    }
+
     
     .title {
       text-align: center;
-      font-size: 22px;
+      font-size: 20px;
       font-weight: bold;
       color: #1a56db;
-      margin: 20px 0 30px 0;
+      margin: 10px 0 30px 0;
+      line-height: 1.5;
     }
     
     .section {
@@ -242,11 +238,10 @@ export async function GET(
   </style>
 </head>
 <body>
-  <div class="header">
-    ${dateStr}, ${timeStr} AM
+  <div class="title">
+    ${headerLine1}<br>
+    ${headerLine2}
   </div>
-  
-  <div class="title">${pageTitle}</div>
   
   <div class="section">
     <h2 class="section-title">1. ข้อมูลพื้นฐาน</h2>

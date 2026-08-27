@@ -214,17 +214,22 @@ export default function RegisterSupportDetailView({ id, hideScores = false, read
     }
     
     try {
-      const response = await fetch(`/api/school/${submission.schoolId}/download-pdf`);
+      // เปิดหน้า HTML สำหรับ print ใน tab ใหม่
+      const response = await fetch(`/api/school/${submission.schoolId}/pdf`);
       if (response.ok) {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${submission.regsup_schoolName || submission.schoolId}.pdf`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
+        const htmlContent = await response.text();
+        const printWindow = window.open('', '_blank');
+        if (printWindow) {
+          printWindow.document.write(htmlContent);
+          printWindow.document.close();
+          
+          // รอให้ content โหลดเสร็จแล้วเปิด print dialog
+          printWindow.onload = () => {
+            setTimeout(() => {
+              printWindow.print();
+            }, 500);
+          };
+        }
       } else {
         alert('เกิดข้อผิดพลาดในการดาวน์โหลด PDF');
       }
@@ -236,19 +241,25 @@ export default function RegisterSupportDetailView({ id, hideScores = false, read
 
   const handleExportPDF = async () => {
     try {
-      // ดาวน์โหลด PDF Full Version โดยตรง (ไม่เปิด print dialog)
-      const response = await fetch(`/api/register-support/${id}/export/pdf-download`);
+      // เปิดหน้า HTML สำหรับ print ใน tab ใหม่
+      const response = await fetch(`/api/register-support/${id}/export/pdf`);
       
       if (response.ok) {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${submission?.regsup_schoolName || 'โรงเรียน'}_Full.pdf`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
+        const htmlContent = await response.text();
+        
+        // สร้าง tab ใหม่และเขียน HTML content
+        const printWindow = window.open('', '_blank');
+        if (printWindow) {
+          printWindow.document.write(htmlContent);
+          printWindow.document.close();
+          
+          // รอให้ content โหลดเสร็จแล้วเปิด print dialog
+          printWindow.onload = () => {
+            setTimeout(() => {
+              printWindow.print();
+            }, 500);
+          };
+        }
       } else {
         alert('เกิดข้อผิดพลาดในการส่งออก PDF');
       }
