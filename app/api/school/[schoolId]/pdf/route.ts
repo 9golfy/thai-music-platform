@@ -89,9 +89,7 @@ export async function GET(
     const headerLine1 = type === 'register100' 
       ? 'ประเภท โรงเรียนดนตรีไทย 100 เปอร์เซ็นต์'
       : 'ประเภท โรงเรียนสนับสนุนและส่งเสริมดนตรีไทย';
-    const headerLine2 = type === 'register100'
-      ? 'รายงานข้อมูล โรงเรียนดนตรีไทย Register100 Full Fields Complete'
-      : 'รายงานข้อมูล โรงเรียนสนับสนุนและส่งเสริมดนตรีไทย';
+    const headerLine2 = `รายงานข้อมูล ${schoolName}`;
 
     // Format date and time - use simple format, Sarabun font handles Arabic numerals correctly
     const now = new Date();
