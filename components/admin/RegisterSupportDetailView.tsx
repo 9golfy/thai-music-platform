@@ -83,6 +83,20 @@ export default function RegisterSupportDetailView({ id, hideScores = false, read
     if (!submission) return;
     setIsEditMode(true);
     setEditedData({ ...submission });
+    
+    // Debug: Log score values when entering edit mode
+    console.log('🔍 Edit Mode - Score Values:', {
+      teacher_qualification_score: submission.teacher_qualification_score,
+      support_from_org_score: submission.support_from_org_score,
+      support_from_external_score: submission.support_from_external_score,
+      award_score: submission.award_score,
+      activity_within_province_internal_score: submission.activity_within_province_internal_score,
+      activity_within_province_external_score: submission.activity_within_province_external_score,
+      activity_outside_province_score: submission.activity_outside_province_score,
+      pr_activity_score: submission.pr_activity_score,
+      video1_score: submission.video1_score,
+      video2_score: submission.video2_score,
+    });
   };
 
   const handleCancelEdit = () => {
@@ -190,6 +204,33 @@ export default function RegisterSupportDetailView({ id, hideScores = false, read
       const updatedArray = [...(editedData[actualArrayField] || [])];
       updatedArray.splice(index, 1);
       setEditedData({ ...editedData, [actualArrayField]: updatedArray });
+    }
+  };
+
+  const handleSchoolPageDownload = async () => {
+    if (!submission.schoolId) {
+      alert('ไม่พบ School ID');
+      return;
+    }
+    
+    try {
+      const response = await fetch(`/api/school/${submission.schoolId}/download-pdf`);
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${submission.regsup_schoolName || submission.schoolId}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      } else {
+        alert('เกิดข้อผิดพลาดในการดาวน์โหลด PDF');
+      }
+    } catch (error) {
+      console.error('Error downloading PDF:', error);
+      alert('เกิดข้อผิดพลาดในการดาวน์โหลด PDF');
     }
   };
 
@@ -942,6 +983,15 @@ export default function RegisterSupportDetailView({ id, hideScores = false, read
         <div className="flex gap-3 mb-6 justify-end">
           {!isEditMode ? (
             <>
+              <button
+                onClick={handleSchoolPageDownload}
+                className="px-6 py-2 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all flex items-center gap-2 shadow-md"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+                SchoolPage
+              </button>
               <button
                 onClick={() => handleExportPDF()}
                 className="px-6 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all flex items-center gap-2 shadow-md"

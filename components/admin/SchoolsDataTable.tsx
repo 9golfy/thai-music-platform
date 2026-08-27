@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Download, ChevronLeft, ChevronRight } from 'lucide-react';
 import DeleteSchoolButton from './DeleteSchoolButton';
 import { calculateGrade, calculateGradeRegister100, getGradeNameThai } from '@/lib/utils/gradeCalculator';
+import PDFProgressModal from './PDFProgressModal';
 
 interface SchoolsDataTableProps {
   type: 'register100' | 'register-support';
@@ -29,6 +30,8 @@ export default function SchoolsDataTable({
   const [gradeFilter, setGradeFilter] = useState('');
   const [isFullDataLoaded, setIsFullDataLoaded] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
+  const [showPDFProgress, setShowPDFProgress] = useState(false);
+  const [pdfMode, setPdfMode] = useState<'short' | 'full'>('short');
 
   // Helper function to calculate total score including video scores
   const calculateTotalScore = (school: any) => {
@@ -224,6 +227,36 @@ export default function SchoolsDataTable({
 
   const handleDeleteSuccess = () => {
     fetchSchools(); // Refresh data after successful delete
+  };
+
+  const handleDownloadAllPDF = async () => {
+    if (schools.length === 0) {
+      alert('ไม่มีข้อมูลสำหรับดาวน์โหลด');
+      return;
+    }
+
+    const confirmed = confirm(`คุณต้องการดาวน์โหลด PDF ของโรงเรียนทั้งหมด (${schools.length} โรงเรียน) เป็น ZIP ไฟล์ใช่หรือไม่?\n\nการดาวน์โหลดจะแสดง progress bar`);
+    
+    if (!confirmed) return;
+
+    // Set mode to short and open progress modal
+    setPdfMode('short');
+    setShowPDFProgress(true);
+  };
+
+  const handleDownloadFullPDF = async () => {
+    if (schools.length === 0) {
+      alert('ไม่มีข้อมูลสำหรับดาวน์โหลด');
+      return;
+    }
+
+    const confirmed = confirm(`คุณต้องการดาวน์โหลด PDF แบบเต็มรูปแบบ (Full Version) ของโรงเรียนทั้งหมด (${schools.length} โรงเรียน) เป็น ZIP ไฟล์ใช่หรือไม่?\n\nแต่ละโรงเรียนจะมีประมาณ 20 หน้า\nการดาวน์โหลดจะแสดง progress bar`);
+    
+    if (!confirmed) return;
+
+    // Set mode to full and open progress modal
+    setPdfMode('full');
+    setShowPDFProgress(true);
   };
 
   const handleExportExcel = async () => {
@@ -428,13 +461,29 @@ export default function SchoolsDataTable({
                 : ` (${totalItems})`
               }
             </CardTitle>
-            <button 
-              onClick={handleExportExcel}
-              className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all flex items-center gap-2 shadow-md"
-            >
-              <Download className="w-4 h-4" />
-              Export Excel
-            </button>
+            <div className="flex gap-2">
+              <button 
+                onClick={handleDownloadAllPDF}
+                className="px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-sm rounded-lg hover:from-indigo-600 hover:to-purple-600 transition-all flex items-center gap-2 shadow-md"
+              >
+                <Download className="w-4 h-4" />
+                All School Page (ZIP)
+              </button>
+              <button 
+                onClick={handleDownloadFullPDF}
+                className="px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-sm rounded-lg hover:from-blue-600 hover:to-cyan-600 transition-all flex items-center gap-2 shadow-md"
+              >
+                <Download className="w-4 h-4" />
+                Full School Page (ZIP)
+              </button>
+              <button 
+                onClick={handleExportExcel}
+                className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all flex items-center gap-2 shadow-md"
+              >
+                <Download className="w-4 h-4" />
+                Export Excel
+              </button>
+            </div>
           </div>
           
           {/* Grade Legend - New Row */}
@@ -758,6 +807,14 @@ export default function SchoolsDataTable({
           )}
         </div>
       </CardContent>
+
+      {/* PDF Progress Modal */}
+      <PDFProgressModal
+        isOpen={showPDFProgress}
+        onClose={() => setShowPDFProgress(false)}
+        type={type}
+        mode={pdfMode}
+      />
     </Card>
   );
 }

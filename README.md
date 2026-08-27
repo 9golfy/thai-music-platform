@@ -493,11 +493,22 @@ lsof -ti:3000 | xargs kill -9
 
 ## 📖 เอกสารเพิ่มเติม
 
+### **General Documentation**
 - [DEPLOYMENT-GUIDE.md](./DEPLOYMENT-GUIDE.md) - คู่มือการ Deploy
 - [FINAL-SUMMARY.md](./FINAL-SUMMARY.md) - สรุปโปรเจค
 - [AUTHENTICATION-SYSTEM-PHASE1.md](./AUTHENTICATION-SYSTEM-PHASE1.md) - ระบบ Authentication
 - [PHASE2-COMPLETE.md](./PHASE2-COMPLETE.md) - Admin Dashboard
 - [PHASE3-COMPLETE.md](./PHASE3-COMPLETE.md) - User Management & Teacher Portal
+
+### **Draft Validation Fixes (2026-05-28)** ⭐ NEW
+- [DRAFT-FIXES-INDEX.md](./DRAFT-FIXES-INDEX.md) - 📚 Navigation guide for all draft fixes documentation
+- [DEPLOYMENT-READY.md](./DEPLOYMENT-READY.md) - 🚀 Quick deployment guide (START HERE)
+- [QUICK-REFERENCE.md](./QUICK-REFERENCE.md) - ⚡ One-page command reference
+- [CONTEXT-TRANSFER-SUMMARY.md](./CONTEXT-TRANSFER-SUMMARY.md) - 📊 Complete overview of fixes
+- [DRAFT-FIXES-DEPLOYMENT.md](./DRAFT-FIXES-DEPLOYMENT.md) - 📘 Detailed deployment guide
+- [PRODUCTION-DEPLOYMENT-COMMANDS.md](./PRODUCTION-DEPLOYMENT-COMMANDS.md) - 💻 All production commands
+- [CASE-SAOWALAK-OTP-ISSUE.md](./CASE-SAOWALAK-OTP-ISSUE.md) - 📧 OTP email case study
+- [scripts/README.md](./scripts/README.md) - 📜 Database scripts documentation
 
 ## 🎯 Roadmap
 
@@ -588,10 +599,16 @@ This project is proprietary and confidential.
 - **Expected**: This text should appear on server after 2-3 minutes
 
 If you see this on the server, auto deploy is working! ✅
-T e s t   w e b h o o k   0 4 / 0 1 / 2 0 2 6   1 8 : 5 3 : 0 5  
- T e s t   w e b h o o k   d e p l o y   -   0 4 / 0 1 / 2 0 2 6   1 9 : 0 0 : 4 0  
- T e s t   w e b h o o k   a u t o   d e p l o y   -   0 4 / 0 1 / 2 0 2 6   1 9 : 0 9 : 5 8  
- T e s t   0 4 / 0 1 / 2 0 2 6   1 9 : 1 4 : 4 9  
- T e s t   f i n a l   0 4 / 0 1 / 2 0 2 6   1 9 : 2 1 : 5 2  
- T e s t   a u t o   d e p l o y   s u c c e s s   -   0 4 / 0 1 / 2 0 2 6   1 9 : 4 3 : 0 9  
+T e s t   w e b h o o k   0 4 / 0 1 / 2 0 2 6   1 8 : 5 3 : 0 5 
+ 
+ T e s t   w e b h o o k   d e p l o y   -   0 4 / 0 1 / 2 0 2 6   1 9 : 0 0 : 4 0 
+ 
+ T e s t   w e b h o o k   a u t o   d e p l o y   -   0 4 / 0 1 / 2 0 2 6   1 9 : 0 9 : 5 8 
+ 
+ T e s t   0 4 / 0 1 / 2 0 2 6   1 9 : 1 4 : 4 9 
+ 
+ T e s t   f i n a l   0 4 / 0 1 / 2 0 2 6   1 9 : 2 1 : 5 2 
+ 
+ T e s t   a u t o   d e p l o y   s u c c e s s   -   0 4 / 0 1 / 2 0 2 6   1 9 : 4 3 : 0 9 
+ 
  

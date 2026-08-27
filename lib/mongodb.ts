@@ -14,7 +14,15 @@ export async function connectToDatabase() {
       throw new Error('MONGODB_URI or MONGO_URI environment variable is not set. Please add it to .env.local');
     }
     
-    const dbName = process.env.MONGO_DB || 'thai-music-platform';
+    // Extract database name from URI if not provided in MONGO_DB
+    let dbName = process.env.MONGO_DB;
+    
+    if (!dbName) {
+      // Try to extract from URI: mongodb://user:pass@host:port/dbname?options
+      const match = uri.match(/\/([^/?]+)(\?|$)/);
+      dbName = match ? match[1] : 'thai_music_school';
+      console.log('📝 Database name extracted from URI:', dbName);
+    }
     
     console.log('🔌 Connecting to MongoDB...');
     console.log('📍 URI:', uri.replace(/\/\/.*@/, '//<credentials>@')); // Hide credentials in log

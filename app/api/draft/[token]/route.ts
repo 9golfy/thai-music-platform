@@ -180,11 +180,11 @@ export async function PUT(
       );
     }
 
-    if (typeof currentStep !== 'number' || currentStep < 1) {
+    if (typeof currentStep !== 'number' || currentStep < 1 || currentStep > 7) {
       return NextResponse.json(
         {
           success: false,
-          message: 'Valid current step is required.',
+          message: 'Valid current step is required (1-7).',
         },
         { status: 400 }
       );

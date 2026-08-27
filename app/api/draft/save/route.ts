@@ -178,11 +178,11 @@ export async function POST(request: NextRequest) {
     }
     
     // Validate current step
-    if (currentStep < 1 || currentStep > 8) {
+    if (currentStep < 1 || currentStep > 7) {
       return NextResponse.json(
         {
           success: false,
-          message: 'Invalid current step. Must be between 1 and 8.',
+          message: 'Invalid current step. Must be between 1 and 7.',
         },
         { status: 400 }
       );

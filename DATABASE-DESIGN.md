@@ -1,5 +1,8 @@
 # Database Design — Data Dictionary
 
+**Last Updated**: July 27, 2026  
+**Latest Commit**: `cabca94` — Add detailed score columns to Excel export
+
 Database: **MongoDB**  
 Database Name: `thai_music_school`  
 Driver: `mongodb` (native Node.js driver)
@@ -172,12 +175,25 @@ Driver: `mongodb` (native Node.js driver)
 | `teacher_qualification_score` | Number | 20 | คะแนนคุณสมบัติครู (unique qualification × 5) |
 | `support_from_org_score` | Number | 5 | คะแนนสนับสนุนจากต้นสังกัด |
 | `support_from_external_score` | Number | 15 | คะแนนสนับสนุนจากภายนอก |
-| `award_score` | Number | 20 | คะแนนรางวัล (ระดับสูงสุด) |
+| `award_score` | Number | 20 | คะแนนรางวัล (ระดับสูงสูด) |
 | `activity_within_province_internal_score` | Number | 5 | คะแนนกิจกรรมภายใน |
 | `activity_within_province_external_score` | Number | 5 | คะแนนกิจกรรมภายนอก |
 | `activity_outside_province_score` | Number | 5 | คะแนนกิจกรรมนอกจังหวัด |
 | `pr_activity_score` | Number | 5 | คะแนนประชาสัมพันธ์ |
-| `total_score` | Number | 200 | คะแนนรวม |
+| **Part 2 Scores (Manual Entry)** | | | |
+| `video1_score` | Number | 50 | คะแนนวิดีโอที่ 1 (admin ป้อนด้วยตนเอง) |
+| `video2_score` | Number | 50 | คะแนนวิดีโอที่ 2 (admin ป้อนด้วยตนเอง) |
+| `total_score` | Number | 200 | คะแนนรวม (Part 1 + Part 2) |
+
+**คะแนนรวม Part 1** (คำนวณอัตโนมัติ): 100 คะแนน  
+**คะแนนรวม Part 2** (ป้อนด้วยตนเอง): 100 คะแนน (video1 50 + video2 50)  
+**คะแนนรวมทั้งหมด**: 200 คะแนน
+
+### Admin Fields (เพิ่มใหม่)
+
+| Field | Type | Required | คำอธิบาย |
+|---|---|---|---|
+| `adminNotes` | String | No | หมายเหตุจาก admin (เพิ่มเมื่อ June 2026) |
 
 ---
 
@@ -214,7 +230,38 @@ Driver: `mongodb` (native Node.js driver)
 | `activity_within_province_external_score` | Number | 5 | คะแนนกิจกรรมภายนอก |
 | `activity_outside_province_score` | Number | 5 | คะแนนกิจกรรมนอกจังหวัด |
 | `pr_activity_score` | Number | 5 | คะแนนประชาสัมพันธ์ |
-| `total_score` | Number | 180 | คะแนนรวม |
+| **Part 2 Scores (Manual Entry)** | | | |
+| `video1_score` | Number | 40 | คะแนนวิดีโอที่ 1 (admin ป้อนด้วยตนเอง) |
+| `video2_score` | Number | 40 | คะแนนวิดีโอที่ 2 (admin ป้อนด้วยตนเอง) |
+| `total_score` | Number | 180 | คะแนนรวม (Part 1 + Part 2) |
+
+**คะแนนรวม Part 1** (คำนวณอัตโนมัติ): 100 คะแนน  
+**คะแนนรวม Part 2** (ป้อนด้วยตนเอง): 80 คะแนน (video1 40 + video2 40)  
+**คะแนนรวมทั้งหมด**: 180 คะแนน
+
+### Admin Fields (เพิ่มใหม่)
+
+| Field | Type | Required | คำอธิบาย |
+|---|---|---|---|
+| `adminNotes` | String | No | หมายเหตุจาก admin (เพิ่มเมื่อ June 2026) |
+
+### Score Preservation Logic
+
+**Commit**: `fd447a8` (June 2026)
+
+Register-Support มีระบบป้องกันการคำนวณคะแนนซ้ำ:
+- **Manual Edit Mode**: เมื่อ admin แก้ไขคะแนน video ด้วยตนเอง → ระบบจะไม่คำนวณคะแนน Part 1 ใหม่
+- **Normal Edit Mode**: เมื่อแก้ไขข้อมูลแบบฟอร์มปกติ → ระบบคำนวณคะแนน Part 1 ใหม่ แต่คงคะแนน video ไว้
+
+```javascript
+// Manual Edit (preserves Part 1 scores)
+PUT /api/register-support/[id]?manualEdit=true
+Body: { video1_score: 35, video2_score: 38 }
+
+// Normal Edit (recalculates Part 1 scores, preserves Part 2)
+PUT /api/register-support/[id]
+Body: { regsup_awards: [...] } // Scores recalculated
+```
 
 ---
 
@@ -350,6 +397,153 @@ Driver: `mongodb` (native Node.js driver)
 | ไม่มี prefix | users, certificates, drafts | Collection อื่นๆ |
 
 > หมายเหตุ: field บางตัวใน submission มีทั้งแบบมี prefix และไม่มี prefix เก็บไว้คู่กัน เพื่อ backward compatibility กับ code เก่า
+
+---
+
+## Export Features
+
+### Overview
+
+ระบบมีฟีเจอร์ Export ข้อมูลโรงเรียนเป็นไฟล์ CSV พร้อมคะแนนแบบละเอียดทุกส่วน โดยจัดเรียงคะแนนเป็น columns แนวนอน
+
+**Implementation**: `components/admin/SchoolsDataTable.tsx`  
+**Method**: Client-side generation (ไม่ใช้ API routes)  
+**Commit**: `cabca94` (July 27, 2026)
+
+### Export Locations
+
+| Registration Type | Dashboard URL | Export Function |
+|-------------------|---------------|-----------------|
+| Register100 | `/dashboard/register100` | `handleExportExcel()` |
+| Register-Support | `/dashboard/register-support` | `handleExportExcel()` |
+
+### File Format
+
+**Naming Convention**:
+- Register100: `register100_schools_YYYYMMDD_HHmmss.csv`
+- Register-Support: `register_support_schools_YYYYMMDD_HHmmss.csv`
+
+**Encoding**: UTF-8 with BOM (`\uFEFF`) — รองรับภาษาไทยใน Excel
+
+### Export Columns Structure
+
+#### Register100 CSV (23 columns)
+
+```
+ลำดับ | วันที่บันทึก | ชื่อโรงเรียน | จังหวัด | ระดับการศึกษา | เกณฑ์ | School ID | อีเมลครู | เบอร์โทรศัพท์ |
+Step 5: นโยบาย (20) | Step 4: คุณวุฒิครู (20) | Step 6: สนับสนุนต้นสังกัด (5) | Step 6: สนับสนุนภายนอก (15) |
+Step 7: รางวัล (20) | Step 8: กิจกรรมภายใน (5) | Step 8: กิจกรรมภายนอก (5) | Step 8: กิจกรรมนอกจังหวัด (5) |
+Step 9: ประชาสัมพันธ์ (5) | รวมส่วนที่ 1 (100) | วิดีโอ 1 (50) | วิดีโอ 2 (50) |
+รวมส่วนที่ 2 (100) | คะแนนรวมทั้งหมด (200)
+```
+
+#### Register-Support CSV (23 columns)
+
+```
+ลำดับ | วันที่บันทึก | ชื่อโรงเรียน | จังหวัด | ระดับการศึกษา | เกณฑ์ | School ID | อีเมลครู | เบอร์โทรศัพท์ |
+Step 4: ฝึกอบรมครู (20) | Step 4: คุณวุฒิครู (20) | Step 6: สนับสนุนต้นสังกัด (5) | Step 6: สนับสนุนภายนอก (15) |
+Step 7: รางวัล (20) | Step 8: กิจกรรมภายใน (5) | Step 8: กิจกรรมภายนอก (5) | Step 8: กิจกรรมนอกจังหวัด (5) |
+Step 9: ประชาสัมพันธ์ (5) | รวมส่วนที่ 1 (100) | วิดีโอ 1 (40) | วิดีโอ 2 (40) |
+รวมส่วนที่ 2 (80) | คะแนนรวมทั้งหมด (180)
+```
+
+### Database Field → CSV Column Mapping
+
+#### Register100
+
+| Database Field | CSV Column | Max Score |
+|----------------|------------|-----------|
+| `teaching_curriculum_score` | Step 5: นโยบาย (20) | 20 |
+| `teacher_qualification_score` | Step 4: คุณวุฒิครู (20) | 20 |
+| `support_from_org_score` | Step 6: สนับสนุนต้นสังกัด (5) | 5 |
+| `support_from_external_score` | Step 6: สนับสนุนภายนอก (15) | 15 |
+| `award_score` | Step 7: รางวัล (20) | 20 |
+| `activity_within_province_internal_score` | Step 8: กิจกรรมภายใน (5) | 5 |
+| `activity_within_province_external_score` | Step 8: กิจกรรมภายนอก (5) | 5 |
+| `activity_outside_province_score` | Step 8: กิจกรรมนอกจังหวัด (5) | 5 |
+| `pr_activity_score` | Step 9: ประชาสัมพันธ์ (5) | 5 |
+| *(calculated)* | รวมส่วนที่ 1 (100) | 100 |
+| `video1_score` | วิดีโอ 1 (50) | 50 |
+| `video2_score` | วิดีโอ 2 (50) | 50 |
+| *(calculated)* | รวมส่วนที่ 2 (100) | 100 |
+| *(calculated)* | คะแนนรวมทั้งหมด (200) | 200 |
+
+#### Register-Support
+
+| Database Field | CSV Column | Max Score |
+|----------------|------------|-----------|
+| `teacher_training_score` | Step 4: ฝึกอบรมครู (20) | 20 |
+| `teacher_qualification_score` | Step 4: คุณวุฒิครู (20) | 20 |
+| `support_from_org_score` | Step 6: สนับสนุนต้นสังกัด (5) | 5 |
+| `support_from_external_score` | Step 6: สนับสนุนภายนอก (15) | 15 |
+| `award_score` | Step 7: รางวัล (20) | 20 |
+| `activity_within_province_internal_score` | Step 8: กิจกรรมภายใน (5) | 5 |
+| `activity_within_province_external_score` | Step 8: กิจกรรมภายนอก (5) | 5 |
+| `activity_outside_province_score` | Step 8: กิจกรรมนอกจังหวัด (5) | 5 |
+| `pr_activity_score` | Step 9: ประชาสัมพันธ์ (5) | 5 |
+| *(calculated)* | รวมส่วนที่ 1 (100) | 100 |
+| `video1_score` | วิดีโอ 1 (40) | 40 |
+| `video2_score` | วิดีโอ 2 (40) | 40 |
+| *(calculated)* | รวมส่วนที่ 2 (80) | 80 |
+| *(calculated)* | คะแนนรวมทั้งหมด (180) | 180 |
+
+### Technical Implementation
+
+#### Score Calculation
+```typescript
+// Part 1 Score Calculation (Register100)
+const part1Score = 
+  (school.teaching_curriculum_score || 0) +
+  (school.teacher_qualification_score || 0) +
+  (school.support_from_org_score || 0) +
+  (school.support_from_external_score || 0) +
+  (school.award_score || 0) +
+  (school.activity_within_province_internal_score || 0) +
+  (school.activity_within_province_external_score || 0) +
+  (school.activity_outside_province_score || 0) +
+  (school.pr_activity_score || 0);
+
+// Part 2 Score Calculation
+const part2Score = (school.video1_score || 0) + (school.video2_score || 0);
+
+// Total Score
+const totalScore = part1Score + part2Score;
+```
+
+#### CSV Generation
+```typescript
+// Add UTF-8 BOM for Thai character support
+const blob = new Blob(['\uFEFF' + csvContent], { 
+  type: 'text/csv;charset=utf-8;' 
+});
+
+// Handle special characters in CSV
+if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
+  return `"${value.replace(/"/g, '""')}"`;
+}
+```
+
+### Export Features
+
+1. **Filter Support**: Export เฉพาะข้อมูลที่กรองแล้ว
+   - Search term (ชื่อโรงเรียน, จังหวัด, School ID)
+   - Province filter
+   - Education level filter
+   - Grade filter
+
+2. **Real-time Calculation**: คะแนนรวมและ subtotals คำนวณตอน export
+
+3. **Zero Handling**: คะแนนที่ไม่มีข้อมูล แสดงเป็น 0
+
+4. **Thai Date Format**: วันที่แสดงเป็น `dd MMM yyyy` (ภาษาไทย)
+
+5. **Grade Display**: แสดงเกณฑ์เป็น `ดีเด่น`, `ดีมาก`, `ดี`, `พอใช้`, `ปรับปรุง`
+
+### Performance Notes
+
+- Client-side generation → ไม่ให้ load server
+- สามารถ export ข้อมูลหลายพันรายการได้
+- ไม่ใช้ API routes (`/api/register100/[id]/export/excel` ไม่ถูกใช้งาน)
 
 ---
 

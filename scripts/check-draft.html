@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Check Draft Status - Customer Support</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+    }
+    .input-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #333;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #ddd;
+      border-radius: 5px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    input:focus {
+      outline: none;
+      border-color: #4CAF50;
+    }
+    button {
+      background: #4CAF50;
+      color: white;
+      padding: 12px 30px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      width: 100%;
+      font-weight: 600;
+    }
+    button:hover {
+      background: #45a049;
+    }
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    .result {
+      margin-top: 30px;
+      padding: 20px;
+      border-radius: 5px;
+      display: none;
+    }
+    .result.success {
+      background: #d4edda;
+      border: 1px solid #c3e6cb;
+      color: #155724;
+    }
+    .result.error {
+      background: #f8d7da;
+      border: 1px solid #f5c6cb;
+      color: #721c24;
+    }
+    .result.warning {
+      background: #fff3cd;
+      border: 1px solid #ffeaa7;
+      color: #856404;
+    }
+    .result h3 {
+      margin-top: 0;
+    }
+    .info-row {
+      margin: 10px 0;
+      padding: 8px;
+      background: rgba(0,0,0,0.03);
+      border-radius: 3px;
+    }
+    .info-label {
+      font-weight: 600;
+      display: inline-block;
+      width: 150px;
+    }
+    .loading {
+      text-align: center;
+      padding: 20px;
+      display: none;
+    }
+    .spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #4CAF50;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .example {
+      background: #f8f9fa;
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 12px;
+      color: #666;
+      margin-top: 5px;
+    }
+    pre {
+      background: #f4f4f4;
+      padding: 15px;
+      border-radius: 5px;
+      overflow-x: auto;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔍 Check Draft Status</h1>
+    <p class="subtitle">Customer Support Tool - Production</p>
+    
+    <div class="input-group">
+      <label for="baseUrl">Base URL:</label>
+      <input 
+        type="text" 
+        id="baseUrl" 
+        value="https://dcpschool100.net"
+        placeholder="https://dcpschool100.net"
+      >
+      <div class="example">Production: https://dcpschool100.net | Local: http://localhost:3000</div>
+    </div>
+    
+    <div class="input-group">
+      <label for="token">Draft Token:</label>
+      <input 
+        type="text" 
+        id="token" 
+        placeholder="50d290d9-4c86-47c4-ba68-02e45f41d3ff"
+      >
+      <div class="example">ตัวอย่าง: 50d290d9-4c86-47c4-ba68-02e45f41d3ff (จาก URL: /draft/TOKEN)</div>
+    </div>
+    
+    <button onclick="checkDraft()">ตรวจสอบ Draft</button>
+    
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <p>กำลังตรวจสอบ...</p>
+    </div>
+    
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    async function checkDraft() {
+      const baseUrl = document.getElementById('baseUrl').value.trim();
+      const token = document.getElementById('token').value.trim();
+      const resultDiv = document.getElementById('result');
+      const loadingDiv = document.getElementById('loading');
+      
+      if (!token) {
+        alert('กรุณาใส่ Token');
+        return;
+      }
+      
+      // Show loading
+      resultDiv.style.display = 'none';
+      loadingDiv.style.display = 'block';
+      
+      try {
+        const response = await fetch(`${baseUrl}/api/draft/${token}/data`);
+        const data = await response.json();
+        
+        loadingDiv.style.display = 'none';
+        resultDiv.style.display = 'block';
+        
+        if (data.success && data.exists) {
+          // Draft found
+          const isExpired = new Date(data.expiresAt) < new Date();
+          const isSubmitted = data.status === 'submitted';
+          
+          let resultClass = 'success';
+          let statusIcon = '✅';
+          
+          if (isExpired || isSubmitted) {
+            resultClass = 'warning';
+            statusIcon = '⚠️';
+          }
+          
+          resultDiv.className = `result ${resultClass}`;
+          resultDiv.innerHTML = `
+            <h3>${statusIcon} Draft พบแล้ว!</h3>
+            <div class="info-row">
+              <span class="info-label">Token:</span>
+              <code>${data.draftToken}</code>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Email:</span>
+              ${data.email}
+            </div>
+            <div class="info-row">
+              <span class="info-label">Phone:</span>
+              ${data.phone || 'ไม่ระบุ'}
+            </div>
+            <div class="info-row">
+              <span class="info-label">Type:</span>
+              ${data.submissionType === 'register100' ? 'ลงทะเบียน 100 โรงเรียน' : 'ลงทะเบียนสนับสนุน'}
+            </div>
+            <div class="info-row">
+              <span class="info-label">Status:</span>
+              <strong>${data.status}</strong>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Current Step:</span>
+              ${data.currentStep}
+            </div>
+            <div class="info-row">
+              <span class="info-label">Last Modified:</span>
+              ${new Date(data.lastModified).toLocaleString('th-TH')}
+            </div>
+            <div class="info-row">
+              <span class="info-label">Expires:</span>
+              ${new Date(data.expiresAt).toLocaleString('th-TH')}
+            </div>
+            <div class="info-row">
+              <span class="info-label">Expired:</span>
+              ${isExpired ? '❌ YES (หมดอายุแล้ว)' : '✅ NO (ยังใช้งานได้)'}
+            </div>
+            ${isSubmitted ? '<p style="margin-top: 15px; font-weight: 600;">⚠️ Draft นี้ถูก submit ไปแล้ว</p>' : ''}
+            ${isExpired ? '<p style="margin-top: 15px; font-weight: 600;">⚠️ Draft นี้หมดอายุแล้ว (เกิน 7 วัน)</p>' : ''}
+            <details style="margin-top: 20px;">
+              <summary style="cursor: pointer; font-weight: 600;">📄 Raw Response</summary>
+              <pre>${JSON.stringify(data, null, 2)}</pre>
+            </details>
+          `;
+        } else {
+          // Draft not found
+          resultDiv.className = 'result error';
+          resultDiv.innerHTML = `
+            <h3>❌ ไม่พบ Draft</h3>
+            <p><strong>Message:</strong> ${data.message}</p>
+            <p style="margin-top: 15px;"><strong>สาเหตุที่เป็นไปได้:</strong></p>
+            <ul>
+              <li>Draft ถูก submit ไปแล้ว</li>
+              <li>Draft ถูกลบโดยผู้ใช้</li>
+              <li>Draft หมดอายุ (เกิน 7 วัน)</li>
+              <li>Token ไม่ถูกต้อง</li>
+            </ul>
+            <details style="margin-top: 20px;">
+              <summary style="cursor: pointer; font-weight: 600;">📄 Raw Response</summary>
+              <pre>${JSON.stringify(data, null, 2)}</pre>
+            </details>
+          `;
+        }
+      } catch (error) {
+        loadingDiv.style.display = 'none';
+        resultDiv.style.display = 'block';
+        resultDiv.className = 'result error';
+        resultDiv.innerHTML = `
+          <h3>❌ เกิดข้อผิดพลาด</h3>
+          <p>${error.message}</p>
+          <p style="margin-top: 15px;">กรุณาตรวจสอบ:</p>
+          <ul>
+            <li>Base URL ถูกต้องหรือไม่</li>
+            <li>เชื่อมต่อ Internet ได้หรือไม่</li>
+            <li>Server ทำงานปกติหรือไม่</li>
+          </ul>
+        `;
+      }
+    }
+    
+    // Allow Enter key to submit
+    document.getElementById('token').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        checkDraft();
+      }
+    });
+  </script>
+</body>
+</html>

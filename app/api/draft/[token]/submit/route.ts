@@ -175,12 +175,21 @@ export async function POST(
       );
     }
 
+    // Extract name from form data based on submission type
+    const fullName = draft.submissionType === 'register100' 
+      ? (formData.reg100_mgtFullName || formData.mgtName || '')
+      : (formData.regsup_school_director_name || formData.mgtName || '');
+    
+    const nameParts = fullName.trim().split(/\s+/);
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || '';
+
     const newUser = {
       email: draft.email.toLowerCase(),
       password: hashedPassword,
       role: 'teacher',
-      firstName: formData.mgtName || '',
-      lastName: '',
+      firstName: firstName,
+      lastName: lastName,
       phone: draft.phone,
       schoolId: schoolId,
       isActive: true,
