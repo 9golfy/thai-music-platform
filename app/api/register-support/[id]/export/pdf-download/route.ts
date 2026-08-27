@@ -67,7 +67,8 @@ export async function GET(
     // Generate PDF using Puppeteer
     browser = await puppeteer.launch({
       headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu']
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu'],
+      timeout: 120000 // 120 seconds timeout for production server
     });
     
     const page = await browser.newPage();
