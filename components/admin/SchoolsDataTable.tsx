@@ -530,6 +530,8 @@ export default function SchoolsDataTable({
               }
             </CardTitle>
             <div className="flex gap-2">
+              {/* All School Page (ZIP) - HIDDEN: No longer needed */}
+              {/* 
               <button 
                 onClick={handleDownloadAllPDF}
                 className="px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-sm rounded-lg hover:from-indigo-600 hover:to-purple-600 transition-all flex items-center gap-2 shadow-md"
@@ -537,6 +539,7 @@ export default function SchoolsDataTable({
                 <Download className="w-4 h-4" />
                 All School Page (ZIP)
               </button>
+              */}
               {/* Full School Page (ZIP) - HIDDEN: Too resource intensive, can cause server crash */}
               {/* 
               <button 
