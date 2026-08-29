@@ -40,36 +40,61 @@ export default function HeroSection() {
           transition={{ duration: 1, ease: "easeOut" }}
         >
           <motion.h1
-            className="cinematic-gold-title text-3xl sm:text-4xl md:text-5xl lg:text-[3.4rem] font-bold leading-tight text-balance"
+            className="cinematic-gold-title text-xl sm:text-2xl md:text-3xl lg:text-[2rem] font-bold leading-tight text-balance cursor-pointer hover:opacity-80 transition-opacity"
             style={{
               paddingBottom: "5px",
             }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
+            onClick={() => {
+              const link = document.createElement('a');
+              link.href = '/filedownload/file003_ประกาศผลการคัดเลือกดนตรีไทย 2569.pdf';
+              link.download = 'file003_ประกาศผลการคัดเลือกดนตรีไทย 2569.pdf';
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            }}
           >
-            {"ขอเชิญลงทะเบียนเสนอผลงาน 69"}
+            <div className="mb-2">ประกาศกรมส่งเสริมวัฒนธรรม</div>
+            <div>ผลการคัดเลือกโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์ ประจำปีงบประมาณ พ.ศ. 2569</div>
           </motion.h1>
 
-          <motion.p
-            className="max-w-4xl text-base sm:text-lg md:text-xl text-white/90 leading-relaxed lg:whitespace-nowrap"
+          {/* Download Button - Moved up closer to title */}
+          <motion.div
+            className="mt-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            {"เพื่อเข้าร่วมรับการคัดเลือกกิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์ ประจำปีงบประมาณ พ.ศ. 2569"}
-          </motion.p>
+            <button
+              onClick={() => {
+                const link = document.createElement('a');
+                link.href = '/filedownload/file003_ประกาศผลการคัดเลือกดนตรีไทย 2569.pdf';
+                link.download = 'file003_ประกาศผลการคัดเลือกดนตรีไทย 2569.pdf';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+              }}
+              className="group relative overflow-hidden rounded-full px-8 py-3.5 text-sm sm:text-base font-semibold text-white transition-all duration-300 hover:shadow-[0_0_25px_rgba(16,185,129,0.5)] hover:scale-[1.02] hover:brightness-110"
+              style={{
+                background: "linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%)",
+                boxShadow: "0 4px 15px rgba(16,185,129,0.3), inset 0 1px 0 rgba(255,255,255,0.2)",
+              }}
+            >
+              <span className="relative z-10 flex items-center gap-2">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                {"ดาวน์โหลดประกาศผลการคัดเลือก"}
+              </span>
+            </button>
+          </motion.div>
 
-          <motion.p
-            className="max-w-2xl text-sm sm:text-base md:text-lg text-white/70 leading-relaxed"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-          >
-            {"เพื่อสืบสาน รักษา ต่อยอดวิชาดนตรีไทยให้คงอยู่คู่สังคมไทย"}
-          </motion.p>
-
-          {/* Registration Period */}
+          {/* Registration Period - HIDDEN */}
+          {/*
           <motion.div
             className="mt-[245px] mb-2"
             initial={{ opacity: 0, y: 20 }}
@@ -86,8 +111,10 @@ export default function HeroSection() {
               </span>
             </div>
           </motion.div>
+          */}
 
-          {/* CTA Buttons - Luxury 4 💎 Emerald 🤍 Ivory Style */}
+          {/* CTA Buttons - HIDDEN */}
+          {/*
           <motion.div
             className="flex flex-col sm:flex-row gap-4"
             initial={{ opacity: 0, y: 20 }}
@@ -129,6 +156,7 @@ export default function HeroSection() {
               </span>
             </a>
           </motion.div>
+          */}
         </motion.div>
       </div>
 
