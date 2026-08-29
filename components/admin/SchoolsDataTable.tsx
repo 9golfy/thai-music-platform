@@ -343,6 +343,33 @@ export default function SchoolsDataTable({
           ? calculateGradeRegister100(totalScore)
           : calculateGrade(totalScore, 180);
         
+        // Build complete address from individual fields
+        const buildAddress = (school: any) => {
+          const addressParts = [];
+          
+          if (type === 'register100') {
+            if (school.reg100_addressNo) addressParts.push(`เลขที่ ${school.reg100_addressNo}`);
+            if (school.reg100_moo) addressParts.push(`หมู่ ${school.reg100_moo}`);
+            if (school.reg100_soi) addressParts.push(`ซอย ${school.reg100_soi}`);
+            if (school.reg100_road) addressParts.push(`ถนน ${school.reg100_road}`);
+            if (school.reg100_subDistrict) addressParts.push(`ตำบล/แขวง ${school.reg100_subDistrict}`);
+            if (school.reg100_district) addressParts.push(`อำเภอ/เขต ${school.reg100_district}`);
+            if (school.reg100_provinceAddress) addressParts.push(`จังหวัด ${school.reg100_provinceAddress}`);
+            if (school.reg100_postalCode) addressParts.push(`${school.reg100_postalCode}`);
+          } else {
+            if (school.regsup_addressNo) addressParts.push(`เลขที่ ${school.regsup_addressNo}`);
+            if (school.regsup_moo) addressParts.push(`หมู่ ${school.regsup_moo}`);
+            if (school.regsup_soi) addressParts.push(`ซอย ${school.regsup_soi}`);
+            if (school.regsup_road) addressParts.push(`ถนน ${school.regsup_road}`);
+            if (school.regsup_subDistrict) addressParts.push(`ตำบล/แขวง ${school.regsup_subDistrict}`);
+            if (school.regsup_district) addressParts.push(`อำเภอ/เขต ${school.regsup_district}`);
+            if (school.regsup_provinceAddress) addressParts.push(`จังหวัด ${school.regsup_provinceAddress}`);
+            if (school.regsup_postalCode) addressParts.push(`${school.regsup_postalCode}`);
+          }
+          
+          return addressParts.length > 0 ? addressParts.join(' ') : '-';
+        };
+        
         const baseData = {
           'ลำดับ': index + 1,
           'วันที่บันทึก': school.createdAt 
@@ -353,6 +380,7 @@ export default function SchoolsDataTable({
               })
             : '-',
           'ชื่อโรงเรียน': school.reg100_schoolName || school.regsup_schoolName || '-',
+          'ที่อยู่': buildAddress(school),
           'จังหวัด': school.reg100_schoolProvince || school.regsup_schoolProvince || '-',
           'ระดับการศึกษา': school.reg100_schoolLevel || school.regsup_schoolLevel || 'ไม่ระบุ',
           'เกณฑ์': getGradeNameThai(grade),
