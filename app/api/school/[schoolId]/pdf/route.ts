@@ -258,39 +258,39 @@ export async function GET(
       </tr>
       <tr>
         <th>สังกัด</th>
-        <td>${getFieldValue('schoolAffiliation') || '-'}</td>
+        <td>${getFieldValue('affiliation') || '-'}</td>
       </tr>
       <tr>
         <th>ระบุ</th>
-        <td>${getFieldValue('schoolDistrict') || '-'}</td>
+        <td>${getFieldValue('affiliationDetail') || '-'}</td>
       </tr>
       <tr>
         <th>ขนาดโรงเรียน</th>
         <td>${getDisplayValue('schoolSize') || '-'}</td>
       </tr>
       <tr>
+        <th>จำนวนบุคลากร</th>
+        <td>${getFieldValue('staffCount') || '-'}</td>
+      </tr>
+      <tr>
         <th>จำนวนนักเรียน</th>
         <td>${getFieldValue('studentCount') || '-'}</td>
       </tr>
       <tr>
-        <th>จำนวนนักเรียน</th>
-        <td>${getFieldValue('studentTotal') || '-'}</td>
-      </tr>
-      <tr>
         <th>จำนวนนักเรียนแต่ละชั้น</th>
-        <td>${getFieldValue('studentPerGrade') || '-'}</td>
+        <td>${getFieldValue('studentCountByGrade') || '-'}</td>
       </tr>
       <tr>
         <th>สถานที่ตั้ง</th>
-        <td>${getFieldValue('schoolAddress') || '-'}</td>
+        <td>เลขที่ ${getFieldValue('addressNo')} ${getFieldValue('moo') ? 'หมู่ ' + getFieldValue('moo') : ''} ${getFieldValue('soi') ? 'ซอย ' + getFieldValue('soi') : ''} ${getFieldValue('road') ? 'ถนน ' + getFieldValue('road') : ''} ${getFieldValue('subDistrict') ? 'ตำบล/แขวง ' + getFieldValue('subDistrict') : ''} ${getFieldValue('district') ? 'อำเภอ/เขต ' + getFieldValue('district') : ''} ${getFieldValue('provinceAddress') ? 'จังหวัด ' + getFieldValue('provinceAddress') : ''} ${getFieldValue('postalCode') ? getFieldValue('postalCode') : ''}</td>
       </tr>
       <tr>
         <th>โทรศัพท์</th>
-        <td>${getFieldValue('schoolPhone') || '-'}</td>
+        <td>${getFieldValue('phone') || '-'}</td>
       </tr>
       <tr>
         <th>โทรสาร</th>
-        <td>${getFieldValue('schoolFax') || '-'}</td>
+        <td>${getFieldValue('fax') || '-'}</td>
       </tr>
     </table>
   </div>
