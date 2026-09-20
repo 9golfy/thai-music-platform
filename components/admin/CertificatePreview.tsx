@@ -1,26 +1,31 @@
 'use client';
 
 import { useRef } from 'react';
-import { getTemplateById } from '@/lib/config/certificateTemplates';
 
 interface CertificatePreviewProps {
   schoolName: string;
   province?: string | null;
+  supportTypeName?: string | null;
+  grade?: string | null;
   certificateNumber: string;
   issueDate: string;
   templateName?: string;
   templateImageUrl?: string | null;
   showDownloadButton?: boolean;
+  certificateType?: string; // 'register100' or 'register-support'
 }
 
 export default function CertificatePreview({
   schoolName,
   province = null,
+  supportTypeName = null,
+  grade = null,
   certificateNumber,
   issueDate,
   templateName,
   templateImageUrl = null,
   showDownloadButton = false,
+  certificateType = 'register100',
 }: CertificatePreviewProps) {
   const certificateRef = useRef<HTMLDivElement>(null);
 
@@ -35,22 +40,154 @@ export default function CertificatePreview({
     window.print();
   };
 
-  // Format date to Thai format
-  const formatDate = (dateString: string) => {
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString('th-TH', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-      });
-    } catch {
-      return dateString;
+  // Function to wrap text if longer than 70 characters
+  const wrapSchoolName = (name: string) => {
+    // Count and log the character count
+    console.log('=== School Name Character Count ===');
+    console.log('School Name:', name);
+    console.log('Character Count:', name.length);
+    console.log('==================================');
+    
+    // Special case: Force wrap at opening parenthesis for specific school
+    if (name.includes('โรงเรียนบ้านหนองเพรางาย (สลากกินแบ่งสงเคราะห์')) {
+      const parts = name.split(' (');
+      if (parts.length === 2) {
+        console.log('Special case: Wrapping at parenthesis');
+        console.log('Line 1:', parts[0]);
+        console.log('Line 2:', '(' + parts[1]);
+        return { 
+          line1: parts[0], 
+          line2: '(' + parts[1], 
+          multiLine: true 
+        };
+      }
     }
+    
+    if (name.length <= 70) {
+      return name;
+    }
+    
+    // Find the last space before character 70
+    const firstPart = name.substring(0, 70);
+    const lastSpaceIndex = firstPart.lastIndexOf(' ');
+    
+    if (lastSpaceIndex > 0) {
+      // Split at the last space
+      const line1 = name.substring(0, lastSpaceIndex);
+      const line2 = name.substring(lastSpaceIndex + 1);
+      console.log('Multi-line detected:');
+      console.log('Line 1:', line1, `(${line1.length} chars)`);
+      console.log('Line 2:', line2, `(${line2.length} chars)`);
+      return { line1, line2, multiLine: true };
+    }
+    
+    // If no space found, just return the original name
+    return name;
   };
+
+  const wrappedSchoolName = wrapSchoolName(schoolName);
+  const isMultiLine = typeof wrappedSchoolName !== 'string' && wrappedSchoolName.multiLine;
+  const isRegisterSupport = certificateType === 'register-support';
+  
+  // Check for Theme2 (Participation Certificate)
+  const isParticipationCert = 
+    templateName === 'CERT-เข้าร่วมกิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์' || 
+    templateName === 'Theme2' || 
+    templateName === 'theme2' ||
+    templateName === 'THEME2' ||
+    (templateName && templateName.toLowerCase().includes('theme2')) ||
+    (templateName && templateName.includes('เข้าร่วมกิจกรรม'));
+  
+  // Check for Theme1 (Support Certificate) - check by template name directly
+  const isTheme1 = 
+    templateName === 'Theme1' || 
+    templateName === 'theme1' || 
+    templateName === 'THEME1' ||
+    (templateName && templateName.toLowerCase().includes('theme1'));
+  
+  // Debug logging
+  console.log('=== Certificate Template Debug ===');
+  console.log('Template Name:', templateName);
+  console.log('Certificate Type:', certificateType);
+  console.log('Is Multi Line:', isMultiLine);
+  console.log('Is Participation Cert (Theme2):', isParticipationCert);
+  console.log('Is Theme1:', isTheme1);
+  console.log('Is Register Support Type:', isRegisterSupport);
+  console.log('==================================');
+  
+  // Adjust positions based on certificate type and whether school name is multi-line
+  let schoolNameTop = 286;
+  let provinceTop = 328;
+  let gradeTop = 428;
+  let showGradeAndType = true;
+  let schoolNameLineHeight = '1.8';
+  
+  // ==============================================
+  // THEME2: CERT-เข้าร่วมกิจกรรมโรงเรียนดนตรีไทย 100%
+  // ==============================================
+  if (isParticipationCert) {
+    if (isMultiLine) {
+      // Theme2 - Multi-line (ชื่อ >70 ตัวอักษร)
+      schoolNameTop = 285;
+      provinceTop = 375;
+      schoolNameLineHeight = '1.2';
+    } else {
+      // Theme2 - Single line (ชื่อ ≤70 ตัวอักษร)
+      schoolNameTop = 305;
+      provinceTop = 360;
+      schoolNameLineHeight = '1.8';
+    }
+    showGradeAndType = false; // ไม่แสดงประเภท/ระดับ
+  } 
+  
+  // ==============================================
+  // THEME1: ANY certificate with Theme1 template
+  // ==============================================
+  else if (isTheme1) {
+    if (isMultiLine) {
+      // Theme1 - Multi-line (ชื่อ >70 ตัวอักษร)
+      schoolNameTop = 276;
+      provinceTop = 336;
+      gradeTop = 428;
+      schoolNameLineHeight = '1.3';
+    } else {
+      // Theme1 - Single line (ชื่อ ≤70 ตัวอักษร)
+      schoolNameTop = 286;
+      provinceTop = 328;
+      gradeTop = 428;
+      schoolNameLineHeight = '1.2';
+    }
+    showGradeAndType = true; // แสดงประเภท/ระดับ
+  } 
+  
+  // ==============================================
+  // DEFAULT: CERT-โรงเรียนดนตรีไทย 100 เปอร์เซ็นต์
+  // ==============================================
+  else {
+    if (isMultiLine) {
+      // Default - Multi-line (ชื่อ >70 ตัวอักษร) - ใช้ค่าเดียวกับ Theme1
+      schoolNameTop = 276;
+      provinceTop = 336;
+      gradeTop = 428;
+      schoolNameLineHeight = '1.3';
+    } else {
+      // Default - Single line (ชื่อ ≤70 ตัวอักษร)
+      schoolNameTop = 286;
+      provinceTop = 328;
+      gradeTop = 428;
+      schoolNameLineHeight = '2.0';
+    }
+    showGradeAndType = true; // แสดงประเภท/ระดับ
+  }
 
   return (
     <div className="space-y-4">
+      {/* Google Fonts - Sarabun */}
+      <link
+        href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap"
+        rel="stylesheet"
+      />
+      
       {/* Certificate Display */}
       <div
         ref={certificateRef}
@@ -69,6 +206,8 @@ export default function CertificatePreview({
             className="absolute inset-0 bg-cover bg-center bg-no-repeat"
             style={{
               backgroundImage: `url(${templateImageUrl})`,
+              WebkitBackfaceVisibility: 'hidden',
+              backfaceVisibility: 'hidden',
             }}
           />
         ) : (
@@ -96,26 +235,32 @@ export default function CertificatePreview({
         <div
           className="absolute"
           style={{
-            top: '38.5%',
+            top: `${schoolNameTop}px`,
             left: '50%',
             transform: 'translateX(-50%)',
-            fontSize: '20px',
-            fontFamily: 'Sarabun, sans-serif',
+            fontSize: '23px',
+            fontFamily: '"Sarabun", sans-serif',
             color: '#1a1a1a',
             textAlign: 'center',
-            fontWeight: '600',
-            maxWidth: '500px',
-            lineHeight: '1.2',
+            fontWeight: '700',
             width: 'auto',
+            lineHeight: schoolNameLineHeight,
             padding: '0 8px',
-            whiteSpace: 'nowrap',
             overflow: 'visible',
             display: 'flex',
+            flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
           }}
         >
-          {schoolName}
+          {typeof wrappedSchoolName === 'string' ? (
+            <span style={{ whiteSpace: 'nowrap' }}>{wrappedSchoolName}</span>
+          ) : (
+            <>
+              <span style={{ whiteSpace: 'nowrap' }}>{wrappedSchoolName.line1}</span>
+              <span style={{ whiteSpace: 'nowrap' }}>{wrappedSchoolName.line2}</span>
+            </>
+          )}
         </div>
 
         {/* Province Overlay - On dotted line after "จังหวัด" */}
@@ -123,16 +268,16 @@ export default function CertificatePreview({
           <div
             className="absolute"
             style={{
-              top: '43%',
+              top: `${provinceTop}px`,
               left: '50%',
               transform: 'translateX(-50%)',
-              fontSize: '18px',
-              fontFamily: 'Sarabun, sans-serif',
+              fontSize: '23px',
+              fontFamily: '"Sarabun", sans-serif',
               color: '#1a1a1a',
               textAlign: 'center',
-              fontWeight: '600',
-              maxWidth: '400px',
-              lineHeight: '1.2',
+              fontWeight: '700',
+              maxWidth: '450px',
+              lineHeight: '1.3',
               width: 'auto',
               padding: '0 8px',
               whiteSpace: 'nowrap',
@@ -142,42 +287,55 @@ export default function CertificatePreview({
               justifyContent: 'center',
             }}
           >
-            {province}
+            {province === 'กรุงเทพมหานคร' ? 'กรุงเทพมหานคร' : `จังหวัด${province}`}
           </div>
         )}
 
-        {/* Certificate Number - Bottom Left */}
+        {/* Support Type and Grade on same line */}
+        {showGradeAndType && (supportTypeName || grade) && (
+          <div
+            className="absolute"
+            style={{
+              top: `${gradeTop}px`,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              fontSize: '23px',
+              fontFamily: '"Sarabun", sans-serif',
+              color: '#1a1a1a',
+              textAlign: 'center',
+              fontWeight: '700',
+              maxWidth: '700px',
+              lineHeight: '1.3',
+              width: 'auto',
+              padding: '0 8px',
+              whiteSpace: 'nowrap',
+              overflow: 'visible',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+            }}
+          >
+            {supportTypeName && <span>ประเภท{supportTypeName}</span>}
+            {grade && <span>{grade}</span>}
+          </div>
+        )}
+
+        {/* Certificate Number - Bottom Left Corner */}
         <div
           className="absolute"
           style={{
-            top: '75%',
-            left: '20%', // ลดจาก 25% เป็น 20% (ลด 20%)
+            bottom: '1.125%',
+            left: '11.33%',
             transform: 'none',
-            fontSize: '14px', // ลดจาก 16px เป็น 14px
-            fontFamily: 'Sarabun, sans-serif',
-            color: '#666666',
+            fontSize: '11px',
+            fontFamily: '"Sarabun", sans-serif',
+            color: '#999999',
             textAlign: 'left',
             fontWeight: '400',
           }}
         >
           เลขที่: {certificateNumber}
-        </div>
-
-        {/* Issue Date - Bottom Right */}
-        <div
-          className="absolute"
-          style={{
-            top: '75%',
-            left: '80%', // เพิ่มจาก 75% เป็น 80% (ลด margin-right 20%)
-            transform: 'translateX(-100%)',
-            fontSize: '14px', // ลดจาก 16px เป็น 14px
-            fontFamily: 'Sarabun, sans-serif',
-            color: '#666666',
-            textAlign: 'right',
-            fontWeight: '400',
-          }}
-        >
-          วันที่ออก: {formatDate(issueDate)}
         </div>
       </div>
 
@@ -221,31 +379,41 @@ export default function CertificatePreview({
             margin: 0 !important;
             padding: 0 !important;
             box-shadow: none !important;
-            transform: none !important;
+            page-break-after: avoid !important;
+            page-break-inside: avoid !important;
           }
           
-          /* Ensure background images print */
+          /* Force high quality rendering */
+          #certificate-preview,
           #certificate-preview * {
             -webkit-print-color-adjust: exact !important;
             color-adjust: exact !important;
             print-color-adjust: exact !important;
           }
           
-          /* Ensure text positioning is preserved */
-          #certificate-preview div[style*="position: absolute"] {
-            position: absolute !important;
+          /* High quality background image - use high-quality rendering */
+          #certificate-preview > div:first-child {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            background-size: cover !important;
+            background-position: center !important;
           }
           
-          /* Hide action buttons when printing */
+          /* Hide buttons */
           button {
             display: none !important;
           }
           
-          /* Ensure certificate fills the page */
+          /* Force single page */
+          html, body {
+            height: 800px !important;
+            overflow: hidden !important;
+          }
+          
+          /* Page setup - high quality */
           @page {
-            margin: 0;
-            size: 1200px 800px;
             size: landscape;
+            margin: 0;
           }
         }
       `}</style>

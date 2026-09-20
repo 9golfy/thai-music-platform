@@ -26,6 +26,11 @@ async function getCertificate(id: string) {
       return null;
     }
 
+    // Debug: Log all certificate fields
+    console.log('=== All Certificate Fields ===');
+    console.log(JSON.stringify(certificate, null, 2));
+    console.log('==============================');
+
     // Get template image URL by template name
     let templateImageUrl = null;
     if (certificate.templateName) {
@@ -38,19 +43,107 @@ async function getCertificate(id: string) {
 
     // Get province from submission
     let province = null;
+    let supportTypeName = null;
     if (certificate.schoolId) {
       if (certificate.certificateType === 'register100') {
         const submission = await register100Collection.findOne(
           { schoolId: certificate.schoolId },
-          { projection: { reg100_schoolProvince: 1 } }
+          { projection: { 
+            reg100_schoolProvince: 1
+          } }
         );
         province = submission?.reg100_schoolProvince || null;
       } else {
         const submission = await registerSupportCollection.findOne(
           { schoolId: certificate.schoolId },
-          { projection: { regsup_schoolProvince: 1 } }
+          { projection: { 
+            regsup_schoolProvince: 1,
+            supportType: 1,
+            supportTypeName: 1
+          } }
         );
         province = submission?.regsup_schoolProvince || null;
+        supportTypeName = submission?.supportTypeName || submission?.supportType || null;
+      }
+    }
+
+    // Get grade from certificate, or calculate from submission if not stored
+    let grade = certificate.grade || null;
+    
+    // If grade not stored, calculate from submission scores (for old certificates)
+    if (!grade && certificate.schoolId) {
+      if (certificate.certificateType === 'register100') {
+        const submission = await register100Collection.findOne(
+          { schoolId: certificate.schoolId },
+          { projection: { 
+            teaching_curriculum_score: 1,
+            teacher_qualification_score: 1,
+            support_from_org_score: 1,
+            support_from_external_score: 1,
+            award_score: 1,
+            activity_within_province_internal_score: 1,
+            activity_within_province_external_score: 1,
+            activity_outside_province_score: 1,
+            pr_activity_score: 1,
+            video1_score: 1,
+            video2_score: 1
+          } }
+        );
+        
+        if (submission) {
+          const part1Score = 
+            (submission.teaching_curriculum_score || 0) +
+            (submission.teacher_qualification_score || 0) +
+            (submission.support_from_org_score || 0) +
+            (submission.support_from_external_score || 0) +
+            (submission.award_score || 0) +
+            (submission.activity_within_province_internal_score || 0) +
+            (submission.activity_within_province_external_score || 0) +
+            (submission.activity_outside_province_score || 0) +
+            (submission.pr_activity_score || 0);
+          const video1Score = submission.video1_score || 0;
+          const video2Score = submission.video2_score || 0;
+          const totalScore = part1Score + video1Score + video2Score;
+          
+          const { calculateGradeRegister100, getGradeNameThai } = await import('@/lib/utils/gradeCalculator');
+          const gradeLevel = calculateGradeRegister100(totalScore);
+          grade = getGradeNameThai(gradeLevel);
+        }
+      } else {
+        const submission = await registerSupportCollection.findOne(
+          { schoolId: certificate.schoolId },
+          { projection: { 
+            teacher_qualification_score: 1,
+            support_from_org_score: 1,
+            support_from_external_score: 1,
+            award_score: 1,
+            activity_within_province_internal_score: 1,
+            activity_within_province_external_score: 1,
+            activity_outside_province_score: 1,
+            pr_activity_score: 1,
+            video1_score: 1,
+            video2_score: 1
+          } }
+        );
+        
+        if (submission) {
+          const part1Score =
+            (submission.teacher_qualification_score || 0) +
+            (submission.support_from_org_score || 0) +
+            (submission.support_from_external_score || 0) +
+            (submission.award_score || 0) +
+            (submission.activity_within_province_internal_score || 0) +
+            (submission.activity_within_province_external_score || 0) +
+            (submission.activity_outside_province_score || 0) +
+            (submission.pr_activity_score || 0);
+          const video1Score = submission.video1_score || 0;
+          const video2Score = submission.video2_score || 0;
+          const totalScore = part1Score + video1Score + video2Score;
+          
+          const { calculateGrade, getGradeNameThai } = await import('@/lib/utils/gradeCalculator');
+          const gradeLevel = calculateGrade(totalScore);
+          grade = getGradeNameThai(gradeLevel);
+        }
       }
     }
 
@@ -59,6 +152,8 @@ async function getCertificate(id: string) {
       _id: certificate._id.toString(),
       templateImageUrl,
       province,
+      supportTypeName,
+      grade,
     };
   } catch (error) {
     console.error('Error fetching certificate:', error);
@@ -98,6 +193,14 @@ export default async function CertificateDetailPage({
       </div>
     );
   }
+
+  // Debug: Log certificate data
+  console.log('=== Certificate Data ===');
+  console.log('schoolName:', (certificate as any).schoolName);
+  console.log('province:', (certificate as any).province);
+  console.log('grade:', (certificate as any).grade);
+  console.log('certificateNumber:', (certificate as any).certificateNumber);
+  console.log('========================');
 
   return (
     <div className="space-y-6">
@@ -164,6 +267,18 @@ export default async function CertificateDetailPage({
               {(certificate as any).isActive ? 'Active' : 'Inactive'}
             </span>
           </div>
+          {(certificate as any).province && (
+            <div>
+              <p className="text-sm text-gray-500 mb-1">จังหวัด</p>
+              <p className="font-medium text-gray-900">{(certificate as any).province}</p>
+            </div>
+          )}
+          {(certificate as any).grade && (
+            <div>
+              <p className="text-sm text-gray-500 mb-1">ระดับเกณฑ์</p>
+              <p className="font-medium text-gray-900">{(certificate as any).grade}</p>
+            </div>
+          )}
         </div>
       </div>
 
@@ -173,10 +288,13 @@ export default async function CertificateDetailPage({
         <CertificatePreview
           schoolName={(certificate as any).schoolName}
           province={(certificate as any).province}
+          supportTypeName={(certificate as any).supportTypeName}
+          grade={(certificate as any).grade}
           certificateNumber={(certificate as any).certificateNumber}
           issueDate={(certificate as any).issueDate}
           templateName={(certificate as any).templateName}
           templateImageUrl={(certificate as any).templateImageUrl}
+          certificateType={(certificate as any).certificateType}
           showDownloadButton={true}
         />
       </div>

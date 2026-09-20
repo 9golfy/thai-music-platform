@@ -60,13 +60,32 @@ export default function HeroSection() {
             <div>ผลการคัดเลือกโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์ ประจำปีงบประมาณ พ.ศ. 2569</div>
           </motion.h1>
 
-          {/* Download Button - Moved up closer to title */}
+          {/* Additional Action Buttons */}
           <motion.div
-            className="mt-8"
+            className="mt-8 flex flex-col sm:flex-row gap-3 flex-wrap justify-center items-center"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
+            {/* คำชี้แจงรางวัล */}
+            <button
+              onClick={() => {
+                const link = document.createElement('a');
+                link.href = '/filedownload/file004_คำชี้แจง_รางวัล_และใบประกาศเกียรติคุณ_69.pdf';
+                link.download = 'file004_คำชี้แจง_รางวัล_และใบประกาศเกียรติคุณ_69.pdf';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+              }}
+              className="px-6 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 rounded-full hover:from-blue-700 hover:to-blue-800 transition-all duration-300 hover:shadow-lg hover:scale-105 flex items-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              คำชี้แจงรางวัล
+            </button>
+
+            {/* ผลการคัดเลือก - สีเขียว */}
             <button
               onClick={() => {
                 const link = document.createElement('a');
@@ -76,20 +95,48 @@ export default function HeroSection() {
                 link.click();
                 document.body.removeChild(link);
               }}
-              className="group relative overflow-hidden rounded-full px-8 py-3.5 text-sm sm:text-base font-semibold text-white transition-all duration-300 hover:shadow-[0_0_25px_rgba(16,185,129,0.5)] hover:scale-[1.02] hover:brightness-110"
-              style={{
-                background: "linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%)",
-                boxShadow: "0 4px 15px rgba(16,185,129,0.3), inset 0 1px 0 rgba(255,255,255,0.2)",
-              }}
+              className="px-6 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-full hover:from-emerald-700 hover:to-emerald-800 transition-all duration-300 hover:shadow-lg hover:scale-105 flex items-center gap-2"
             >
-              <span className="relative z-10 flex items-center gap-2">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                  <polyline points="7 10 12 15 17 10"></polyline>
-                  <line x1="12" y1="15" x2="12" y2="3"></line>
-                </svg>
-                {"ดาวน์โหลดประกาศผลการคัดเลือก"}
-              </span>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              ผลการคัดเลือก
+            </button>
+
+            {/* รายชื่อสถานศึกษาเข้าร่วมกิจกรรม */}
+            <button
+              onClick={() => {
+                const link = document.createElement('a');
+                link.href = '/filedownload/file005_รายชื่อสถานศึกษาเข้าร่วมกิจกรรม.pdf';
+                link.download = 'file005_รายชื่อสถานศึกษาเข้าร่วมกิจกรรม.pdf';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+              }}
+              className="px-6 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-amber-600 to-amber-700 rounded-full hover:from-amber-700 hover:to-amber-800 transition-all duration-300 hover:shadow-lg hover:scale-105 flex items-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              รายชื่อสถานศึกษาเข้าร่วมกิจกรรม
+            </button>
+
+            {/* วิธีการ/ขั้นตอนการ download เกียรติบัตร */}
+            <button
+              onClick={() => {
+                const link = document.createElement('a');
+                link.href = '/filedownload/file006_วิธีการ_ขั้นตอนการ_download_เกียรติบัตร.pdf';
+                link.download = 'file006_วิธีการ_ขั้นตอนการ_download_เกียรติบัตร.pdf';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+              }}
+              className="px-6 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-rose-600 to-rose-700 rounded-full hover:from-rose-700 hover:to-rose-800 transition-all duration-300 hover:shadow-lg hover:scale-105 flex items-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              วิธีการ/ขั้นตอนการ download เกียรติบัตร
             </button>
           </motion.div>
 

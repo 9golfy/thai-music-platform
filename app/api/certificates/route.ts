@@ -142,6 +142,45 @@ export async function POST(request: Request) {
       schoolName = school.reg100_schoolName;
     }
 
+    // Calculate grade based on scores
+    let grade = null;
+    if (certificateType === 'register100') {
+      const part1Score = 
+        (school.teaching_curriculum_score || 0) +
+        (school.teacher_qualification_score || 0) +
+        (school.support_from_org_score || 0) +
+        (school.support_from_external_score || 0) +
+        (school.award_score || 0) +
+        (school.activity_within_province_internal_score || 0) +
+        (school.activity_within_province_external_score || 0) +
+        (school.activity_outside_province_score || 0) +
+        (school.pr_activity_score || 0);
+      const video1Score = school.video1_score || 0;
+      const video2Score = school.video2_score || 0;
+      const totalScore = part1Score + video1Score + video2Score;
+      
+      const { calculateGradeRegister100, getGradeNameThai } = await import('@/lib/utils/gradeCalculator');
+      const gradeLevel = calculateGradeRegister100(totalScore);
+      grade = getGradeNameThai(gradeLevel);
+    } else {
+      const part1Score =
+        (school.teacher_qualification_score || 0) +
+        (school.support_from_org_score || 0) +
+        (school.support_from_external_score || 0) +
+        (school.award_score || 0) +
+        (school.activity_within_province_internal_score || 0) +
+        (school.activity_within_province_external_score || 0) +
+        (school.activity_outside_province_score || 0) +
+        (school.pr_activity_score || 0);
+      const video1Score = school.video1_score || 0;
+      const video2Score = school.video2_score || 0;
+      const totalScore = part1Score + video1Score + video2Score;
+      
+      const { calculateGrade, getGradeNameThai } = await import('@/lib/utils/gradeCalculator');
+      const gradeLevel = calculateGrade(totalScore);
+      grade = getGradeNameThai(gradeLevel);
+    }
+
     // Create certificate
     const newCertificate = {
       schoolId: schoolId.toString(),
@@ -149,6 +188,7 @@ export async function POST(request: Request) {
       certificateType,
       templateName, // Store template name instead of ID
       certificateNumber,
+      grade, // Add grade
       issueDate: new Date(),
       isActive: true,
       createdBy: session.userId,

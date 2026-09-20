@@ -25,10 +25,10 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { calculateGrade, getGradeColor, getGradeNameThai } from '@/lib/utils/gradeCalculator';
 
 const TEMPLATE_OPTIONS = [
-  { value: 'default', label: 'Default' },
-  { value: 'theme1', label: 'Theme 1' },
-  { value: 'theme2', label: 'Theme 2' },
-  { value: 'theme3', label: 'Theme 3' },
+  { value: 'default', label: 'CERT-โรงเรียนดนตรีไทย 100 เปอร์เซ็นต์' },
+  { value: 'theme1', label: 'CERT-โรงเรียนสนับสนุนและส่งเสริมดนตรีไทย' },
+  { value: 'theme2', label: 'CERT-เข้าร่วมกิจกรรมโรงเรียนดนตรีไทย 100 เปอร์เซ็นต์' },
+  { value: 'theme3', label: 'Theme สำรอง' },
 ];
 
 interface School {
