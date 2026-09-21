@@ -22,7 +22,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
-import { calculateGrade, getGradeColor, getGradeNameThai } from '@/lib/utils/gradeCalculator';
+import { calculateGrade, calculateGradeRegister100, getGradeColor, getGradeNameThai } from '@/lib/utils/gradeCalculator';
 
 const TEMPLATE_OPTIONS = [
   { value: 'default', label: 'CERT-โรงเรียนดนตรีไทย 100 เปอร์เซ็นต์' },
@@ -142,6 +142,15 @@ export default function SchoolCertificateAssignment() {
         }
       };
 
+      // Helper function to calculate grade based on school type
+      const calculateGradeForSchool = (totalScore: number, type: string) => {
+        if (type === 'register100') {
+          return calculateGradeRegister100(totalScore);
+        } else {
+          return calculateGrade(totalScore);
+        }
+      };
+
       // Fetch schools based on selected type
       if (schoolType === 'all') {
         // Fetch both types with loadAll=true to get all records
@@ -158,7 +167,7 @@ export default function SchoolCertificateAssignment() {
           const certInfo = certificateMap.get(school.schoolId);
           // Calculate total score from individual components (like SchoolsDataTable)
           const totalScore = calculateTotalScore(school, 'register100');
-          const grade = calculateGrade(totalScore);
+          const grade = calculateGradeForSchool(totalScore, 'register100');
           
           return {
             ...school,
@@ -178,7 +187,7 @@ export default function SchoolCertificateAssignment() {
           const certInfo = certificateMap.get(school.schoolId);
           // Calculate total score from individual components (like SchoolsDataTable)
           const totalScore = calculateTotalScore(school, 'register-support');
-          const grade = calculateGrade(totalScore);
+          const grade = calculateGradeForSchool(totalScore, 'register-support');
           
           return {
             ...school,
@@ -204,7 +213,7 @@ export default function SchoolCertificateAssignment() {
           const certInfo = certificateMap.get(school.schoolId);
           // Calculate total score from individual components (like SchoolsDataTable)
           const totalScore = calculateTotalScore(school, schoolType);
-          const grade = calculateGrade(totalScore);
+          const grade = calculateGradeForSchool(totalScore, schoolType);
           
           return {
             ...school,
