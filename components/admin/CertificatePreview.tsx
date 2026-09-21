@@ -49,10 +49,25 @@ export default function CertificatePreview({
     console.log('==================================');
     
     // Special case: Force wrap at opening parenthesis for specific school
-    if (name.includes('โรงเรียนบ้านหนองเพรางาย (สลากกินแบ่งสงเคราะห์')) {
-      const parts = name.split(' (');
+    // Check for both "โรงเรียนบ้านหนองเพรางาย(สลากกินแบ่ง" with and without space before (
+    if (name.includes('โรงเรียนบ้านหนองเพรางาย') && name.includes('สลากกินแบ่ง')) {
+      // Try splitting with space first
+      let parts = name.split(' (');
       if (parts.length === 2) {
-        console.log('Special case: Wrapping at parenthesis');
+        console.log('Special case: Wrapping at " ("');
+        console.log('Line 1:', parts[0]);
+        console.log('Line 2:', '(' + parts[1]);
+        return { 
+          line1: parts[0], 
+          line2: '(' + parts[1], 
+          multiLine: true 
+        };
+      }
+      
+      // If no space before (, try without space
+      parts = name.split('(');
+      if (parts.length === 2) {
+        console.log('Special case: Wrapping at "("');
         console.log('Line 1:', parts[0]);
         console.log('Line 2:', '(' + parts[1]);
         return { 
@@ -130,7 +145,7 @@ export default function CertificatePreview({
       // Theme2 - Multi-line (ชื่อ >70 ตัวอักษร)
       schoolNameTop = 285;
       provinceTop = 375;
-      schoolNameLineHeight = '1.2';
+      schoolNameLineHeight = '1.8';
     } else {
       // Theme2 - Single line (ชื่อ ≤70 ตัวอักษร)
       schoolNameTop = 305;
