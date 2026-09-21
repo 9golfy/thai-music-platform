@@ -258,9 +258,21 @@ export default function SchoolCertificateAssignment() {
       });
     }
 
-    // Grade filter
+    // IMPORTANT: When filtering by grade, only show schools matching the selected schoolType
+    // This ensures consistency with dashboard statistics
     if (gradeFilter) {
-      filtered = filtered.filter((school) => school.grade === gradeFilter);
+      filtered = filtered.filter((school) => {
+        // Match grade
+        const gradeMatch = school.grade === gradeFilter;
+        
+        // If schoolType is 'all', include both types
+        // Otherwise, only include schools matching the selected type
+        if (schoolType === 'all') {
+          return gradeMatch;
+        } else {
+          return gradeMatch && school.type === schoolType;
+        }
+      });
     }
 
     setFilteredSchools(filtered);
@@ -346,7 +358,7 @@ export default function SchoolCertificateAssignment() {
   };
 
   const handleDeleteCertificate = async (certificateId: string, schoolName: string) => {
-    if (!confirm(`\u0E15\u0E49\u0E2D\u0E07\u0E01\u0E32\u0E23\u0E22\u0E01\u0E40\u0E25\u0E34\u0E01 "${schoolName}" \u0E43\u0E0A\u0E48\u0E2B\u0E23\u0E37\u0E2D\u0E44\u0E21\u0E48?`)) {
+    if (!confirm(`ต้องการยกเลิก "${schoolName}" ใช่หรือไม่?`)) {
       return;
     }
 
@@ -359,7 +371,7 @@ export default function SchoolCertificateAssignment() {
       const data = await response.json();
       
       if (data.success) {
-        alert('\u0E22\u0E01\u0E40\u0E25\u0E34\u0E01\u0E40\u0E23\u0E35\u0E22\u0E1A\u0E23\u0E49\u0E2D\u0E22\u0E41\u0E25\u0E49\u0E27');
+        alert('ยกเลิกเรียบร้อยแล้ว');
         // Reload data
         await fetchData();
       } else {
@@ -367,9 +379,65 @@ export default function SchoolCertificateAssignment() {
       }
     } catch (error) {
       console.error('Error deleting certificate:', error);
-      alert('\u0E40\u0E01\u0E34\u0E14\u0E02\u0E49\u0E2D\u0E1C\u0E34\u0E14\u0E1E\u0E25\u0E32\u0E14\u0E43\u0E19\u0E01\u0E32\u0E23\u0E22\u0E01\u0E40\u0E25\u0E34\u0E01');
+      alert('เกิดข้อผิดพลาดในการยกเลิก');
     } finally {
       setDeletingCertId(null);
+    }
+  };
+
+  const handleBulkDeleteCertificates = async () => {
+    // Get selected schools that have certificates
+    const schoolsToDelete = Array.from(selectedSchools)
+      .map(schoolId => schools.find(s => s.schoolId === schoolId))
+      .filter(school => school && school.hasCertificate && school.certificateId);
+
+    if (schoolsToDelete.length === 0) {
+      alert('กรุณาเลือกโรงเรียนที่มีใบประกาศแล้ว');
+      return;
+    }
+
+    if (!confirm(`ต้องการยกเลิกใบประกาศของ ${schoolsToDelete.length} โรงเรียนที่เลือกใช่หรือไม่?\n\nการดำเนินการนี้ไม่สามารถย้อนกลับได้`)) {
+      return;
+    }
+
+    setProcessing(true);
+    try {
+      let successCount = 0;
+      let errorCount = 0;
+
+      for (const school of schoolsToDelete) {
+        if (!school || !school.certificateId) continue;
+
+        try {
+          const response = await fetch(`/api/certificates/${school.certificateId}`, {
+            method: 'DELETE',
+          });
+
+          const data = await response.json();
+          if (data.success) {
+            successCount++;
+          } else {
+            errorCount++;
+            console.error(`Failed to delete certificate for ${school.schoolName}:`, data.message);
+          }
+        } catch (error) {
+          errorCount++;
+          console.error(`Error deleting certificate for ${school.schoolName}:`, error);
+        }
+      }
+
+      alert(`ยกเลิกใบประกาศเสร็จสิ้น\nสำเร็จ: ${successCount}\nล้มเหลว: ${errorCount}`);
+      
+      // Clear selection
+      setSelectedSchools(new Set());
+      
+      // Reload data
+      await fetchData();
+    } catch (error) {
+      console.error('Error bulk deleting certificates:', error);
+      alert('เกิดข้อผิดพลาดในการยกเลิกใบประกาศ');
+    } finally {
+      setProcessing(false);
     }
   };
 
@@ -753,28 +821,59 @@ export default function SchoolCertificateAssignment() {
                     กำหนด Template แล้ว <span className="font-semibold text-green-600">{schoolTemplates.size}</span> โรงเรียน
                   </span>
                 </div>
+                {/* ปุ่มยกเลิกการเลือก checkbox */}
+                {selectedSchools.size > 0 && (
+                  <button
+                    onClick={() => setSelectedSchools(new Set())}
+                    disabled={processing}
+                    className="flex items-center gap-2 px-3 py-1.5 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium border border-gray-300 hover:border-gray-400 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    <span>ล้างการเลือก</span>
+                  </button>
+                )}
               </div>
-              {schoolTemplates.size > 0 && (
-                <Button
-                  onClick={handleCreateCertificates}
-                  disabled={processing}
-                  className="h-10 px-6 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all cursor-pointer"
-                >
-                  {processing ? (
-                    <div className="flex items-center gap-2">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                      <span>กำลังสร้าง...</span>
-                    </div>
-                  ) : (
+              <div className="flex items-center gap-3">
+                {/* ปุ่มยกเลิกใบประกาศแบบกลุ่ม */}
+                {selectedSchools.size > 0 && (
+                  <Button
+                    onClick={handleBulkDeleteCertificates}
+                    disabled={processing}
+                    className="h-10 px-6 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold shadow-lg hover:shadow-xl transition-all cursor-pointer"
+                  >
                     <div className="flex items-center gap-2">
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                       </svg>
-                      <span>สร้างใบประกาศ</span>
+                      <span>ยกเลิกใบประกาศ</span>
                     </div>
-                  )}
-                </Button>
-              )}
+                  </Button>
+                )}
+                {/* ปุ่มสร้างใบประกาศ */}
+                {schoolTemplates.size > 0 && (
+                  <Button
+                    onClick={handleCreateCertificates}
+                    disabled={processing}
+                    className="h-10 px-6 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all cursor-pointer"
+                  >
+                    {processing ? (
+                      <div className="flex items-center gap-2">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                        <span>กำลังดำเนินการ...</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>สร้างใบประกาศ</span>
+                      </div>
+                    )}
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
 
