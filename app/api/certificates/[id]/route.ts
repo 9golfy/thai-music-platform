@@ -31,26 +31,36 @@ export async function GET(
       );
     }
 
-    // Log certificate view activity
+    // Log certificate activity based on intent
     const session = await getSession();
     if (session) {
+      const url = new URL(request.url);
+      const intent = url.searchParams.get('intent'); // 'download' or null
+      
       const ipAddress = request.headers.get('x-forwarded-for') || 
                        request.headers.get('x-real-ip') || 
                        'unknown';
       const userAgent = request.headers.get('user-agent') || 'unknown';
+
+      // Determine activity type based on intent
+      const activityType = intent === 'download' ? 'CERTIFICATE_DOWNLOAD' : 'CERTIFICATE_VIEW';
+      const description = intent === 'download' 
+        ? `ดาวน์โหลดใบประกาศ: ${certificate.schoolName} (${certificate.certificateNumber || 'N/A'})`
+        : `เปิดดูใบประกาศ: ${certificate.schoolName} (${certificate.certificateNumber || 'N/A'})`;
 
       await createActivityLog({
         userId: session.userId,
         userName: `${session.firstName} ${session.lastName}`,
         schoolId: session.schoolId,
         schoolName: session.schoolName,
-        activityType: 'CERTIFICATE_VIEW',
-        description: `เปิดดูใบประกาศ: ${certificate.schoolName} (${certificate.certificateNumber || 'N/A'})`,
+        activityType,
+        description,
         metadata: {
           certificateId: certificate._id.toString(),
           certificateNumber: certificate.certificateNumber,
           schoolName: certificate.schoolName,
           certificateType: certificate.certificateType,
+          intent: intent || 'view',
         },
         ipAddress,
         userAgent,
