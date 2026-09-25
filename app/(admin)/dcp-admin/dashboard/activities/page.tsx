@@ -16,6 +16,11 @@ export default function ActivitiesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Modal state for certificate downloads
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
+  const [downloadLogs, setDownloadLogs] = useState<ActivityLog[]>([]);
+  const [loadingDownloads, setLoadingDownloads] = useState(false);
+
   // Filters
   const [activityType, setActivityType] = useState('');
   const [schoolId, setSchoolId] = useState('');
@@ -78,6 +83,30 @@ export default function ActivitiesPage() {
     }
   };
 
+  const fetchCertificateDownloads = async () => {
+    setLoadingDownloads(true);
+    setShowDownloadModal(true);
+    try {
+      const params = new URLSearchParams();
+      params.append('activityType', 'CERTIFICATE_DOWNLOAD');
+      params.append('limit', '100');
+      if (schoolId) params.append('schoolId', schoolId);
+      if (startDate) params.append('startDate', startDate);
+      if (endDate) params.append('endDate', endDate);
+
+      const response = await fetch(`/api/activity-logs?${params}`);
+      const data = await response.json();
+
+      if (data.success) {
+        setDownloadLogs(data.data.logs);
+      }
+    } catch (err) {
+      console.error('Error fetching downloads:', err);
+    } finally {
+      setLoadingDownloads(false);
+    }
+  };
+
   const handleReset = () => {
     setActivityType('');
     setSchoolId('');
@@ -130,14 +159,29 @@ export default function ActivitiesPage() {
           <div className="text-sm text-gray-600">กิจกรรมทั้งหมด</div>
           <div className="text-2xl font-bold text-gray-900 mt-1">{total}</div>
         </div>
-        {stats.slice(0, 3).map((stat) => (
-          <div key={stat.activityType} className="bg-white rounded-lg shadow p-4">
-            <div className="text-sm text-gray-600">
-              {getActivityTypeLabel(stat.activityType)}
+        {stats.slice(0, 3).map((stat) => {
+          const isDownload = stat.activityType === 'CERTIFICATE_DOWNLOAD';
+          return (
+            <div 
+              key={stat.activityType} 
+              className={`bg-white rounded-lg shadow p-4 ${isDownload ? 'cursor-pointer hover:shadow-lg transition-shadow' : ''}`}
+              onClick={() => isDownload && fetchCertificateDownloads()}
+            >
+              <div className="text-sm text-gray-600 flex items-center justify-between">
+                <span>{getActivityTypeLabel(stat.activityType)}</span>
+                {isDownload && (
+                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                )}
+              </div>
+              <div className="text-2xl font-bold text-gray-900 mt-1">{stat.count}</div>
+              {isDownload && (
+                <div className="text-xs text-purple-600 mt-1">คลิกเพื่อดูรายละเอียด</div>
+              )}
             </div>
-            <div className="text-2xl font-bold text-gray-900 mt-1">{stat.count}</div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Filters */}
