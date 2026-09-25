@@ -19,6 +19,21 @@ export default function DownloadCertificateButton({
   const handleDownload = async () => {
     setDownloading(true);
     try {
+      // Log certificate download activity
+      await fetch('/api/activity-logs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          activityType: 'CERTIFICATE_DOWNLOAD',
+          description: `ดาวน์โหลดใบประกาศ: ${schoolName} (${certificateNumber})`,
+          metadata: {
+            certificateId,
+            certificateNumber,
+            schoolName,
+          },
+        }),
+      });
+
       // Open certificate view page in new window for printing/saving as PDF
       const url = `/dcp-admin/dashboard/certificates/${certificateId}`;
       window.open(url, '_blank');

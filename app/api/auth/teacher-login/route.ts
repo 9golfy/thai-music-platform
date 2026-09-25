@@ -4,6 +4,7 @@ import { MongoClient } from 'mongodb';
 import { verifyPassword } from '@/lib/auth/password';
 import { setSessionCookie } from '@/lib/auth/session';
 import { User } from '@/lib/types/user.types';
+import { createActivityLog } from '@/lib/activityLog';
 
 const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017';
 const dbName = 'thai_music_school';
@@ -60,6 +61,7 @@ export async function POST(request: Request) {
     // Find the submission record by schoolId
     let submissionId = null;
     let submissionType = null;
+    let schoolName = undefined;
 
     // Try register100 first
     const register100Collection = database.collection('register100_submissions');
@@ -68,6 +70,7 @@ export async function POST(request: Request) {
     if (register100Submission) {
       submissionId = register100Submission._id.toString();
       submissionType = 'register100';
+      schoolName = register100Submission.schoolName;
     } else {
       // Try register_support
       const registerSupportCollection = database.collection('register_support_submissions');
@@ -76,6 +79,7 @@ export async function POST(request: Request) {
       if (registerSupportSubmission) {
         submissionId = registerSupportSubmission._id.toString();
         submissionType = 'register-support';
+        schoolName = registerSupportSubmission.schoolName;
       }
     }
 
@@ -87,6 +91,28 @@ export async function POST(request: Request) {
       firstName: user.firstName,
       lastName: user.lastName,
       schoolId: user.schoolId,
+    });
+
+    // Log activity
+    const ipAddress = request.headers.get('x-forwarded-for') || 
+                     request.headers.get('x-real-ip') || 
+                     'unknown';
+    const userAgent = request.headers.get('user-agent') || 'unknown';
+
+    await createActivityLog({
+      userId: user._id!.toString(),
+      userName: `${user.firstName} ${user.lastName}`,
+      schoolId: user.schoolId,
+      schoolName: schoolName,
+      activityType: 'LOGIN',
+      description: `ครู ${user.firstName} ${user.lastName} เข้าสู่ระบบ`,
+      metadata: {
+        email: user.email,
+        submissionId,
+        submissionType,
+      },
+      ipAddress,
+      userAgent,
     });
 
     return NextResponse.json({

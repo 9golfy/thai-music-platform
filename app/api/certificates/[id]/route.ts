@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server';
 import { MongoClient, ObjectId } from 'mongodb';
 import { getSession } from '@/lib/auth/session';
+import { createActivityLog } from '@/lib/activityLog';
 
 const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017';
 const dbName = 'thai_music_school';
@@ -28,6 +29,32 @@ export async function GET(
         { success: false, message: 'ไม่พบใบประกาศ' },
         { status: 404 }
       );
+    }
+
+    // Log certificate view activity
+    const session = await getSession();
+    if (session) {
+      const ipAddress = request.headers.get('x-forwarded-for') || 
+                       request.headers.get('x-real-ip') || 
+                       'unknown';
+      const userAgent = request.headers.get('user-agent') || 'unknown';
+
+      await createActivityLog({
+        userId: session.userId,
+        userName: `${session.firstName} ${session.lastName}`,
+        schoolId: session.schoolId,
+        schoolName: session.schoolName,
+        activityType: 'CERTIFICATE_VIEW',
+        description: `เปิดดูใบประกาศ: ${certificate.schoolName} (${certificate.certificateNumber || 'N/A'})`,
+        metadata: {
+          certificateId: certificate._id.toString(),
+          certificateNumber: certificate.certificateNumber,
+          schoolName: certificate.schoolName,
+          certificateType: certificate.certificateType,
+        },
+        ipAddress,
+        userAgent,
+      });
     }
 
     return NextResponse.json({

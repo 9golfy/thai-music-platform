@@ -42,6 +42,8 @@ export interface AuthSession {
   firstName: string;
   lastName: string;
   schoolId?: string;
+  schoolName?: string;
+  name?: string; // Deprecated: use firstName + lastName
 }
 
 export interface PasswordResetRequest {

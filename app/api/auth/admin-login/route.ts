@@ -4,6 +4,7 @@ import { connectToDatabase } from '@/lib/mongodb';
 import { verifyPassword } from '@/lib/auth/password';
 import { setSessionCookie } from '@/lib/auth/session';
 import { User } from '@/lib/types/user.types';
+import { createActivityLog } from '@/lib/activityLog';
 
 export async function POST(request: Request) {
   try {
@@ -68,6 +69,27 @@ export async function POST(request: Request) {
     });
 
     console.log('✅ Login successful');
+
+    // Log activity
+    const ipAddress = request.headers.get('x-forwarded-for') || 
+                     request.headers.get('x-real-ip') || 
+                     'unknown';
+    const userAgent = request.headers.get('user-agent') || 'unknown';
+
+    await createActivityLog({
+      userId: user._id!.toString(),
+      userName: `${user.firstName} ${user.lastName}`,
+      schoolId: user.schoolId,
+      schoolName: undefined, // Admin ไม่มี schoolName
+      activityType: 'LOGIN',
+      description: `Admin ${user.firstName} ${user.lastName} เข้าสู่ระบบ`,
+      metadata: {
+        email: user.email,
+        role: user.role,
+      },
+      ipAddress,
+      userAgent,
+    });
 
     return NextResponse.json({
       success: true,

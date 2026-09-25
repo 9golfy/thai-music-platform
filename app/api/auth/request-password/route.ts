@@ -5,6 +5,7 @@ import { sendTeacherPasswordEmail } from '@/lib/email/mailer';
 import { notifyAdminPasswordReset } from '@/lib/email/adminNotifications';
 import { sendEmailWithRateLimit } from '@/lib/email/rateLimiter';
 import { User } from '@/lib/types/user.types';
+import { createActivityLog } from '@/lib/activityLog';
 import bcrypt from 'bcryptjs';
 
 const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017';
@@ -134,6 +135,28 @@ export async function POST(request: Request) {
       }
       // Don't fail the request - this is just a notification
     }
+
+    // Log activity
+    const ipAddress = request.headers.get('x-forwarded-for') || 
+                     request.headers.get('x-real-ip') || 
+                     'unknown';
+    const userAgent = request.headers.get('user-agent') || 'unknown';
+
+    await createActivityLog({
+      userId: user._id!.toString(),
+      userName: `${user.firstName} ${user.lastName}`,
+      schoolId: user.schoolId,
+      schoolName: schoolName,
+      activityType: 'PASSWORD_CHANGE',
+      description: `ขอรหัสผ่านใหม่: ${user.firstName} ${user.lastName} (${user.email})`,
+      metadata: {
+        email: user.email,
+        phone: user.phone,
+        method: 'request-password',
+      },
+      ipAddress,
+      userAgent,
+    });
 
     return NextResponse.json({
       success: true,
