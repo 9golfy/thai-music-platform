@@ -70,7 +70,10 @@ export async function POST(request: Request) {
     if (register100Submission) {
       submissionId = register100Submission._id.toString();
       submissionType = 'register100';
-      schoolName = register100Submission.schoolName;
+      // Try multiple field names
+      schoolName = register100Submission.schoolName || 
+                   register100Submission.reg100_schoolName || 
+                   register100Submission.regsup_schoolName;
     } else {
       // Try register_support
       const registerSupportCollection = database.collection('register_support_submissions');
@@ -79,7 +82,10 @@ export async function POST(request: Request) {
       if (registerSupportSubmission) {
         submissionId = registerSupportSubmission._id.toString();
         submissionType = 'register-support';
-        schoolName = registerSupportSubmission.schoolName;
+        // Try multiple field names
+        schoolName = registerSupportSubmission.schoolName || 
+                     registerSupportSubmission.regsup_schoolName || 
+                     registerSupportSubmission.reg100_schoolName;
       }
     }
 
