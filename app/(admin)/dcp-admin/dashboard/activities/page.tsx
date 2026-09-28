@@ -153,35 +153,46 @@ export default function ActivitiesPage() {
         </div>
       </div>
 
-      {/* Statistics Cards */}
+      {/* Statistics Cards — fixed cards, always visible */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {/* Total */}
         <div className="bg-white rounded-lg shadow p-4">
           <div className="text-sm text-gray-600">กิจกรรมทั้งหมด</div>
           <div className="text-2xl font-bold text-gray-900 mt-1">{total}</div>
         </div>
-        {stats.slice(0, 3).map((stat) => {
-          const isDownload = stat.activityType === 'CERTIFICATE_DOWNLOAD';
-          return (
-            <div 
-              key={stat.activityType} 
-              className={`bg-white rounded-lg shadow p-4 ${isDownload ? 'cursor-pointer hover:shadow-lg transition-shadow' : ''}`}
-              onClick={() => isDownload && fetchCertificateDownloads()}
-            >
-              <div className="text-sm text-gray-600 flex items-center justify-between">
-                <span>{getActivityTypeLabel(stat.activityType)}</span>
-                {isDownload && (
-                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                )}
-              </div>
-              <div className="text-2xl font-bold text-gray-900 mt-1">{stat.count}</div>
-              {isDownload && (
-                <div className="text-xs text-purple-600 mt-1">คลิกเพื่อดูรายละเอียด</div>
-              )}
-            </div>
-          );
-        })}
+
+        {/* LOGIN */}
+        <div className="bg-white rounded-lg shadow p-4">
+          <div className="text-sm text-gray-600">เข้าสู่ระบบ</div>
+          <div className="text-2xl font-bold text-gray-900 mt-1">
+            {stats.find((s) => s.activityType === 'LOGIN')?.count ?? 0}
+          </div>
+        </div>
+
+        {/* PASSWORD_CHANGE */}
+        <div className="bg-white rounded-lg shadow p-4">
+          <div className="text-sm text-gray-600">เปลี่ยนรหัสผ่าน</div>
+          <div className="text-2xl font-bold text-gray-900 mt-1">
+            {stats.find((s) => s.activityType === 'PASSWORD_CHANGE')?.count ?? 0}
+          </div>
+        </div>
+
+        {/* CERTIFICATE_DOWNLOAD — always shown, clickable */}
+        <div
+          className="bg-white rounded-lg shadow p-4 cursor-pointer hover:shadow-lg hover:border-2 hover:border-purple-300 border-2 border-transparent transition-all"
+          onClick={fetchCertificateDownloads}
+        >
+          <div className="text-sm text-gray-600 flex items-center justify-between">
+            <span>ดาวน์โหลดใบประกาศ</span>
+            <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </div>
+          <div className="text-2xl font-bold text-purple-700 mt-1">
+            {stats.find((s) => s.activityType === 'CERTIFICATE_DOWNLOAD')?.count ?? 0}
+          </div>
+          <div className="text-xs text-purple-500 mt-1 font-medium">คลิกเพื่อดูรายละเอียด</div>
+        </div>
       </div>
 
       {/* Filters */}
