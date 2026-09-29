@@ -13,6 +13,7 @@ interface CertificatePreviewProps {
   templateImageUrl?: string | null;
   showDownloadButton?: boolean;
   certificateType?: string; // 'register100' or 'register-support'
+  onDownload?: () => void; // optional callback เมื่อกดดาวน์โหลด
 }
 
 export default function CertificatePreview({
@@ -26,17 +27,19 @@ export default function CertificatePreview({
   templateImageUrl = null,
   showDownloadButton = false,
   certificateType = 'register100',
+  onDownload,
 }: CertificatePreviewProps) {
   const certificateRef = useRef<HTMLDivElement>(null);
 
   // Use provided template image URL
   const hasBackgroundImage = !!templateImageUrl;
-  
+
   // Default dimensions (3:2 ratio)
   const width = 1200;
   const height = 800;
 
   const handlePrint = () => {
+    if (onDownload) onDownload();
     window.print();
   };
 

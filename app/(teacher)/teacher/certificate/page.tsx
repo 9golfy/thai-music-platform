@@ -1,7 +1,8 @@
 import { MongoClient } from 'mongodb';
 import { getSession } from '@/lib/auth/session';
 import { redirect } from 'next/navigation';
-import CertificatePreview from '@/components/admin/CertificatePreview';
+import TeacherCertificateDownload from '@/components/teacher/TeacherCertificateDownload';
+import { createActivityLog } from '@/lib/activityLog';
 
 const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017';
 const dbName = 'thai_music_school';
@@ -153,6 +154,23 @@ export default async function TeacherCertificatePage() {
 
   const certificate = await getCertificate(session.schoolId);
 
+  // Log ครูเข้าดูหน้าใบประกาศ
+  if (certificate) {
+    await createActivityLog({
+      userId: session.userId,
+      userName: `${session.firstName} ${session.lastName}`,
+      schoolId: session.schoolId,
+      schoolName: session.schoolName || (certificate as any).schoolName,
+      activityType: 'CERTIFICATE_VIEW',
+      description: `ครู ${session.firstName} ${session.lastName} เปิดดูใบประกาศ (${(certificate as any).certificateNumber || 'N/A'})`,
+      metadata: {
+        certificateNumber: (certificate as any).certificateNumber,
+        schoolName: (certificate as any).schoolName,
+        certificateType: (certificate as any).certificateType,
+      },
+    });
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -224,17 +242,18 @@ export default async function TeacherCertificatePage() {
             
             <div className="p-8">
               {/* Certificate Preview with actual template */}
-              <CertificatePreview
-                schoolName={(certificate as any).schoolName}
-                province={(certificate as any).province}
-                supportTypeName={(certificate as any).supportTypeName}
-                grade={(certificate as any).grade}
-                certificateNumber={(certificate as any).certificateNumber}
-                issueDate={(certificate as any).issueDate}
-                templateName={(certificate as any).templateName}
-                templateImageUrl={(certificate as any).templateImageUrl}
-                certificateType={(certificate as any).certificateType}
-                showDownloadButton={true}
+              <TeacherCertificateDownload
+                certificate={{
+                  schoolName: (certificate as any).schoolName,
+                  province: (certificate as any).province,
+                  supportTypeName: (certificate as any).supportTypeName,
+                  grade: (certificate as any).grade,
+                  certificateNumber: (certificate as any).certificateNumber,
+                  issueDate: (certificate as any).issueDate,
+                  templateName: (certificate as any).templateName,
+                  templateImageUrl: (certificate as any).templateImageUrl,
+                  certificateType: (certificate as any).certificateType,
+                }}
               />
 
               {/* Certificate Info */}

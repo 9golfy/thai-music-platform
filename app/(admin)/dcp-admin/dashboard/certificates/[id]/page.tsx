@@ -3,6 +3,7 @@ import { getSession } from '@/lib/auth/session';
 import { redirect } from 'next/navigation';
 import CertificatePreview from '@/components/admin/CertificatePreview';
 import Link from 'next/link';
+import { createActivityLog } from '@/lib/activityLog';
 
 const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017';
 const dbName = 'thai_music_school';
@@ -165,11 +166,14 @@ async function getCertificate(id: string) {
 
 export default async function CertificateDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ intent?: string }>;
 }) {
   const session = await getSession();
   const { id } = await params;
+  const { intent } = await searchParams;
 
   if (!session || !['root', 'admin', 'super_admin'].includes(session.role)) {
     redirect('/login');
@@ -194,13 +198,27 @@ export default async function CertificateDetailPage({
     );
   }
 
-  // Debug: Log certificate data
-  console.log('=== Certificate Data ===');
-  console.log('schoolName:', (certificate as any).schoolName);
-  console.log('province:', (certificate as any).province);
-  console.log('grade:', (certificate as any).grade);
-  console.log('certificateNumber:', (certificate as any).certificateNumber);
-  console.log('========================');
+  // Log activity based on intent
+  const activityType = intent === 'download' ? 'CERTIFICATE_DOWNLOAD' : 'CERTIFICATE_VIEW';
+  const description = intent === 'download'
+    ? `ดาวน์โหลดใบประกาศ: ${(certificate as any).schoolName} (${(certificate as any).certificateNumber || 'N/A'})`
+    : `เปิดดูใบประกาศ: ${(certificate as any).schoolName} (${(certificate as any).certificateNumber || 'N/A'})`;
+
+  await createActivityLog({
+    userId: session.userId,
+    userName: `${session.firstName} ${session.lastName}`,
+    schoolId: session.schoolId,
+    schoolName: session.schoolName,
+    activityType,
+    description,
+    metadata: {
+      certificateId: id,
+      certificateNumber: (certificate as any).certificateNumber,
+      schoolName: (certificate as any).schoolName,
+      certificateType: (certificate as any).certificateType,
+      intent: intent || 'view',
+    },
+  });
 
   return (
     <div className="space-y-6">
