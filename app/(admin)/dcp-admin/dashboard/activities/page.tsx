@@ -177,21 +177,12 @@ export default function ActivitiesPage() {
           </div>
         </div>
 
-        {/* CERTIFICATE_DOWNLOAD — always shown, clickable */}
-        <div
-          className="bg-white rounded-lg shadow p-4 cursor-pointer hover:shadow-lg hover:border-2 hover:border-purple-300 border-2 border-transparent transition-all"
-          onClick={fetchCertificateDownloads}
-        >
-          <div className="text-sm text-gray-600 flex items-center justify-between">
-            <span>ดาวน์โหลดใบประกาศ</span>
-            <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </div>
-          <div className="text-2xl font-bold text-purple-700 mt-1">
+        {/* CERTIFICATE_DOWNLOAD — always shown */}
+        <div className="bg-white rounded-lg shadow p-4">
+          <div className="text-sm text-gray-600">ดาวน์โหลดใบประกาศ</div>
+          <div className="text-2xl font-bold text-gray-900 mt-1">
             {stats.find((s) => s.activityType === 'CERTIFICATE_DOWNLOAD')?.count ?? 0}
           </div>
-          <div className="text-xs text-purple-500 mt-1 font-medium">คลิกเพื่อดูรายละเอียด</div>
         </div>
       </div>
 
