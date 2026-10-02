@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { activityType, description, metadata } = body;
+    const { activityType, description, metadata, schoolName: bodySchoolName } = body;
 
     if (!activityType || !description) {
       return NextResponse.json(
@@ -108,12 +108,16 @@ export async function POST(request: NextRequest) {
                      'unknown';
     const userAgent = request.headers.get('user-agent') || 'unknown';
 
+    // ใช้ schoolName จาก body ก่อน ถ้าไม่มีค่อยใช้จาก session
+    // (session ไม่มี schoolName แต่ client รู้ข้อมูลนี้จาก certificate)
+    const schoolName = bodySchoolName || session.schoolName || metadata?.schoolName;
+
     // บันทึก log
     await createActivityLog({
       userId: session.userId,
       userName: `${session.firstName} ${session.lastName}`,
       schoolId: session.schoolId,
-      schoolName: session.schoolName,
+      schoolName,
       activityType,
       description,
       metadata,

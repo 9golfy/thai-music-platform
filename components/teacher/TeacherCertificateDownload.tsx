@@ -25,7 +25,8 @@ export default function TeacherCertificateDownload({ certificate }: TeacherCerti
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           activityType: 'CERTIFICATE_DOWNLOAD',
-          description: `ดาวน์โหลดใบประกาศ (พิมพ์/บันทึก PDF): ${certificate.certificateNumber || 'N/A'}`,
+          description: `ดาวน์โหลดใบประกาศ (พิมพ์/บันทึก PDF): ${certificate.schoolName} (${certificate.certificateNumber || 'N/A'})`,
+          schoolName: certificate.schoolName,
           metadata: {
             certificateNumber: certificate.certificateNumber,
             schoolName: certificate.schoolName,
